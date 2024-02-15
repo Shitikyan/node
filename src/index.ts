@@ -43,6 +43,7 @@ import * as bitcoin from "bitcoinjs-lib"
 
 // REVIEW Delete when tested properly 
 // import testMultiversx from "sdk/localsdk/multichain/multiversx/test"
+// import { testTron } from "sdk/localsdk/multichain/tron"
 
 let enough_peers = true
 // INFO Loading the known peers
@@ -224,3 +225,4 @@ main()
 
 // REVIEW Delete when tested properly 
 // testMultiversx()
+// testTron()

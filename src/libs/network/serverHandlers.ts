@@ -19,6 +19,7 @@ import {
     confirmTransaction,
 } from "src/libs/blockchain/routines/validateTransaction"
 import Transaction from "src/libs/blockchain/transaction"
+
 import deriveBlock from "src/libs/consensus/routines/deriveBlock"
 import Cryptography from "src/libs/crypto/cryptography"
 import Hashing from "src/libs/crypto/hashing"
@@ -61,7 +62,7 @@ import { StatusNative } from "src/model/entities/StatusNative"
 import Block from "../blockchain/block"
 import { BlockContent } from "../../../../sdks/src/types/blockchain/blocks"
 import handleWeb2Request from "./routines/transactions/handleWeb2Request"
-
+import { demosWork } from "@kynesyslabs/demosdk/types"
 let term = terminalkit.terminal
 
 export default class ServerHandlers {
@@ -109,9 +110,7 @@ export default class ServerHandlers {
         return proposedBlockHash
     }
 
-    // !SECTION Login On Chain
-
-    // ANCHOR Comlinks
+    // TODO Insert demosWork logic here too
     static async handleValidateTransaction(
         tx: Transaction,
     ): Promise<ValidityData> {
@@ -258,7 +257,7 @@ export default class ServerHandlers {
             | Web2Payload
             | NativePayload
             | StringifiedPayload
-        switch (tx.content.type) {
+        switch (tx.content.type) { // ! Change the logic using demosWork
             case "crosschainOperation":
             case "multichainOperation":
                 payload = tx.content.data as XMPayload

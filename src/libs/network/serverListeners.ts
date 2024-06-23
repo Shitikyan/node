@@ -133,6 +133,7 @@ export default class ServerListeners {
 
         // NOTE Intercepts the comlink and checks if it is a L2PS request
         if (content.type === "l2ps") {
+            // !  Remember to add gas cost calculation to l2ps too
             ;({ response, require_reply, extra } = await ServerHandlers.handleL2PS(content))
             if (!response) {
                 term.red.bold(
@@ -151,21 +152,6 @@ export default class ServerListeners {
             return
         }
 
-        /* NOTE If we are here, we have a transaction or we error out
-        if (content.type !== "transaction") {
-            term.red.bold(
-                "[SERVER] Received a non recognized comlink, aborting",
-            )
-            console.log(content.type)
-            await demostdlib.reply(
-                _comlink_request,
-                false,
-                false,
-                "invalid comlink type",
-            )
-            receiver.emit("comlink_reply", _comlink_request) // reply is managed in the common listeners
-            return
-        } */
 
         // TODO Better to modularize this
         // REVIEW We use the 'extra' field to see if it is a confirmTx request (prior to execution)
@@ -206,6 +192,8 @@ export default class ServerListeners {
             // They are treated as messages and are handled by their types themselves
             // For readability, we call an external function to manage the messages
             default:
+                term.yellow.bold("[SERVER] Not a transaction: treating as message\n")
+                term.yellow("[SERVER] content.type: " + content.type + "\n")
                 ;({ extra, require_reply, response } = await manageMessages(
                     content,
                     _comlink_request,

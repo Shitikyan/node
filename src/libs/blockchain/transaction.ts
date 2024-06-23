@@ -40,7 +40,7 @@ interface TransactionResponse {
 }
 
 export default class Transaction implements ITransaction {
-    content: TransactionContent
+    content: TransactionContent // TODO Implement demosWork through _TransactionContent
     signature: ISignature
     hash: string
     status: string

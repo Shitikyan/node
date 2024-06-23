@@ -1,0 +1,80 @@
+<mxfile host="Electron" modified="2024-06-21T19:25:11.365Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.5.3 Chrome/124.0.6367.207 Electron/30.0.6 Safari/537.36" etag="uC0BdQ0FQSNSLk7qXgWE" version="24.5.3" type="device">
+  <diagram name="Pagina-1" id="jqzI3rUO0G-A7w2R0EOK">
+    <mxGraphModel dx="1129" dy="666" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="7qHSllp7C8XnSddMIWm0-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="7qHSllp7C8XnSddMIWm0-1" target="7qHSllp7C8XnSddMIWm0-6">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="414" y="320" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="7qHSllp7C8XnSddMIWm0-33" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;curved=0;dashed=1;dashPattern=8 8;" edge="1" parent="1" source="7qHSllp7C8XnSddMIWm0-1" target="7qHSllp7C8XnSddMIWm0-32">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="7qHSllp7C8XnSddMIWm0-1" value="DEMOS Work" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;darkOpacity2=0.1;" vertex="1" parent="1">
+          <mxGeometry x="354" y="120" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="7qHSllp7C8XnSddMIWm0-6" value="Signature &amp;amp; Hash" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="480" y="290" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="7qHSllp7C8XnSddMIWm0-8" value="DEMOS Work" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;darkOpacity2=0.1;" vertex="1" parent="1">
+          <mxGeometry x="234" y="330" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="7qHSllp7C8XnSddMIWm0-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0;entryDx=120;entryDy=50;entryPerimeter=0;" edge="1" parent="1" source="7qHSllp7C8XnSddMIWm0-1" target="7qHSllp7C8XnSddMIWm0-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="7qHSllp7C8XnSddMIWm0-10" value="" style="html=1;whiteSpace=wrap;shape=isoCube2;backgroundOutline=1;isoAngle=15;" vertex="1" parent="1">
+          <mxGeometry x="170" y="510" width="90" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="7qHSllp7C8XnSddMIWm0-11" value="" style="html=1;whiteSpace=wrap;shape=isoCube2;backgroundOutline=1;isoAngle=15;" vertex="1" parent="1">
+          <mxGeometry x="300" y="510" width="90" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="7qHSllp7C8XnSddMIWm0-12" value="" style="html=1;whiteSpace=wrap;shape=isoCube2;backgroundOutline=1;isoAngle=15;" vertex="1" parent="1">
+          <mxGeometry x="40" y="510" width="90" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="7qHSllp7C8XnSddMIWm0-13" value="" style="html=1;whiteSpace=wrap;shape=isoCube2;backgroundOutline=1;isoAngle=15;" vertex="1" parent="1">
+          <mxGeometry x="430" y="510" width="90" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="7qHSllp7C8XnSddMIWm0-15" value="DEMOS Work" style="swimlane;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="20" y="460" width="520" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="7qHSllp7C8XnSddMIWm0-20" value="C" style="fillColor=none;strokeColor=none;html=1;fontSize=11;fontStyle=0;align=left;fontColor=#596780;fontStyle=1;fontSize=11" vertex="1" parent="7qHSllp7C8XnSddMIWm0-15">
+          <mxGeometry x="115" y="142" width="240" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="7qHSllp7C8XnSddMIWm0-21" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;List of DEMOS Work Steps&lt;/font&gt;" style="rounded=1;arcSize=9;align=center;spacingLeft=5;strokeColor=#4C9AFF;html=1;strokeWidth=2;fontSize=12" vertex="1" parent="7qHSllp7C8XnSddMIWm0-15">
+          <mxGeometry x="115" y="167" width="290" height="33" as="geometry" />
+        </mxCell>
+        <mxCell id="7qHSllp7C8XnSddMIWm0-22" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.527;entryY=-0.015;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="7qHSllp7C8XnSddMIWm0-8" target="7qHSllp7C8XnSddMIWm0-15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="7qHSllp7C8XnSddMIWm0-29" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="7qHSllp7C8XnSddMIWm0-23" target="7qHSllp7C8XnSddMIWm0-27">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="7qHSllp7C8XnSddMIWm0-30" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="7qHSllp7C8XnSddMIWm0-23" target="7qHSllp7C8XnSddMIWm0-25">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="7qHSllp7C8XnSddMIWm0-31" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="7qHSllp7C8XnSddMIWm0-23" target="7qHSllp7C8XnSddMIWm0-26">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="7qHSllp7C8XnSddMIWm0-23" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;Each DEMOS Work Step can be&lt;/font&gt;" style="verticalLabelPosition=bottom;verticalAlign=top;html=1;shadow=0;dashed=0;strokeWidth=1;shape=mxgraph.android.textSelHandles;fillColor=#33b5e5;strokeColor=#0099cc;" vertex="1" parent="1">
+          <mxGeometry x="10" y="660" width="540" height="42.2" as="geometry" />
+        </mxCell>
+        <mxCell id="7qHSllp7C8XnSddMIWm0-25" value="Web2 Step" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="25" y="800" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="7qHSllp7C8XnSddMIWm0-26" value="Native Step" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="415" y="800" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="7qHSllp7C8XnSddMIWm0-27" value="XM Step" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="220" y="800" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="7qHSllp7C8XnSddMIWm0-32" value="DEMOS Work Response" style="html=1;dashed=0;whiteSpace=wrap;shape=mxgraph.dfd.start" vertex="1" parent="1">
+          <mxGeometry x="600" y="50" width="160" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -48,7 +48,9 @@ export async function confirmTransaction(
             reference_block: reference_block,
             message: "[Native Tx Validation] [NOT PROCESSED] Transaction yet to be processed\n",
             gas_operation: null,
-            transaction: tx,
+            // ! We need to have the transaction object here supporting the demosWork logic, 
+            // ! so NativePayload should be used instead of Transaction to be executed
+            transaction: tx, // ! Rewrite this with demosWork logic
         },
         signature: null,
         rpc_public_key: sharedState.getInstance().identity.ed25519.publicKey as pki.ed25519.BinaryBuffer,
@@ -215,7 +217,7 @@ export async function broadcastVerifiedNativeTransaction(
     // has confirmed the transaction in the block.
 
     let execution = await executeNativeTransaction(
-        validityData.data.transaction,
+        validityData.data.transaction as unknown as Transaction, // ! rewrite this with demosWork logic
     )
     if (!execution[0]) {
         return [false, "Execution failed: " + execution[1]]

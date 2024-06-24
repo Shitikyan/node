@@ -44,6 +44,7 @@ import terminalkit from "terminal-kit"
 
 import {
     AddressInfo,
+    demosStep,
     ExecutionResult,
     IWeb2Payload,
     IWeb2Request,
@@ -250,53 +251,14 @@ export default class ServerHandlers {
                 */
         term.green.bold(fname + "Valid validityData! \n")
         // REVIEW Switch case for different types of transactions
-        let tx = _.cloneDeep(validatedData.data.transaction) // dataManipulation.copyCreate(validatedData.data.transaction)
-        // Using a payload variable to be able to check types immediately
-        let payload:
-            | XMPayload
-            | Web2Payload
-            | NativePayload
-            | StringifiedPayload
-        switch (tx.content.type) { // ! Change the logic using demosWork
-            case "crosschainOperation":
-            case "multichainOperation":
-                payload = tx.content.data as XMPayload
-                console.log("[Included XM Chainscript]")
-                console.log(payload[1])
-                // TODO Better types on answers
-                var xm_result = await ServerHandlers.handleXMChainOperation(
-                    payload[1] as XMScript,
-                )
-                // TODO Add result.success handling
-                result.response = xm_result
-                break
-            case "web2Request":
-                // TODO Better types on answers
-                payload = tx.content.data as Web2Payload
-                var web2_result = await ServerHandlers.handleWeb2Request(
-                    payload[1] as IWeb2Request,
-                    senderSocket,
-                )
-
-                // TODO Add result.success handling
-                result.response = web2_result
-                break
-            case "native":
-                // REVIEW This still works with the new tx system?
-                var native_result = await broadcastVerifiedNativeTransaction(
-                    validatedData,
-                )
-                // NOTE We add the Transaction to the mempool as it looks valid
-                if (native_result[0]) {
-                    result.success = true
-                }
-                // REVIEW Check if this is ok with types
-                result.response = native_result
-        }
+        let tx = _.cloneDeep(validatedData.data.transaction) as unknown as Transaction // ! Change the logic using demosWork
+        // Preparing processing the steps of demosWork
+        result = await ServerHandlers.handleDemosWork(tx, result, senderSocket)
         // Only if the transaction is valid we add it to the mempool
+        
         if (result.success) {
             // REVIEW We add the transaction to the mempool
-            Mempool.addTransaction(queriedTx)
+            Mempool.addTransaction(queriedTx as unknown as Transaction) // ! Change the logic using demosWork
             // TODO Check if Operation(s) are added to the GLS too
             // FIXME Add an operation for the nonce or anyway a way to manage the nonce
         }
@@ -304,6 +266,63 @@ export default class ServerHandlers {
         // Response is then sent back automatically as a reply (with our validation)
         // Returning the state of the transaction including operations
         return result
+    }
+
+    // Handling a whole demosWork as a transaction data
+    static async handleDemosWork(tx: Transaction, result: ExecutionResult, senderSocket: any): Promise<any> {
+        let stepsNumber = tx.content.data.steps.length
+        for (let i = 0; i < stepsNumber; i++) {
+            console.log("[handleDemosWork] Step " + i)
+            let step = tx.content.data.steps[i]
+            // ! Executing the step
+            let step_result = await ServerHandlers.handleDemosStep(step, senderSocket)
+            // TODO Also check each step success or error
+        }
+    }
+
+    // Handling a single demosWork step as a payload
+    static async handleDemosStep(step: demosStep, senderSocket?: any): Promise<any> {
+        let content = step.content
+        let payload = null
+        let step_result = null
+        switch (content.type.context) {
+        // REVIEW We need to check the type of the transaction
+            case "xm":
+                payload = content.type.payload as XMPayload
+                console.log("[Included XM Chainscript]")
+                console.log(payload[1])
+                // TODO Better types on answers
+                var xm_result = await ServerHandlers.handleXMChainOperation(
+                    payload[1] as XMScript,
+                )
+                // TODO Add result.success handling
+                step_result.response = xm_result
+                break
+            case "web2":
+                // TODO Better types on answers
+                payload = content.type.payload as Web2Payload
+                var web2_result = await ServerHandlers.handleWeb2Request(
+                    payload[1] as IWeb2Request,
+                    senderSocket,
+                )
+
+                // TODO Add result.success handling
+                step_result.response = web2_result
+                break
+            case "native":
+                payload = content.type.payload as NativePayload
+                // REVIEW This still works with the new tx system?
+                var native_result = await broadcastVerifiedNativeTransaction(
+                    content.type.payload as NativePayload, // ! Change the logic using demosWork
+                )
+                // NOTE We add the Transaction to the mempool as it looks valid
+                if (native_result[0]) {
+                    step_result.success = true
+                }
+                // REVIEW Check if this is ok with types
+                step_result.response = native_result
+        }
+        return step_result
     }
 
     // INFO Handling XM Transaction

@@ -20,7 +20,7 @@ import Hashing from "../crypto/hashing"
 import PeerManager from "../peer/PeerManager"
 import Block from "./block"
 // INFO Singleton Mempool class
-import Transaction from "./transaction"
+import Transaction from "src/libs/blockchain/transaction"
 import { ISignature } from "@kynesyslabs/demosdk/types"
 
 export interface MempoolData {

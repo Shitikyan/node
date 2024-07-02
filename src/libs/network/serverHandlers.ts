@@ -37,7 +37,7 @@ import { BrowserRequest } from "src/libs/network/serverListeners"
 import { Peer } from "src/libs/peer"
 import { Blocks } from "src/model/entities/Blocks"
 import sharedState from "src/utilities/sharedState"
-import _, { chain } from "lodash"
+import _ from "lodash"
 // NOTE Terminal kit for useful logging
 import terminalkit from "terminal-kit"
 
@@ -563,14 +563,20 @@ export default class ServerHandlers {
             // INFO Address info endpoint
             case "getAddressInfo":
                 if (!data.address) {
-                    receiver.emit("public", {
-                        error: "No address specified",
-                    })
+                    console.log("[SERVER] No address specified")
+                    response = "error"
+                    extra = "No address specified"
                 }
-                nStat = (await GLS.getGLSNativeStatus(
-                    data.address,
-                )) as StatusNative
-                response = nStat.toString() // REVIEW It works ?
+                try {
+                    nStat = (await GLS.getGLSNativeStatus(
+                        data.address,
+                    )) as StatusNative
+                    response = nStat.toString() // REVIEW It works ?
+                } catch (e) {
+                    console.log(e)
+                    response = "error"
+                    extra = e
+                }
                 break
             case "getAddressNonce":
                 if (!data.address) {

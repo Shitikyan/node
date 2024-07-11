@@ -1,7 +1,7 @@
 import Datasource from "src/model/datasource"
 import { Transactions } from "src/model/entities/Transactions"
 
-import { Operation, OperationResult } from "@kynesyslabs/demosdk/types"
+import { Operation, OperationResult } from "@kynesyslabs/demosdk-beta/types"
 
 import Block from "../block"
 import Chain from "../chain"

@@ -6,7 +6,7 @@ import { proofConsensusHandler } from "src/libs/consensus/routines/proofOfConsen
 // NOTE Terminal kit for useful logging
 import terminalkit from "terminal-kit"
 
-import { BundleContent } from "@kynesyslabs/demosdk/types"
+import { BundleContent } from "@kynesyslabs/demosdk-beta/types"
 
 import ServerHandlers from "../serverHandlers"
 

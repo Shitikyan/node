@@ -16,7 +16,7 @@ KyneSys Labs: https://www.kynesys.xyz/
 
 import GLS from "../gls/gls"
 import Transaction from "../transaction"
-import { Operation } from "@kynesyslabs/demosdk/types"
+import { Operation } from "@kynesyslabs/demosdk-beta/types"
 /* NOTE 
 
 Rationale: transactions arrives with a nonce and a timestamp.

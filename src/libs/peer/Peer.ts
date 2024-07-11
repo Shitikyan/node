@@ -9,7 +9,7 @@ KyneSys Labs: https://www.kynesys.xyz/
 
 */
 
-import type { IPeerConfig } from "@kynesyslabs/demosdk/types"
+import type { IPeerConfig } from "@kynesyslabs/demosdk-beta/types"
 import forge from "node-forge"
 import { Socket } from "socket.io-client"
 

@@ -1,4 +1,4 @@
-import { BlockContent, EncryptedTransaction } from "@kynesyslabs/demosdk/types"
+import { BlockContent, EncryptedTransaction } from "@kynesyslabs/demosdk-beta/types"
 import Chain from "src/libs/blockchain/chain"
 import Hashing from "src/libs/crypto/hashing"
 

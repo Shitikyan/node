@@ -17,7 +17,7 @@ import {
     BundleContent,
     ISecurityReport,
     ValidityData,
-} from "@kynesyslabs/demosdk/types"
+} from "@kynesyslabs/demosdk-beta/types"
 
 let term = terminalkit.terminal
 

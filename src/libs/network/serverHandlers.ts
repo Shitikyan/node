@@ -10,7 +10,7 @@ KyneSys Labs: https://www.kynesys.xyz/
 
 */
 
-import multichainCapabilities from "sdk/localsdk/multichain/types/multichainCapabilities"
+import { multichainCapabilities } from "sdk/localsdk/multichain"
 import multichainDispatcher from "src/features/multichain/XMDispatcher"
 import Chain from "src/libs/blockchain/chain"
 import Mempool from "src/libs/blockchain/mempool"
@@ -39,6 +39,8 @@ import { Peer } from "src/libs/peer"
 import { Blocks } from "src/model/entities/Blocks"
 import sharedState from "src/utilities/sharedState"
 import _, { chain } from "lodash"
+
+
 // NOTE Terminal kit for useful logging
 import terminalkit from "terminal-kit"
 
@@ -48,22 +50,20 @@ import {
     ExecutionResult,
     IWeb2Payload,
     IWeb2Request,
-    ValidityData,
-    XMScript,
-} from "@kynesyslabs/demosdk/types"
-
-import GLS from "../blockchain/gls/gls"
-import {
     NativePayload,
     StringifiedPayload,
     Web2Payload,
     XMPayload,
-} from "node_modules/@kynesyslabs/demosdk/build/types/blockchain/Transaction"
+    ValidityData,
+    XMScript,
+} from "@kynesyslabs/demosdk-beta/types"
+
+import GLS from "../blockchain/gls/gls"
 import { StatusNative } from "src/model/entities/StatusNative"
 import Block from "../blockchain/block"
 import { BlockContent } from "../../../../sdks/src/types/blockchain/blocks"
 import handleWeb2Request from "./routines/transactions/handleWeb2Request"
-import { demosWork } from "@kynesyslabs/demosdk/types"
+import { demosWork } from "@kynesyslabs/demosdk-beta/types"
 let term = terminalkit.terminal
 
 export default class ServerHandlers {
@@ -298,7 +298,7 @@ export default class ServerHandlers {
                 // TODO Add result.success handling
                 step_result.response = xm_result
                 break
-            case "web2":
+            case "web2":    
                 // TODO Better types on answers
                 payload = content.type.payload as Web2Payload
                 var web2_result = await ServerHandlers.handleWeb2Request(

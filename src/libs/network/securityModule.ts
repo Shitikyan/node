@@ -1,5 +1,5 @@
 // TODO Implement this
-import { ISecurityReport } from "@kynesyslabs/demosdk/types"
+import { ISecurityReport } from "@kynesyslabs/demosdk-beta/types"
 
 export const modules = {
     // SECTION Modules

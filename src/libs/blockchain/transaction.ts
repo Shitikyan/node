@@ -27,7 +27,7 @@ import {
     TransactionContent,
     _TransactionContent,
     demosWork,
-} from "@kynesyslabs/demosdk/types"
+} from "@kynesyslabs/demosdk-beta/types"
 
 import Cryptography from "../crypto/cryptography"
 import Hashing from "../crypto/hashing"

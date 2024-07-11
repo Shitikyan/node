@@ -1,5 +1,5 @@
-import type { IOperation } from "@kynesyslabs/demosdk/types"
-import * as multichain from "@kynesyslabs/demosdk/xm-localsdk"
+import type { IOperation } from "@kynesyslabs/demosdk-beta/types"
+import * as multichain from "@kynesyslabs/demosdk-beta/xm-localsdk"
 import { evmProviders } from "sdk/localsdk/multichain/configs/evmProviders"
 
 export default async function handleContractRead(

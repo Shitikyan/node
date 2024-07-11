@@ -1,4 +1,4 @@
-import { IWeb2Request } from "@kynesyslabs/demosdk/types"
+import { IWeb2Request } from "@kynesyslabs/demosdk-beta/types"
 import handleWeb2 from "src/features/web2/Web2Dispatcher"
 
 // ? Can we avoid calling another function pls?

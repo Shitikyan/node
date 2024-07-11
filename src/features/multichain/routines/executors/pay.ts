@@ -1,5 +1,5 @@
-import { IOperation } from "@kynesyslabs/demosdk/types"
-import * as multichain from "@kynesyslabs/demosdk/xm-localsdk"
+import { IOperation } from "@kynesyslabs/demosdk-beta/types"
+import * as multichain from "@kynesyslabs/demosdk-beta/xm-localsdk"
 
 import { chainProviders } from "sdk/localsdk/multichain/configs/chainProviders"
 import { evmProviders } from "sdk/localsdk/multichain/configs/evmProviders"

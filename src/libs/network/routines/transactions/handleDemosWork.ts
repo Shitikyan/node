@@ -56,7 +56,7 @@ export default async function handleDemosWork(
  * @returns {Promise<any>} - A promise that resolves to the result of the step execution.
  */
 // TODO Typize the return
-async function handleDemosStep(
+export async function handleDemosStep(
     step: demosStep,
     senderSocket?: any,
 ): Promise<any> {

@@ -1,36 +1,13 @@
-/* eslint-disable no-unused-vars */
-/* LICENSE
-
-© 2023 by KyneSys Labs, licensed under CC BY-NC-ND 4.0
-
-Full license text: https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode
-Human readable license: https://creativecommons.org/licenses/by-nc-nd/4.0/
-
-KyneSys Labs: https://www.kynesys.xyz/
-
-*/
-
-import { multichainCapabilities } from "sdk/localsdk/multichain"
-import multichainDispatcher from "src/features/multichain/XMDispatcher"
 import Chain from "src/libs/blockchain/chain"
 import Mempool from "src/libs/blockchain/mempool"
-import {
-    broadcastVerifiedNativeTransaction,
-    confirmTransaction,
-} from "src/libs/blockchain/routines/validateTransaction"
+import { confirmTransaction } from "src/libs/blockchain/routines/validateTransaction"
 import Transaction from "src/libs/blockchain/transaction"
 
 import deriveBlock from "src/libs/consensus/routines/deriveBlock"
 import Cryptography from "src/libs/crypto/cryptography"
 import Hashing from "src/libs/crypto/hashing"
 import eggs from "src/libs/network/routines/eggs"
-import getBlockByHash from "src/libs/network/routines/nodecalls/getBlockByHash"
-import getBlockByNumber from "src/libs/network/routines/nodecalls/getBlockByNumber"
-import getBlockHeaderByHash from "src/libs/network/routines/nodecalls/getBlockHeaderByHash"
-import getBlockHeaderByNumber from "src/libs/network/routines/nodecalls/getBlockHeaderByNumber"
-import getPeerlist from "src/libs/network/routines/nodecalls/getPeerlist"
-import getPreviousHashFromBlockHash from "src/libs/network/routines/nodecalls/getPreviousHashFromBlockHash"
-import getPreviousHashFromBlockNumber from "src/libs/network/routines/nodecalls/getPreviousHashFromBlockNumber"
+import { handleNodeAPI } from "./routines/nodecalls/handleNodeAPI"
 import handleL2PS from "./routines/transactions/dispatcher/handleL2PS"
 import { normalizeWebBuffers } from "src/libs/network/routines/normalizeWebBuffers"
 import Sessions from "src/libs/network/routines/sessionManager"
@@ -38,33 +15,17 @@ import { BrowserRequest } from "src/libs/network/serverListeners"
 import { Peer } from "src/libs/peer"
 import { Blocks } from "src/model/entities/Blocks"
 import sharedState from "src/utilities/sharedState"
-import _, { chain } from "lodash"
+import _ from "lodash"
 
 import handleDemosWork from "./routines/transactions/handleDemosWork"
 
 // NOTE Terminal kit for useful logging
 import terminalkit from "terminal-kit"
 
-import {
-    AddressInfo,
-    demosStep,
-    ExecutionResult,
-    IWeb2Payload,
-    IWeb2Request,
-    NativePayload,
-    StringifiedPayload,
-    Web2Payload,
-    XMPayload,
-    ValidityData,
-    XMScript,
-} from "@kynesyslabs/demosdk-beta/types"
+import { AddressInfo, ExecutionResult, ValidityData, demosWork } from "@kynesyslabs/demosdk-beta/types"
 
 import GLS from "../blockchain/gls/gls"
 import { StatusNative } from "src/model/entities/StatusNative"
-import Block from "../blockchain/block"
-import { BlockContent } from "../../../../sdks/src/types/blockchain/blocks"
-import handleWeb2Request from "./routines/transactions/dispatcher/handleWeb2Request"
-import { demosWork } from "@kynesyslabs/demosdk-beta/types"
 let term = terminalkit.terminal
 
 export default class ServerHandlers {
@@ -383,146 +344,14 @@ export default class ServerHandlers {
         return { extra, require_reply, response }
     }
 
-    // TODO Make this modular ffs
-    // FIXME Pls modularize me! Don't leave me alone!
-    // REVIEW The method is scared: please modularize it!
-    // NOTE As you can see, this method is a mess. Please modularize it.
-    // ! I need attention
-    // ? Y u leave me behind
     static async handleNodeAPI(
         content: any,
         receiver: any,
         id_ed25519: any,
     ): Promise<any> {
-        // Basic Node API handling logic
-        // ...
         let extra: any
         let require_reply = false
-        let response:
-            | string
-            | Peer[]
-            | number
-            | Blocks
-            | Transaction
-            | Transaction[]
-            | AddressInfo
-        let result: any // Storage for the result
-        let nStat: any // Storage for the native status
-        let { data } = content
-        //console.log(typeof data)
-        console.log(JSON.stringify(content))
-        switch (content.message) {
-            // NOTE The following commented block of code is vestigial
-            /*case "crosschain_operation":
-            case "multichain_operation":
-                term.yellow.bold("[SERVER] Received crosschain_operation\n")
-                response = await ServerHandlers.handleXMChainOperation(content)
-                break // REVIEW Here or in comlinks? */
-            case "getPeerlist":
-                response = await getPeerlist()
-                break
-            // REVIEW Both below for getting the last hash (untested yet)
-            case "getPreviousHashFromBlockNumber":
-                result = await getPreviousHashFromBlockNumber(data)
-                response = result.response
-                extra = result.extra
-                break
-            case "getPreviousHashFromBlockHash":
-                result = await getPreviousHashFromBlockHash(data)
-                response = result.response
-                extra = result.extra
-                break
-            // REVIEW (untested) Headers instead of full blocks
-            case "getBlockHeaderByNumber":
-                result = await getBlockHeaderByNumber(data)
-                response = result.response
-                extra = result.extra
-                break
-            case "getBlockHeaderByHash":
-                result = await getBlockHeaderByHash(data)
-                response = result.response
-                extra = result.extra
-                break
-            case "getLastBlockNumber":
-                console.log("[SERVER] Received getLastBlockNumber")
-                response = await Chain.getLastBlockNumber()
-                console.log("[CHAIN.ts] Received reply from the database") // REVIEW Debug
-                //console.log(response)
-                break
-            case "getLastBlockHash":
-                response = await Chain.getLastBlockHash()
-                break
-            case "getBlockByNumber":
-                console.log(`get block by number ${data.blockNumber}`)
-                result = await getBlockByNumber(data)
-                response = result.response
-                extra = result.extra
-                break
-            case "getBlockByHash":
-                console.log(`get block by hash ${data.hash}`)
-                result = getBlockByHash(data)
-                response = result.response
-                extra = result.extra
-                break
-            case "getTxByHash":
-                if (!data.hash) {
-                    receiver.emit("public", {
-                        error: "No tx specified",
-                    })
-                }
-                console.log(`getting tx with hash ${data.hash}`)
-                response = await Chain.getTxByHash(data.hash)
-                break
-            case "getMempool":
-                response = await Chain.getPendingPool()
-                break
-            // INFO Authentication listener
-            case "getPeerIdentity":
-                // NOTE We don't need to sign anything as the comlink is signed already
-                response = "I am " + id_ed25519.publicKey.toString("hex")
-                //console.log(response)
-                break
-
-            // INFO Address info endpoint
-            case "getAddressInfo":
-                if (!data.address) {
-                    receiver.emit("public", {
-                        error: "No address specified",
-                    })
-                }
-                nStat = (await GLS.getGLSNativeStatus(
-                    data.address,
-                )) as StatusNative
-                response = nStat.toString() // REVIEW It works ?
-                break
-            case "getAddressNonce":
-                if (!data.address) {
-                    receiver.emit("public", {
-                        error: "No address specified",
-                    })
-                }
-                nStat = (await GLS.getGLSNativeStatus(
-                    data.address,
-                )) as StatusNative
-                response = nStat.nonce
-                break
-            case "getPeerTime":
-                response = new Date().getTime()
-                break
-
-            // NOTE Don't look past here, go away
-            // INFO For real, nothing here to be seen
-            case "hots":
-                console.log("[SERVER] Received hots")
-                response = eggs.hots()
-                break
-            default:
-                console.log("[SERVER] Received unknown message")
-                // eslint-disable-next-line quotes
-                response = '{ error: "Unknown message"}'
-                break
-        }
-
+        let response = await handleNodeAPI(content, receiver, id_ed25519)
         // REVIEW Unified error handling
         if (response === "error") {
             receiver.emit("error", {
@@ -533,4 +362,5 @@ export default class ServerHandlers {
         // REVIEW Is this ok? Follow back and see
         return { extra, require_reply, response }
     }
+        
 }

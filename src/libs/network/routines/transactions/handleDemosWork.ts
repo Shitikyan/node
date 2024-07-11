@@ -13,6 +13,7 @@ import {
 import handleWeb2Request from "./dispatcher/handleWeb2Request"
 import { handleXMScript } from "./dispatcher/handleXMScript"
 import { handleNativeTx } from "./dispatcher/handleNativeTx"
+import handleL2PS from "./dispatcher/handleL2PS"
 import { cloneDeep } from "lodash"
 
 const emptyResult: ExecutionResult = {
@@ -42,8 +43,8 @@ export default async function handleDemosWork(
         // ! Executing the step
         let step_result = await handleDemosStep(step, senderSocket)
         // TODO Also check each step success or error
+        result.operations.push(step_result)
     }
-    // ! Compile the result and return it
     return result
 }
 
@@ -54,6 +55,7 @@ export default async function handleDemosWork(
  * @param {any} [senderSocket] - The socket through which the sender is connected (optional).
  * @returns {Promise<any>} - A promise that resolves to the result of the step execution.
  */
+// TODO Typize the return
 async function handleDemosStep(
     step: demosStep,
     senderSocket?: any,

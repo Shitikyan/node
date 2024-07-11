@@ -31,7 +31,7 @@ import getBlockHeaderByNumber from "src/libs/network/routines/nodecalls/getBlock
 import getPeerlist from "src/libs/network/routines/nodecalls/getPeerlist"
 import getPreviousHashFromBlockHash from "src/libs/network/routines/nodecalls/getPreviousHashFromBlockHash"
 import getPreviousHashFromBlockNumber from "src/libs/network/routines/nodecalls/getPreviousHashFromBlockNumber"
-import handleL2PS from "./routines/transactions/handleL2PS"
+import handleL2PS from "./routines/transactions/dispatcher/handleL2PS"
 import { normalizeWebBuffers } from "src/libs/network/routines/normalizeWebBuffers"
 import Sessions from "src/libs/network/routines/sessionManager"
 import { BrowserRequest } from "src/libs/network/serverListeners"
@@ -40,6 +40,7 @@ import { Blocks } from "src/model/entities/Blocks"
 import sharedState from "src/utilities/sharedState"
 import _, { chain } from "lodash"
 
+import handleDemosWork from "./routines/transactions/handleDemosWork"
 
 // NOTE Terminal kit for useful logging
 import terminalkit from "terminal-kit"
@@ -62,7 +63,7 @@ import GLS from "../blockchain/gls/gls"
 import { StatusNative } from "src/model/entities/StatusNative"
 import Block from "../blockchain/block"
 import { BlockContent } from "../../../../sdks/src/types/blockchain/blocks"
-import handleWeb2Request from "./routines/transactions/handleWeb2Request"
+import handleWeb2Request from "./routines/transactions/dispatcher/handleWeb2Request"
 import { demosWork } from "@kynesyslabs/demosdk-beta/types"
 let term = terminalkit.terminal
 
@@ -253,7 +254,7 @@ export default class ServerHandlers {
         // REVIEW Switch case for different types of transactions
         let tx = _.cloneDeep(validatedData.data.transaction) as unknown as Transaction // ! Change the logic using demosWork
         // Preparing processing the steps of demosWork
-        result = await ServerHandlers.handleDemosWork(tx, result, senderSocket)
+        result = await handleDemosWork(tx.content.data, senderSocket)
         // Only if the transaction is valid we add it to the mempool
         
         if (result.success) {
@@ -268,113 +269,18 @@ export default class ServerHandlers {
         return result
     }
 
-    // Handling a whole demosWork as a transaction data
-    static async handleDemosWork(tx: Transaction, result: ExecutionResult, senderSocket: any): Promise<any> {
-        let stepsNumber = tx.content.data.steps.length
-        for (let i = 0; i < stepsNumber; i++) {
-            console.log("[handleDemosWork] Step " + i)
-            let step = tx.content.data.steps[i]
-            // ! Executing the step
-            let step_result = await ServerHandlers.handleDemosStep(step, senderSocket)
-            // TODO Also check each step success or error
-        }
-    }
-
-    // Handling a single demosWork step as a payload
-    static async handleDemosStep(step: demosStep, senderSocket?: any): Promise<any> {
-        let content = step.content
-        let payload = null
-        let step_result = null
-        switch (content.type.context) {
-        // REVIEW We need to check the type of the transaction
-            case "xm":
-                payload = content.type.payload as XMPayload
-                console.log("[Included XM Chainscript]")
-                console.log(payload[1])
-                // TODO Better types on answers
-                var xm_result = await ServerHandlers.handleXMChainOperation(
-                    payload[1] as XMScript,
-                )
-                // TODO Add result.success handling
-                step_result.response = xm_result
-                break
-            case "web2":    
-                // TODO Better types on answers
-                payload = content.type.payload as Web2Payload
-                var web2_result = await ServerHandlers.handleWeb2Request(
-                    payload[1] as IWeb2Request,
-                    senderSocket,
-                )
-
-                // TODO Add result.success handling
-                step_result.response = web2_result
-                break
-            case "native":
-                payload = content.type.payload as NativePayload
-                // REVIEW This still works with the new tx system?
-                var native_result = await broadcastVerifiedNativeTransaction(
-                    content.type.payload as NativePayload, // ! Change the logic using demosWork
-                )
-                // NOTE We add the Transaction to the mempool as it looks valid
-                if (native_result[0]) {
-                    step_result.success = true
-                }
-                // REVIEW Check if this is ok with types
-                step_result.response = native_result
-        }
-        return step_result
-    }
-
-    // INFO Handling XM Transaction
-    static async handleXMChainOperation(
-        xmscript: XMScript,
-    ): Promise<{ response: any; require_reply: boolean; extra: any }> {
-        /* NOTE This workflow goeas as:
-         * The XM Operation is validated, executed and verified
-         * when applicable.
-         * A transaction is derived from the executed operation.
-         * An operation is then created and pushed in the GLS.
-         * An operation for the gas is also pushed it pn the GLS.
-         * The tx is pushed in the mempool if applicable.
-         */
-        let extra: any
-        let require_reply = false
-        console.log("[XMChain] Handling XM Chain Operation...")
-        // REVIEW Remember that crosschain operations can be in chainscript syntax
-        // INFO Use the src/features/multichain/chainscript/chainscript.chs for the specs
-        //console.log(content.data)
-        let response = await multichainDispatcher.digest(xmscript)
-        // TODO
-        return { extra, require_reply, response }
-    }
-
-    // INFO This method is used to allow signed data exchanges between peers and clients
-    static async handleXMChainSignedPayload(content: any): Promise<any> {
-        // TODO Probably to take out
-    }
-
-    static async handleXMChainStatus(): Promise<any> {
-        let extra: any
-        let require_reply = false
-        // NOTE Remember that crosschain operations are in chainscript syntax (see chainscript_example.ts)
-        const response = await multichainCapabilities()
-        // TODO
-        return { extra, require_reply, response }
-    }
-
-    // Proxy method for handleWeb2Request
-    static async handleWeb2Request(
-        content: IWeb2Request,
-        senderSocket: any,
-    ): Promise<{ response: any; require_reply: boolean; extra: any }> {
-        return handleWeb2Request(content, senderSocket)
+    // Handling a whole demosWork as a transaction data using the dedicated method
+    static async handleDemosWork(demosWork: demosWork, senderSocket: any): Promise<ExecutionResult> {
+        return handleDemosWork(demosWork, senderSocket)
     }
 
     // Proxy method for handleL2PS
+    // ! Add this to demosWork
     static async handleL2PS(content: any): Promise<{ response: any; require_reply: boolean; extra: any }> {
         return handleL2PS(content)
     }
 
+    // TODO Use a dedicated module for this
     static async handleConsensusRequest(
         request: any,
         content: any,
@@ -447,6 +353,7 @@ export default class ServerHandlers {
         }
     }
 
+    // TODO Use a dedicated module for this
     static async handleMessage(content: any): Promise<any> {
         // Basic message handling logic
         // ...
@@ -456,6 +363,7 @@ export default class ServerHandlers {
         return { extra, require_reply, response }
     }
 
+    // TODO Use a dedicated module for this
     static async handleStorage(): Promise<any> {
         // Basic storage handling logic
         // ...
@@ -465,6 +373,7 @@ export default class ServerHandlers {
         return { extra, require_reply, response }
     }
 
+    // TODO Use a dedicated module for this
     static async handleMempool(content: any): Promise<any> {
         // Basic message handling logic
         // ...
@@ -478,6 +387,8 @@ export default class ServerHandlers {
     // FIXME Pls modularize me! Don't leave me alone!
     // REVIEW The method is scared: please modularize it!
     // NOTE As you can see, this method is a mess. Please modularize it.
+    // ! I need attention
+    // ? Y u leave me behind
     static async handleNodeAPI(
         content: any,
         receiver: any,

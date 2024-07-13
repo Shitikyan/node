@@ -105,8 +105,8 @@ export async function handleNodeAPI(
             // INFO Authentication listener
             case "getPeerIdentity":
                 // NOTE We don't need to sign anything as the comlink is signed already
-                response = "I am " + id_ed25519.publicKey.toString("hex")
-                //console.log(response)
+                response = id_ed25519.publicKey.toString("hex") // "I am " + 
+                console.log(response)
                 break
 
             // INFO Address info endpoint
@@ -148,4 +148,6 @@ export async function handleNodeAPI(
                 response = '{ error: "Unknown message"}'
                 break
         }
+        console.log("[handleNodeAPI] response: ", response)
+        return response
 }

@@ -14,7 +14,7 @@ import handleWeb2Request from "./dispatcher/handleWeb2Request"
 import { handleXMScript } from "./dispatcher/handleXMScript"
 import { handleNativeTx } from "./dispatcher/handleNativeTx"
 import handleL2PS from "./dispatcher/handleL2PS"
-import { cloneDeep } from "lodash"
+import _ from "lodash"
 
 import { XmWorkStep, Web2WorkStep, NativeWorkStep } from "@kynesyslabs/demosdk-beta/demoswork"
 
@@ -27,7 +27,7 @@ const emptyResult: ExecutionResult = {
     operations: [],
 }
 
-/**
+/** 
  * Handles the execution of a demosWork object, processing each step sequentially.
  *
  * @param {demoScript} demoScript - The demosWork object containing the steps to be executed.
@@ -38,7 +38,7 @@ export default async function handleDemosWork(
     demoScript: DemoScript,
     senderSocket: any,
 ): Promise<ExecutionResult> {
-    let result = cloneDeep(emptyResult)
+    let result = _.cloneDeep(emptyResult)
     let steps = demoScript.steps
     for (let stepID in steps) {
         console.log("[handleDemosWork] Step " + stepID)
@@ -60,13 +60,12 @@ export default async function handleDemosWork(
  */
 // TODO Typize the return
 export async function handleDemosStep(
-    step: WorkStep,
+    step: WorkStep, 
     senderSocket?: any,
 ): Promise<any> {
     let payload = null
     let content = step.content
-    let step_result = null
-    // ? Is this the right way to do this now that we have the type of the step?
+    let step_result = null  
     switch (step.context) {
         // REVIEW We need to check the type of the transaction
         case "xm":

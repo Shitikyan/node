@@ -25,8 +25,7 @@ import {
     RawTransaction,
     Transaction as ITransaction,
     TransactionContent,
-    _TransactionContent,
-    demosWork,
+    DemoScript,
 } from "@kynesyslabs/demosdk-beta/types"
 
 import Cryptography from "../crypto/cryptography"
@@ -41,17 +40,9 @@ interface TransactionResponse {
     data: {}
 }
 
-// ! Merge this into the sdk
-export interface _Transaction {
-    content: _TransactionContent;
-    signature: ISignature | null;
-    hash: string;
-    status: string;
-    blockNumber: number | null;
-}
 
-export default class Transaction implements _Transaction {
-    content: _TransactionContent // TODO Implement demosWork through _TransactionContent
+export default class Transaction implements Transaction {
+    content: TransactionContent // TODO Implement demosWork through _TransactionContent
     signature: ISignature
     hash: string
     status: string
@@ -59,10 +50,7 @@ export default class Transaction implements _Transaction {
 
     constructor() {
         // Defining an empty work
-        var data: demosWork = {
-            workUID: null,
-            steps: null,
-        }
+        var data: DemoScript
         // Filling an empty transaction
         this.content = {
             type: null,

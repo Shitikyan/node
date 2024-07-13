@@ -22,7 +22,10 @@ import handleDemosWork from "./routines/transactions/handleDemosWork"
 // NOTE Terminal kit for useful logging
 import terminalkit from "terminal-kit"
 
-import { AddressInfo, ExecutionResult, ValidityData, demosWork } from "@kynesyslabs/demosdk-beta/types"
+import { AddressInfo, DemoScript, ExecutionResult, ValidityData } from "@kynesyslabs/demosdk-beta/types"
+import { DemosWork } from "@kynesyslabs/demosdk-beta/demoswork"
+
+import { XmWorkStep, Web2WorkStep, NativeWorkStep } from "@kynesyslabs/demosdk-beta/demoswork"
 
 import GLS from "../blockchain/gls/gls"
 import { StatusNative } from "src/model/entities/StatusNative"
@@ -214,7 +217,7 @@ export default class ServerHandlers {
         term.green.bold(fname + "Valid validityData! \n")
         // REVIEW Switch case for different types of transactions
         let tx = _.cloneDeep(validatedData.data.transaction) as unknown as Transaction // ! Change the logic using demosWork
-        // Preparing processing the steps of demosWork
+        // Preparing processing the steps of demoScript
         result = await handleDemosWork(tx.content.data, senderSocket)
         // Only if the transaction is valid we add it to the mempool
         
@@ -231,8 +234,8 @@ export default class ServerHandlers {
     }
 
     // Handling a whole demosWork as a transaction data using the dedicated method
-    static async handleDemosWork(demosWork: demosWork, senderSocket: any): Promise<ExecutionResult> {
-        return handleDemosWork(demosWork, senderSocket)
+    static async handleDemosWork(demoScript: DemoScript, senderSocket: any): Promise<ExecutionResult> {
+        return handleDemosWork(demoScript, senderSocket)
     }
 
     // Proxy method for handleL2PS

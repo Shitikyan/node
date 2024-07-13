@@ -1,5 +1,6 @@
-import { NativePayload } from "@kynesyslabs/demosdk-beta/types"
 
-export async function handleNativeTx(nativeTx: NativePayload) {
+import { INativePayload } from "node_modules/@kynesyslabs/demosdk-beta/build/types/native"
+
+export async function handleNativeTx(nativeTx: INativePayload) {
     console.log(nativeTx)
 }

@@ -1,20 +1,23 @@
 import {
-    demosWork,
-    demosStep,
+    DemoScript,
+    WorkStepInput,
     ExecutionResult,
 } from "@kynesyslabs/demosdk-beta/types"
 import {
-    XMPayload,
-    XMScript,
-    IWeb2Request,
-    Web2Payload,
-    NativePayload,
-} from "@kynesyslabs/demosdk-beta/types"
+    DemosWorkOperation,
+    WorkStep,
+    DemosWork,
+} from "@kynesyslabs/demosdk-beta/demoswork"
+import { XMScript, IWeb2Request } from "@kynesyslabs/demosdk-beta/types"
+import { INativePayload } from "node_modules/@kynesyslabs/demosdk-beta/build/types/native"
 import handleWeb2Request from "./dispatcher/handleWeb2Request"
 import { handleXMScript } from "./dispatcher/handleXMScript"
 import { handleNativeTx } from "./dispatcher/handleNativeTx"
 import handleL2PS from "./dispatcher/handleL2PS"
 import { cloneDeep } from "lodash"
+
+import { XmWorkStep, Web2WorkStep, NativeWorkStep } from "@kynesyslabs/demosdk-beta/demoswork"
+
 
 const emptyResult: ExecutionResult = {
     success: true,
@@ -27,19 +30,19 @@ const emptyResult: ExecutionResult = {
 /**
  * Handles the execution of a demosWork object, processing each step sequentially.
  *
- * @param {demosWork} demosWork - The demosWork object containing the steps to be executed.
+ * @param {demoScript} demoScript - The demosWork object containing the steps to be executed.
  * @param {any} senderSocket - The socket through which the sender is connected.
  * @returns {Promise<ExecutionResult>} - A promise that resolves to the execution result of the demosWork.
  */
 export default async function handleDemosWork(
-    demosWork: demosWork,
+    demoScript: DemoScript,
     senderSocket: any,
 ): Promise<ExecutionResult> {
     let result = cloneDeep(emptyResult)
-    let stepsNumber = demosWork.steps.length
-    for (let i = 0; i < stepsNumber; i++) {
-        console.log("[handleDemosWork] Step " + i)
-        let step = demosWork.steps[i]
+    let steps = demoScript.steps
+    for (let stepID in steps) {
+        console.log("[handleDemosWork] Step " + stepID)
+        let step = steps[stepID]
         // ! Executing the step
         let step_result = await handleDemosStep(step, senderSocket)
         // TODO Also check each step success or error
@@ -57,40 +60,41 @@ export default async function handleDemosWork(
  */
 // TODO Typize the return
 export async function handleDemosStep(
-    step: demosStep,
+    step: WorkStep,
     senderSocket?: any,
 ): Promise<any> {
-    let content = step.content
     let payload = null
+    let content = step.content
     let step_result = null
-    switch (content.type.context) {
+    // ? Is this the right way to do this now that we have the type of the step?
+    switch (step.context) {
         // REVIEW We need to check the type of the transaction
         case "xm":
-            payload = content.type.payload as XMPayload
+            payload = content as XMScript
             console.log("[Included XM Chainscript]")
-            console.log(payload[1])
+            console.log(payload)
             // TODO Better types on answers
-            var xm_result = await handleXMScript(payload[1] as XMScript)
+            var xm_result = await handleXMScript(payload)  // ? review this method
             // TODO Add result.success handling
             step_result.response = xm_result
             break
         case "web2":
             // TODO Better types on answers
-            payload = content.type.payload as Web2Payload
+            payload = content as IWeb2Request
             var web2_result = await handleWeb2Request(
                 payload[1] as IWeb2Request,
                 senderSocket,
-            )
+            )  // ? review this method
 
             // TODO Add result.success handling
             step_result.response = web2_result
             break
         case "native":
-            payload = content.type.payload as NativePayload
+            payload = content as INativePayload
             // REVIEW This still works with the new tx system?
             var native_result = await handleNativeTx(
-                content.type.payload as NativePayload,
-            )
+                payload,
+            )  // ? review this method
             // NOTE We add the Transaction to the mempool as it looks valid
             if (native_result[0]) {
                 step_result.success = true

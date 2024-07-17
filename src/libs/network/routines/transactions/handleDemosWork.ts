@@ -82,7 +82,7 @@ export async function handleDemosStep(
             payload = content as IWeb2Request
             var web2_result = await handleWeb2Request(
                 payload[1] as IWeb2Request,
-                senderSocket,
+                senderSocket,       
             )  // ? review this method
 
             // TODO Add result.success handling

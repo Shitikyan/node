@@ -216,7 +216,7 @@ export default class Chain {
 
     static async getOnlinePeersForLastThreeBlocks(): Promise<
         [string, string][]
-    > {
+    > { // ! TODO: Fix this type and this method in general
         const lastBlockNumber = await this.getLastBlockNumber()
 
         if (lastBlockNumber < 3) {

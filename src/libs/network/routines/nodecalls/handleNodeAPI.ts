@@ -14,6 +14,7 @@ import getBlockHeaderByNumber from "./dispatcher/getBlockHeaderByNumber"
 import getBlockHeaderByHash from "./dispatcher/getBlockHeaderByHash"
 import getBlockByNumber from "./dispatcher/getBlockByNumber"
 import getBlockByHash from "./dispatcher/getBlockByHash"
+import { getAllTxs } from "./dispatcher/getAllTxs"
 
 export async function handleNodeAPI(
         content: any,
@@ -98,6 +99,10 @@ export async function handleNodeAPI(
                 }
                 console.log(`getting tx with hash ${data.hash}`)
                 response = await Chain.getTxByHash(data.hash)
+                break
+            case "getAllTxs":
+                var object_response = await getAllTxs()
+                response = JSON.stringify(object_response)
                 break
             case "getMempool":
                 response = await Chain.getPendingPool()

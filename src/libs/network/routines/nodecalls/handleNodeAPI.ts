@@ -98,8 +98,9 @@ export async function handleNodeAPI(
                     })
                 }
                 console.log(`getting tx with hash ${data.hash}`)
-                response = await Chain.getTxByHash(data.hash)
+                response = await Chain.getTxByHash(data.hash)       
                 break
+            // Getting all the transactions in the blockchain database
             case "getAllTxs":
                 var object_response = await getAllTxs()
                 response = JSON.stringify(object_response)

@@ -47,5 +47,9 @@ docker/node_2/data/chain.db
 .trunk/tools
 .vscode/settings.json
 documentation/schemas/.*
-documentation/code diagrams/*
+pnpm-lock.yaml
+
+# DB Files
+postgres/data
+postgres/data_*
 postgres_*

@@ -23,7 +23,6 @@ import * as http from "http"
 //     cert: "/opt/tinycp/domains/node2.demoscan.live/ssl/ssl-letsencrypt.crt",
 //     ca: "/opt/tinycp/domains/node2.demoscan.live/ssl/ssl-letsencrypt.ca",
 // })
-// SECTION REVIEW ZONE
 import * as https from "https"
 import { Server } from "socket.io"
 import terminalkit from "terminal-kit"
@@ -42,7 +41,7 @@ const term = terminalkit.terminal
 
 dotenv.config()
 
-let enough_peers = true
+let enough_peers = true // ? Review this
 // INFO Loading the known peers
 if (!fs.existsSync("./demos_peers")) {
     enough_peers = false
@@ -55,10 +54,6 @@ let OVERRIDE_PEER_LIST_FILE = null
 let OVERRIDE_IS_TESTER = null
 let COMMANDLINE_MODE = null
 
-let RPC_FEE: number = 10 // parseInt(process.env.RPC_FEE) || 10
-
-let SERVER_PORT: number = 53550 // parseInt(process.env.SERVER_PORT, 10) || 53550
-let PEER_LIST_FILE = "./demos_peers"
 
 let PEER_LIST: any
 
@@ -69,8 +64,28 @@ var ssl_options = {
     cert: fs.readFileSync("src/ssl/server.crt"),
     ca: fs.readFileSync("src/ssl/ca.crt"),
 } // TODO Fill the right values
-const s_server = https.createServer(ssl_options, app) // REVIEW Use tHIS instead of http.createServer
-// !SECTION REVIEW ZONE
+const s_server =    https.createServer(ssl_options, app) // REVIEW Use tHIS instead of http.createServer
+
+/* SECTION Environment variables loading and configuration */
+let RPC_FEE: number = parseInt(process.env.RPC_FEE) || 10
+// Allow overriding pg port through RPC_PG_PORT
+let PG_PORT: number = parseInt(process.env.RPC_PG_PORT, 10) || 5332
+// Allow overriding server port through RPC_PORT
+let SERVER_PORT: number = parseInt(process.env.RPC_PORT, 10) || 0
+if (SERVER_PORT == 0) {
+    SERVER_PORT = parseInt(process.env.SERVER_PORT, 10) || 53550
+}   
+// Allow overriding peer list file through RPC_PEER_LIST_FILE
+let PEER_LIST_FILE = process.env.PEER_LIST_FILE || "./demos_peers"
+/* !SECTION Environment variables loading and configuration */
+
+console.log("= Configured environment variables = \n")
+console.log("PG_PORT: " + PG_PORT)
+console.log("RPC_FEE: " + RPC_FEE)
+console.log("SERVER_PORT: " + SERVER_PORT)
+console.log("PEER_LIST_FILE: " + PEER_LIST_FILE)
+console.log("= End of Configuration = \n")
+
 
 const server = http.createServer(app)
 
@@ -145,13 +160,15 @@ async function main() {
     //console.log(PEER_LIST)
 
     // NOTE The whole first part of main ensures the environment is ready to run
-    await sharedState.getInstance().identity.ensureIdentity()
+    await sharedState.getInstance().identity.ensureIdentity() // ? Should we generate the identity option based too? (see SERVER_PORT and others    )
     const id = sharedState.getInstance().identity
     term.green("[BOOTSTRAP] Our identity is ready\n")
     // Log identity
     term.green(
         "\n[MAIN] 🔗 WE ARE " + id.ed25519.publicKey.toString("hex") + " 🔗 \n",
     )
+    // Creating ourselves as a peer // ? Should this be removed in production?
+    let ourselves = "http://127.0.0.1>" + SERVER_PORT + ">" + id.ed25519.publicKey.toString("hex")
     // And saves the public key file
     fs.writeFileSync("publickey", id.ed25519.publicKey.toString("hex") + "\n")
 
@@ -175,10 +192,11 @@ async function main() {
     term.green("[GENESIS] 🖥️ Found the genesis block\n")
 
     // Loading the peers
+    PEER_LIST.push(ourselves)
 
     // INFO Setting the common variables and propagating them
     term.yellow("[BOOTSTRAP] 🌐 Bootstrapping peers...\n")
-    //console.log(PEER_LIST)
+    console.log(PEER_LIST)
     const peerList = await peerBootstrap(PEER_LIST)
     for (const peer of peerList) {
         peerManager.addPeer(peer)

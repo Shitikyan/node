@@ -48,3 +48,4 @@ docker/node_2/data/chain.db
 .vscode/settings.json
 documentation/schemas/.*
 documentation/code diagrams/*
+postgres_*

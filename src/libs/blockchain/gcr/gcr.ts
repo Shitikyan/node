@@ -190,21 +190,20 @@ export default class GCR {
         const db = await Datasource.getInstance()
         const gcrRepository = db
             .getDataSource()
-            .getRepository(GlobalChangeRegistry)
+            .getRepository(GCRMain)
 
         try {
-            const gcrSearch = await gcrRepository.findOneBy({
-                publicKey: address,
+            const gcrSearch = await gcrRepository.findOne({
+                where: { pubkey: address },
             })
-            const gcrExtendedData = gcrSearch?.extended
-            return gcrExtendedData && gcrExtendedData.tokens
-                ? gcrExtendedData.tokens[tokenAddress]
-                : 0
+            const tokenState = gcrSearch?.tokens.get(tokenAddress)
+            return tokenState ? tokenState.balance : 0n
         } catch (e) {
             console.error(e)
         }
     }
 
+    // TODO Refactor this to use the GCRMain table when it is implemented
     static async getGCRNFTBalance(address: string, nftAddress: string) {
         const db = await Datasource.getInstance()
         const gcrRepository = db
@@ -365,9 +364,11 @@ export default class GCR {
                     assignedTxs: [],
                     nonce: 0,
                     balance: BigInt(0),
+                    tokens: new Map(),
                     identities: {
                         xm: {},
                         web2: {},
+                        pqc: {},
                     },
                     points: {
                         totalPoints: 0,
@@ -389,9 +390,11 @@ export default class GCR {
                 assignedTxs: [],
                 nonce: 0,
                 balance: BigInt(0),
+                tokens: new Map(),
                 identities: {
                     xm: {},
                     web2: {},
+                    pqc: {},
                 },
                 points: {
                     totalPoints: 0,

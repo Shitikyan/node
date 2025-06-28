@@ -1,5 +1,6 @@
 import { Column, Entity, PrimaryColumn } from "typeorm"
 import type { StoredIdentities } from "../types/IdentityTypes"
+import { Token, TokenStateForAddress } from "@/libs/blockchain/gcr/types/Token"
 // Define the shape of your JSON data
 
 @Entity("gcr_main")
@@ -27,4 +28,6 @@ export class GCRMain {
         }
         lastUpdated: Date
     }
+    @Column({ type: "jsonb", name: "tokens", default: () => "'{}'" })
+    tokens: Map<string, TokenStateForAddress> // token address -> token state for this address
 }

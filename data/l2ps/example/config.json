@@ -1,0 +1,23 @@
+{
+    "uid": "example-l2ps-001",
+    "name": "Example L2PS Network",
+    "description": "A demonstration L2PS subnet for encrypted transaction processing",
+    "config": {
+        "created_at_block": 1000000,
+        "known_rpcs": [
+            "http://localhost:8545",
+            "http://localhost:8546"
+        ],
+        "network_params": {
+            "max_tx_per_block": 1000,
+            "block_time_ms": 5000,
+            "consensus_threshold": 67
+        }
+    },
+    "keys": {
+        "private_key_path": "data/l2ps/example/private.key",
+        "iv_path": "data/l2ps/example/iv.key"
+    },
+    "enabled": true,
+    "auto_start": true
+}

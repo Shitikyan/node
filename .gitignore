@@ -97,3 +97,6 @@ src/GTAGS
 # Output files
 output/*
 .env
+architecture
+CLAUDE.md
+GEMINI.md

@@ -14,4 +14,29 @@ export class GCRMain {
     balance: bigint
     @Column({ type: "jsonb", name: "identities" })
     identities: StoredIdentities
+    @Column({ type: "jsonb", name: "points", default: () => "'{}'" })
+    points: {
+        totalPoints: number
+        breakdown: {
+            web3Wallets: { [chain: string]: number }
+            socialAccounts: {
+                twitter: number
+                github: number
+                discord: number
+            }
+            referrals: number
+        }
+        lastUpdated: Date
+    }
+    @Column({ type: "jsonb", name: "referralInfo", default: () => "'{}'" })
+    referralInfo: {
+        totalReferrals: number
+        referredBy?: string
+        referralCode: string
+        referrals: Array<{
+            referredUserId: string
+            referredAt: string
+            pointsAwarded: number
+        }>
+    }
 }

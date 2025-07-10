@@ -81,6 +81,8 @@ export async function deriveTransaction(data: any): Promise<Transaction> {
         return await createTransactionProxy(data.data)
     } else if (data.type === "xm") {
         return await createTransactionProxy(data.data)
+    } else if (data.type === "logic_execution") {
+        return await createTransactionLogicExecution(data.data)
     } else {
         return null
     }
@@ -143,6 +145,30 @@ export async function createOperation(
 
 async function createTransactionProxy(data: any): Promise<Transaction> {
     return await createTransaction(data)
+}
+
+async function createTransactionLogicExecution(data: any): Promise<Transaction> {
+    // FIXME: Adapt this for logic execution specific requirements
+    const derivableData: DerivableNative = {
+        from: getSharedState.publicKeyHex, // FIXME: Should this come from data?
+        to: data.to || "0x0", // FIXME: Logic execution might not have a 'to' field
+        type: "logic_execution",
+        data: data,
+        timestamp: Date.now(),
+        fees: {
+            networkFee: 0, // REVIEW: Gas model for logic execution
+            rpcFee: 0,
+            additionalFee: 0,
+        }
+    }
+    
+    const transaction = await createTransaction(derivableData)
+    
+    // Override transaction data to use logic_execution format
+    transaction.content.type = "logic_execution"
+    transaction.content.data = ["logic_execution", data]
+    
+    return transaction
 }
 
 export async function createTransaction(

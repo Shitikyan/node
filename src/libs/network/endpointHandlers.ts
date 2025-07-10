@@ -57,6 +57,7 @@ import {
 import { IdentityPayload } from "@kynesyslabs/demosdk/abstraction"
 import { NativeBridgeOperationCompiled } from "@kynesyslabs/demosdk/bridge"
 import handleNativeBridgeTx from "./routines/transactions/handleNativeBridgeTx"
+import { handleLogicExecution } from "@/features/logicexecution"
 /* // ! Note: this will be removed once demosWork is in place
 import {
     NativePayload,
@@ -384,6 +385,39 @@ export default class ServerHandlers {
                     }
                 }
                 result.response = nativeBridgeResult
+                break
+
+            case "logic_execution":
+                try {
+                    const logicExecutionResult = await handleLogicExecution(
+                        tx,
+                        sender,
+                    )
+                    result.success = logicExecutionResult.success
+                    result.response = logicExecutionResult
+                    if (!logicExecutionResult.success) {
+                        result.extra = {
+                            error:
+                                "Logic execution failed: " +
+                                logicExecutionResult.extra,
+                        }
+                    }
+                } catch (e) {
+                    console.error(e)
+                    log.error(
+                        "[handleExecuteTransaction] Error in logic execution: " +
+                            e,
+                    )
+                    result.success = false
+                    result.response = {
+                        success: false,
+                        result: null,
+                        extra: "Logic execution error",
+                    }
+                    result.extra = {
+                        error: e.toString(),
+                    }
+                }
                 break
         }
 

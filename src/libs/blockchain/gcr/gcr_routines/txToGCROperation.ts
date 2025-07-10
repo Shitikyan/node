@@ -28,10 +28,29 @@ export async function txToGCROperation(tx: Transaction): Promise<GCROperation> {
         address = tx.content.from
     }
     operation.address = address
-    // Extract the data from the transaction as a DemosWork
-    operation.data = tx.content.data[1] as DemoScript
-    // Calculate the gas used
-    operation.gas = await calculateCurrentGas(operation.data)
+    
+    // Handle different transaction types
+    switch (tx.content.type) {
+        case "logic_execution":
+            // Store both the original request and result in GCR
+            // REVIEW: Should we create specific GCR operations for state changes made by logic execution?
+            operation.data = {
+                type: "logic_execution",
+                request: tx.content.data[1], // Original JSON request
+                // FIXME: How to get the execution result here? May need to pass it in
+                result: null, // TODO: Get execution result from somewhere
+                timestamp: Date.now()
+            }
+            operation.gas = 0 // REVIEW: Gas model for logic execution not implemented yet
+            break
+        default:
+            // Extract the data from the transaction as a DemosWork
+            operation.data = tx.content.data[1] as DemoScript
+            // Calculate the gas used
+            operation.gas = await calculateCurrentGas(operation.data)
+            break
+    }
+    
     // Return the operation
     return operation
 }

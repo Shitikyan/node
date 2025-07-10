@@ -140,6 +140,10 @@ export default class SharedState {
     // TODO The following variables should be in the genesis
     maxMessageSize = parseInt(process.env.MAX_MESSAGE_SIZE) // TODO Implement // 5 GB just for debug purpose
 
+    // Logic Execution Configuration
+    logicExecutionMaxSize = parseInt(process.env.LOGIC_EXECUTION_MAX_SIZE) || 65536 // 64KB
+    logicExecutionMaxOperations = parseInt(process.env.LOGIC_EXECUTION_MAX_OPERATIONS) || 10
+
     constructor() {
         this.identity = Identity.getInstance()
     }

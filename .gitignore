@@ -105,3 +105,9 @@ GEMINI.md
 
 architecture
 .DS_Store
+
+.gitbook-cache.json
+
+# Plans
+plans/*
+SMART_CONTRACTS_IMPLEMENTATION*.md

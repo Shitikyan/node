@@ -2,7 +2,7 @@ import { DemoScript } from "@kynesyslabs/demosdk/types"
 
 export default interface GCROperation {
     address: string // Public key of the address
-    data: DemoScript // The data that has been executed
+    data: DemoScript | any // The data that has been executed (expanded for different transaction types)
     gas: number // The gas used
 }
 

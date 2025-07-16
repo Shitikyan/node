@@ -107,3 +107,4 @@ architecture
 .DS_Store
 .gitbook-cache.json
 src/features/logicexecution/LOGICEXECUTION_STATUS.md
+src/features/logicexecution/LOGICEXECUTION_FLOW.md

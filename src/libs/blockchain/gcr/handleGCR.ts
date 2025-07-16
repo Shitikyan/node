@@ -48,6 +48,7 @@ import GCRNonceRoutines from "./gcr_routines/GCRNonceRoutines"
 import Chain from "../chain"
 import { Repository } from "typeorm"
 import GCRIdentityRoutines from "./gcr_routines/GCRIdentityRoutines"
+import GCRLogicExecutionRoutines from "./gcr_routines/GCRLogicExecutionRoutines"
 import { Referrals } from "@/features/incentive/referrals"
 
 export type GetNativeStatusOptions = {
@@ -279,6 +280,12 @@ export default class HandleGCR {
                 // TODO implementations
                 console.log(`Assigning GCREdit ${editOperation.type}`)
                 return { success: true, message: "Not implemented" }
+            case "logic_execution":
+                return GCRLogicExecutionRoutines.apply(
+                    editOperation,
+                    repositories.main as Repository<GCRMain>,
+                    simulate,
+                )
             default:
                 return { success: false, message: "Invalid GCREdit type" }
         }

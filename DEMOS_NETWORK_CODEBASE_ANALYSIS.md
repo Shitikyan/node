@@ -113,6 +113,96 @@ src/libs/blockchain/gcr/
 └── types/                      # GCR type definitions
 ```
 
+## 🔄 GCRv2 System - The Modern State Management
+
+### **Architecture Overview**
+GCRv2 is the current working system that handles all native transactions in Demos Network. Unlike the legacy `txToGCROperation` system, GCRv2 uses **GCR Edits** that are embedded directly in transactions.
+
+### **How GCRv2 Works**
+
+#### **1. Transaction Creation with GCR Edits**
+```typescript
+// SDK generates GCR edits automatically
+// Location: ../sdks/src/websdk/GCRGeneration.ts
+export class GCRGeneration {
+    static generate(tx: Transaction): GCREdit[] {
+        // Converts transaction into atomic GCR edits
+        // For native "send": creates subtract/add balance edits
+    }
+}
+```
+
+#### **2. GCR Edit Structure**
+```typescript
+interface GCREdit {
+    type: "balance" | "nonce" | "identity" | "points" | "custom"
+    operation: "add" | "remove" | "set" | "update"
+    account: string           // Target account public key
+    txhash: string           // Source transaction hash
+    amount?: bigint          // For balance operations
+    data?: any               // For custom operations
+}
+```
+
+#### **3. Consensus Integration**
+```typescript
+// Location: src/libs/consensus/v2/PoRBFT.ts:366-395
+async function applyGCREditsFromMergedMempool(mempool: Transaction[]) {
+    for (const tx of mempool) {
+        const txGCREdits = tx.content.gcr_edits  // Direct from transaction
+        for (const gcrEdit of txGCREdits) {
+            const result = await HandleGCR.apply(gcrEdit, tx)  // Apply to state
+        }
+    }
+}
+```
+
+#### **4. Storage in Unified Table**
+```typescript
+// Location: src/model/entities/GCRv2/GCR_Main.ts
+@Entity("gcr_main")
+export class GCR_Main {
+    @PrimaryColumn("text")
+    pubkey: string              // Account public key
+    
+    @Column("bigint") 
+    balance: bigint             // Account balance
+    
+    @Column("integer")
+    nonce: number               // Transaction nonce
+    
+    @Column("jsonb")
+    assignedTxs: string[]       // Transaction history
+    
+    @Column("jsonb")
+    identities: any             // Identity data
+    
+    @Column("jsonb") 
+    points: any                 // Point system data
+}
+```
+
+### **Native Transaction Flow Example**
+1. **Client**: Creates "send" transaction → SDK generates 2 GCR edits (subtract sender, add receiver)
+2. **Server**: Validates transaction → Regenerates edits server-side for verification
+3. **Consensus**: Processes `tx.content.gcr_edits` → Applies to `gcr_main` table
+4. **Result**: Balance updates stored in unified state table
+
+### **Key Advantages of GCRv2**
+- **Atomic Operations**: All edits succeed or fail together
+- **Client-Side Generation**: SDK creates edits automatically
+- **Server-Side Validation**: Regenerates edits for consistency checking
+- **Unified Storage**: Single `gcr_main` table for all account state
+- **Rollback Support**: Failed transactions can be easily reverted
+- **Bypasses Legacy**: No dependency on incomplete `txToGCROperation`
+
+### **Processing Files**
+- **`GCRGeneration.ts`**: Client-side edit generation
+- **`HandleGCR.ts`**: Server-side edit processing
+- **`GCRBalanceRoutines.ts`**: Balance update operations
+- **`GCRNonceRoutines.ts`**: Nonce management
+- **`PoRBFT.ts`**: Consensus integration
+
 ## 🌐 Network & RPC System
 
 ### **Server Architecture**

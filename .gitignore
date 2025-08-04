@@ -113,3 +113,5 @@ architecture
 # Plans
 plans/*
 SMART_CONTRACTS_IMPLEMENTATION*.md
+
+dist/

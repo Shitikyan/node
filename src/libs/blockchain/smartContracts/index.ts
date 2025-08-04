@@ -40,14 +40,51 @@ export {
     VALID_OPERATIONS,
 } from "./contractValidation"
 
+// Contract Storage Operations
+export {
+    ContractStorage,
+    contractStorage,
+} from "./contractStorage"
+
+// Contract Metadata Management  
+export {
+    ContractMetadataManager,
+    contractMetadata,
+} from "./contractMetadata"
+
+// Contract Query Utilities
+export {
+    ContractQueries,
+    contractQueries,
+} from "./contractQueries"
+
 // Type exports for external use
 export type { ContractOperation } from "./contractValidation"
+export type { 
+    ContractData, 
+    StoredContract, 
+    StorageResult, 
+    ContractSizeInfo, 
+} from "./contractStorage"
+export type {
+    ContractMetadata as ContractMetadataInterface,
+    ExtendedContractMetadata,
+    OwnershipTransfer,
+    VersionHistoryEntry,
+} from "./contractMetadata"
+export type {
+    ContractSearchCriteria,
+    ContractSummary,
+    PaginationInfo,
+    QueryResult,
+    ContractStatistics,
+} from "./contractQueries"
 
 /**
  * Smart Contract System Constants
  */
 export const SMART_CONTRACT_VERSION = "1.0.0"
-export const SMART_CONTRACT_PHASE = "1.3"
+export const SMART_CONTRACT_PHASE = "1.4"
 
 /**
  * Smart Contract System Status
@@ -55,8 +92,8 @@ export const SMART_CONTRACT_PHASE = "1.3"
 export const IMPLEMENTATION_STATUS = {
     "1.1": "COMPLETED", // Database Migration
     "1.2": "COMPLETED", // SDK Type Definitions  
-    "1.3": "COMPLETED", // Contract Address Generation (Current)
-    "1.4": "PENDING",   // Basic Contract Storage
+    "1.3": "COMPLETED", // Contract Address Generation
+    "1.4": "COMPLETED", // Basic Contract Storage (Current)
     "2.1": "PENDING",   // Parser Development
     "2.2": "PENDING",   // Execution Engine
     "2.3": "PENDING",   // Security Framework
@@ -100,7 +137,7 @@ export function getImplementationStatus() {
         completed,
         total,
         nextPhase,
-        currentPhase: "1.3",
+        currentPhase: "1.4",
         status: IMPLEMENTATION_STATUS,
     }
 }

@@ -47,8 +47,10 @@ export class GCRMain {
             state: any,
             owner: string,
             created: number,
-            isContract: boolean,
-            version: number
+            isContract: true,
+            version: number,
+            lastModified?: number,
+            description?: string
         }
     }
 }

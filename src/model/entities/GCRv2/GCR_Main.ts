@@ -40,4 +40,15 @@ export class GCRMain {
             pointsAwarded: number
         }>
     }
+    @Column({ type: "jsonb", name: "contracts", default: () => "'{}'" })
+    contracts: {
+        [contractAddress: string]: {
+            code: string,
+            state: any,
+            owner: string,
+            created: number,
+            isContract: boolean,
+            version: number
+        }
+    }
 }

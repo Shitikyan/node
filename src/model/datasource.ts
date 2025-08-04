@@ -30,7 +30,7 @@ export const dataSource = new DataSource({
     username: "demosuser",
     password: "demospassword",
     database: "demos",
-    migrations: ["../migrations/*.{ts,js}"],
+    migrations: ["src/migrations/*.{ts,js}"],
     entities: [
         Blocks,
         Transactions,

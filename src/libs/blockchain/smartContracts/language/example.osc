@@ -1,0 +1,59 @@
+# OSC Contract Example - SDK-Wrapped Approach
+# This contract demonstrates the OSC language syntax that maps to @kynesyslabs/demosdk methods
+
+contract MyToken {
+
+    # State variables with default values
+    state name: string = "MyToken"
+    state ticket: string = "MTK"  
+    state decimals: int = 18
+    state owner: address = caller()
+
+    # Basic token transfer using SDK
+    function pay(address: address, amount: int) -> boolean {
+        # Maps to: demos.transfer(caller(), address, amount)
+        sdk.transfer(caller(), address, amount)
+        return true
+    }
+
+    # Owner-only function to set token name
+    function setName(name: string) -> boolean {
+        require caller() == state.owner
+        state.name = name
+        return true
+    }
+
+    # Query functions
+    function getName() -> string {
+        return state.name
+    }
+
+    function getTicket() -> string {
+        return state.ticket
+    }
+
+    function getDecimals() -> int {
+        return state.decimals
+    }
+
+    # Advanced: Cross-chain transfer (owner only)
+    function crosschainPay(chain: string, subchain: string, address: string, amount: int) -> boolean {
+        require caller() == state.owner
+        # Maps to: EVM.preparePay() + prepareXMScript() + demos.broadcast()
+        sdk.crosschain.transfer(chain, subchain, address, amount)
+        return true
+    }
+
+    # Advanced: Web2 identity proof
+    function createTwitterProof() -> string {
+        # Maps to: identities.createWeb2ProofPayload(demos)
+        return sdk.web2.createProof("twitter")
+    }
+
+    # Advanced: Send message to another user
+    function sendMessage(targetId: string, message: string) -> boolean {
+        # Maps to: messagingPeer.sendMessage(targetId, message)
+        sdk.messaging.send(targetId, message)
+        return true
+    }
+}

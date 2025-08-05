@@ -3,6 +3,7 @@ import Datasource from "@/model/datasource"
 import { Repository } from "typeorm"
 import { isValidContractAddress, isValidDeployerAddress } from "./contractValidation"
 import { ContractData, StorageResult } from "./contractStorage"
+import { ContractState, OwnershipTransfer, VersionHistoryEntry } from "./language/types/ContractTypes"
 
 /**
  * Smart Contract Metadata Management
@@ -36,26 +37,7 @@ export interface ExtendedContractMetadata extends ContractMetadata {
     deploymentTxHash?: string;
 }
 
-/**
- * Contract ownership transfer data
- */
-export interface OwnershipTransfer {
-    previousOwner: string;
-    newOwner: string;
-    timestamp: number;
-    txHash?: string;
-}
 
-/**
- * Contract version history entry
- */
-export interface VersionHistoryEntry {
-    version: number;
-    timestamp: number;
-    codeHash: string;
-    description?: string;
-    txHash?: string;
-}
 
 /**
  * Contract metadata management class
@@ -276,9 +258,9 @@ export class ContractMetadataManager {
                 return { success: false, error: "Cannot transfer ownership to the same address" }
             }
             
-            // Store ownership transfer history in contract state
-            if (!contractData.state.ownershipHistory) {
-                contractData.state.ownershipHistory = []
+            // Initialize ownership history if needed
+            if (!contractData.ownershipHistory) {
+                contractData.ownershipHistory = []
             }
             
             const transfer: OwnershipTransfer = {
@@ -288,7 +270,7 @@ export class ContractMetadataManager {
                 txHash,
             }
             
-            contractData.state.ownershipHistory.push(transfer)
+            contractData.ownershipHistory.push(transfer)
             
             // Update owner and metadata
             contractData.owner = newOwner
@@ -335,7 +317,7 @@ export class ContractMetadataManager {
             }
             
             const contractData = account.contracts[address]
-            return contractData.state.ownershipHistory || []
+            return contractData.ownershipHistory || []
             
         } catch (error) {
             console.error(`Error getting ownership history for contract ${address}:`, error)
@@ -362,7 +344,7 @@ export class ContractMetadataManager {
             }
             
             const contractData = account.contracts[address]
-            return contractData.state.versionHistory || []
+            return contractData.versionHistory || []
             
         } catch (error) {
             console.error(`Error getting version history for contract ${address}:`, error)
@@ -401,8 +383,8 @@ export class ContractMetadataManager {
             const contractData = account.contracts[address]
             
             // Initialize version history if needed
-            if (!contractData.state.versionHistory) {
-                contractData.state.versionHistory = []
+            if (!contractData.versionHistory) {
+                contractData.versionHistory = []
             }
             
             const versionEntry: VersionHistoryEntry = {
@@ -413,7 +395,7 @@ export class ContractMetadataManager {
                 txHash,
             }
             
-            contractData.state.versionHistory.push(versionEntry)
+            contractData.versionHistory.push(versionEntry)
             contractData.lastModified = Date.now()
             
             // Update contracts field

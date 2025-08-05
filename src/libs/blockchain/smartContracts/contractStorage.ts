@@ -27,6 +27,21 @@ export interface ContractData {
     version: number;
     lastModified?: number;
     description?: string;
+    // Additional metadata fields
+    ownershipHistory?: {
+        previousOwner: string;
+        newOwner: string;
+        timestamp: number;
+        txHash?: string;
+    }[];
+    versionHistory?: {
+        version: number;
+        timestamp: number;
+        codeHash: string;
+        description?: string;
+        txHash?: string;
+    }[];
+    // Additional fields can be added as needed
 }
 
 /**

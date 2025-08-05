@@ -1,5 +1,6 @@
 import { Column, Entity, Index, PrimaryColumn } from "typeorm"
 import type { StoredIdentities } from "../types/IdentityTypes"
+import type { StoredContract } from "../../../libs/blockchain/smartContracts/language/types/ContractTypes"
 // Define the shape of your JSON data
 
 @Entity("gcr_main")
@@ -42,15 +43,6 @@ export class GCRMain {
     }
     @Column({ type: "jsonb", name: "contracts", default: () => "'{}'" })
     contracts: {
-        [contractAddress: string]: {
-            code: string,
-            state: any,
-            owner: string,
-            created: number,
-            isContract: true,
-            version: number,
-            lastModified?: number,
-            description?: string
-        }
+        [contractAddress: string]: StoredContract
     }
 }

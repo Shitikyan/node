@@ -1,0 +1,89 @@
+version: '3.8'
+
+services:
+  demos-postgres:
+    container_name: demos-postgres-${PG_PORT:-5332}
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: demosuser
+      POSTGRES_PASSWORD: demospassword
+      PGDATA: /data/postgres
+      POSTGRES_DB: demos
+    volumes:
+      - ./docker_data/postgres_data:/data/postgres
+    ports:
+      - "${PG_PORT:-5332}:5432"
+    networks:
+      - demos-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U demosuser -d demos"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  demos-node:
+    container_name: demos-node-${RPC_PORT:-53550}
+    build:
+      context: .
+      dockerfile: Dockerfile
+      platforms:
+        - linux/amd64
+        - linux/arm64
+    depends_on:
+      demos-postgres:
+        condition: service_healthy
+    environment:
+      # Database connection
+      PG_PORT: ${PG_PORT:-5332}
+      PG_HOST: demos-postgres
+      
+      # Node configuration
+      RPC_PORT: ${RPC_PORT:-53550}
+      EXPOSED_URL: ${EXPOSED_URL:-}
+      
+      # File paths (container paths)
+      IDENTITY_FILE: ${IDENTITY_FILE:-/app/docker_data/identity/.demos_identity}
+      PEER_LIST_FILE: ${PEER_LIST_FILE:-/app/docker_data/peer_lists/demos_peerlist.json}
+      
+      # Operation modes
+      RESTORE: ${RESTORE:-false}
+      CLEAN: ${CLEAN:-false}
+      VERBOSE: ${VERBOSE:-false}
+      
+      # Runtime
+      NODE_ENV: ${NODE_ENV:-production}
+    volumes:
+      # Data persistence
+      - ./docker_data/identity:/app/docker_data/identity
+      - ./docker_data/peer_lists:/app/docker_data/peer_lists
+      - ./docker_data/logs:/app/docker_data/logs
+      - ./docker_data/backups:/app/docker_data/backups
+      - ./docker_data/ssl:/app/docker_data/ssl
+      - ./docker_data/data:/app/data
+      
+      # Optional: Mount custom configurations
+      - ./.env:/app/.env:ro
+    ports:
+      - "${RPC_PORT:-53550}:${RPC_PORT:-53550}"
+    networks:
+      - demos-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:${RPC_PORT:-53550}/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+networks:
+  demos-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  postgres_data:
+    driver: local

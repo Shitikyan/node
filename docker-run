@@ -1,0 +1,386 @@
+#!/bin/bash
+
+# Demos Network Node - Docker Runner
+# This script provides the same interface as ./run but uses Docker containers
+
+# Default values
+PG_PORT=5332
+CLEAN="false"
+PORT=53550
+VERBOSE=false
+GIT_PULL=true
+RESTORE="false"
+
+# Detect platform for cross-platform compatibility
+PLATFORM=$(uname -s)
+case $PLATFORM in
+    "Darwin")
+        PLATFORM_NAME="macOS"
+        ;;
+    "Linux")
+        PLATFORM_NAME="Linux"
+        ;;
+    *)
+        PLATFORM_NAME="Unknown"
+        ;;
+esac
+
+# Verbose logging function
+log_verbose() {
+    if [ "$VERBOSE" = true ]; then
+        echo "[VERBOSE] $1"
+    fi
+}
+
+# Help documentation function
+show_help() {
+    cat << EOF
+🐳 Demos Network Node - Docker Runner
+
+USAGE:
+    ./docker-run [OPTIONS]
+
+Welcome to Demos Network! This script runs your blockchain node in Docker containers.
+
+OPTIONS:
+    -p <port>       Node port (default: 53550)
+    -d <port>       PostgreSQL port (default: 5332)
+    -i <file>       Identity file path (relative to docker_data/identity/)
+    -c              Clean database on startup
+    -n              Skip git pull (useful for custom branches)
+    -u <url>        Override EXPOSED_URL
+    -l <file>       Peer list file (relative to docker_data/peer_lists/)
+    -r <runtime>    Runtime (only 'bun' supported)
+    -b <true/false> Restore from backup
+    -v              Verbose logging
+    -h              Show this help message
+
+DOCKER-SPECIFIC OPTIONS:
+    --build         Force rebuild of Docker images
+    --no-cache      Build without using Docker cache
+    --logs          Show container logs after startup
+    --detach        Run containers in background (default)
+    --stop          Stop running containers
+    --cleanup       Remove containers and volumes
+
+EXAMPLES:
+    ./docker-run                           # Start with default settings
+    ./docker-run -p 53551 -d 5333         # Run on custom ports
+    ./docker-run -c                       # Clean start (fresh database)
+    ./docker-run -v                       # Verbose output for troubleshooting
+    ./docker-run -n                       # Skip git update (for development)
+    ./docker-run --build                  # Force rebuild Docker images
+    ./docker-run --stop                   # Stop running containers
+
+SYSTEM REQUIREMENTS:
+    - Docker and Docker Compose installed
+    - 8GB RAM minimum (12GB recommended)
+    - 4+ CPU cores
+    - Free ports: 5332 (PostgreSQL) and 53550 (Node)
+
+DATA PERSISTENCE:
+    All data is stored in ./docker_data/ directory:
+    - docker_data/postgres_data/    PostgreSQL database
+    - docker_data/identity/         Node identity files
+    - docker_data/peer_lists/       Peer configuration
+    - docker_data/logs/             Application logs
+    - docker_data/backups/          Backup files
+
+For support and documentation: https://demos.network
+EOF
+}
+
+# Docker-specific operations
+handle_docker_operations() {
+    case $1 in
+        "stop")
+            echo "🛑 Stopping Demos Network containers..."
+            docker compose down
+            exit 0
+            ;;
+        "cleanup")
+            echo "🧹 Cleaning up Demos Network containers and volumes..."
+            read -p "This will remove all containers and data. Are you sure? (y/N): " -n 1 -r
+            echo
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
+                docker compose down -v --remove-orphans
+                docker image rm demos-node-software_demos-node 2>/dev/null || true
+                rm -rf docker_data/postgres_data
+                echo "✅ Cleanup completed"
+            else
+                echo "❌ Cleanup cancelled"
+            fi
+            exit 0
+            ;;
+    esac
+}
+
+# System requirements validation for Docker
+check_docker_requirements() {
+    echo "🔍 Checking Docker requirements..."
+    
+    local failed_requirements=0
+    
+    # Check if Docker is installed
+    if ! command -v docker &> /dev/null; then
+        echo "❌ Docker is not installed"
+        echo "💡 Install Docker from: https://docs.docker.com/get-docker/"
+        failed_requirements=$((failed_requirements + 1))
+    else
+        echo "✅ Docker is installed"
+    fi
+    
+    # Check if Docker Compose is available
+    if ! docker compose version &> /dev/null; then
+        echo "❌ Docker Compose is not available"
+        echo "💡 Make sure Docker Desktop is running or install docker-compose-plugin"
+        failed_requirements=$((failed_requirements + 1))
+    else
+        echo "✅ Docker Compose is available"
+    fi
+    
+    # Check if Docker daemon is running
+    if ! docker info &> /dev/null; then
+        echo "❌ Docker daemon is not running"
+        echo "💡 Start Docker Desktop or run: sudo systemctl start docker"
+        failed_requirements=$((failed_requirements + 1))
+    else
+        echo "✅ Docker daemon is running"
+    fi
+    
+    # Check port availability
+    if command -v lsof > /dev/null; then
+        if lsof -i :$PG_PORT > /dev/null 2>&1; then
+            echo "❌ PostgreSQL port $PG_PORT is already in use"
+            failed_requirements=$((failed_requirements + 1))
+        else
+            echo "✅ PostgreSQL port $PG_PORT is available"
+        fi
+        
+        if lsof -i :$PORT > /dev/null 2>&1; then
+            echo "❌ Node port $PORT is already in use"
+            failed_requirements=$((failed_requirements + 1))
+        else
+            echo "✅ Node port $PORT is available"
+        fi
+    fi
+    
+    if [ $failed_requirements -gt 0 ]; then
+        echo ""
+        echo "❌ Docker requirements check FAILED!"
+        echo "   Failed requirements: $failed_requirements"
+        echo "   Please resolve the above issues before running the node."
+        exit 1
+    else
+        echo ""
+        echo "✅ All Docker requirements met!"
+        echo ""
+    fi
+}
+
+# Docker-specific flags
+BUILD_FLAG=""
+NO_CACHE_FLAG=""
+SHOW_LOGS=false
+DETACH=true
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -p)
+            PORT="$2"
+            shift 2
+            ;;
+        -d)
+            PG_PORT="$2"
+            shift 2
+            ;;
+        -c)
+            CLEAN="true"
+            shift
+            ;;
+        -i)
+            IDENTITY_FILE="$2"
+            shift 2
+            ;;
+        -l)
+            PEER_LIST_FILE="$2"
+            shift 2
+            ;;
+        -n)
+            GIT_PULL=false
+            shift
+            ;;
+        -u)
+            EXPOSED_URL="$2"
+            shift 2
+            ;;
+        -r)
+            if [ "$2" != "bun" ]; then
+                echo "❌ Error: Only 'bun' runtime is supported in Docker"
+                exit 1
+            fi
+            shift 2
+            ;;
+        -b)
+            RESTORE="$2"
+            shift 2
+            ;;
+        -v)
+            VERBOSE=true
+            shift
+            ;;
+        -h)
+            show_help
+            exit 0
+            ;;
+        --build)
+            BUILD_FLAG="--build"
+            shift
+            ;;
+        --no-cache)
+            NO_CACHE_FLAG="--no-cache"
+            BUILD_FLAG="--build"
+            shift
+            ;;
+        --logs)
+            SHOW_LOGS=true
+            shift
+            ;;
+        --detach)
+            DETACH=true
+            shift
+            ;;
+        --stop)
+            handle_docker_operations "stop"
+            ;;
+        --cleanup)
+            handle_docker_operations "cleanup"
+            ;;
+        *)
+            echo "❌ Unknown option: $1"
+            echo "Use -h for help."
+            exit 1
+            ;;
+    esac
+done
+
+# if RESTORE is true, make clean false
+if [ "$RESTORE" == "true" ]; then
+    CLEAN="false"
+fi
+
+# Run Docker requirements check
+check_docker_requirements
+
+# Perform git pull if GIT_PULL is true
+if [ "$GIT_PULL" = true ]; then
+    echo "🔄 Updating repository..."
+    log_verbose "Running git pull to get latest changes"
+    if ! git pull; then
+        echo "⚠️  Warning: Git pull failed, continuing with current version"
+        log_verbose "Git pull failed but continuing - might be in development mode"
+    else
+        echo "✅ Repository updated successfully"
+    fi
+fi
+
+# Create docker_data directories
+echo "📁 Setting up data directories..."
+mkdir -p docker_data/identity
+mkdir -p docker_data/peer_lists
+mkdir -p docker_data/logs
+mkdir -p docker_data/backups
+mkdir -p docker_data/ssl
+mkdir -p docker_data/data
+mkdir -p docker_data/postgres_data
+
+# Set default file paths if not specified
+if [ -z "$IDENTITY_FILE" ]; then
+    IDENTITY_FILE="/app/docker_data/identity/.demos_identity"
+else
+    # Convert relative path to container path
+    IDENTITY_FILE="/app/docker_data/identity/$IDENTITY_FILE"
+fi
+
+if [ -z "$PEER_LIST_FILE" ]; then
+    PEER_LIST_FILE="/app/docker_data/peer_lists/demos_peerlist.json"
+else
+    # Convert relative path to container path
+    PEER_LIST_FILE="/app/docker_data/peer_lists/$PEER_LIST_FILE"
+fi
+
+# Create default peer list if it doesn't exist
+PEER_LIST_HOST_PATH="./docker_data/peer_lists/$(basename "$PEER_LIST_FILE")"
+if [ ! -f "$PEER_LIST_HOST_PATH" ]; then
+    echo "📝 Creating default peer list file"
+    echo "[]" > "$PEER_LIST_HOST_PATH"
+fi
+
+echo ""
+echo "🐳 Welcome to Demos Network (Docker)!"
+echo "⚙️  Node Configuration:"
+echo "   🌐 Node Port: $PORT"
+echo "   🗄️  Database Port: $PG_PORT"
+echo "   🔑 Identity File: $IDENTITY_FILE"
+echo "   📡 Exposed URL: ${EXPOSED_URL:-auto-detected}"
+echo "   👥 Peer List: $PEER_LIST_FILE"
+if [ "$RESTORE" = "true" ]; then
+    echo "   📦 Mode: Restore from backup"
+elif [ "$CLEAN" = "true" ]; then
+    echo "   🧹 Mode: Clean start (fresh database)"
+else
+    echo "   ▶️  Mode: Normal start"
+fi
+log_verbose "Platform: $PLATFORM_NAME"
+log_verbose "Docker build flags: $BUILD_FLAG $NO_CACHE_FLAG"
+echo ""
+
+# Set environment variables for docker-compose
+export PG_PORT
+export RPC_PORT=$PORT
+export EXPOSED_URL
+export IDENTITY_FILE
+export PEER_LIST_FILE
+export RESTORE
+export CLEAN
+export VERBOSE
+
+# Handle clean mode - remove postgres data
+if [ "$CLEAN" = "true" ]; then
+    echo "🧹 Cleaning database data..."
+    rm -rf docker_data/postgres_data/*
+    echo "✅ Database data cleaned"
+fi
+
+echo "🚀 Starting Demos Network containers..."
+log_verbose "Using docker-compose with environment: PG_PORT=$PG_PORT RPC_PORT=$RPC_PORT"
+
+# Build and start containers
+if [ "$DETACH" = true ]; then
+    if ! docker compose up -d $BUILD_FLAG $NO_CACHE_FLAG; then
+        echo "❌ Failed to start containers"
+        exit 1
+    fi
+    
+    echo "✅ Containers started successfully"
+    echo ""
+    echo "🎉 Demos Network is running!"
+    echo "🌐 Node endpoint: http://localhost:$PORT"
+    echo "🗄️  Database: localhost:$PG_PORT"
+    echo "📁 Data directory: ./docker_data/"
+    echo ""
+    echo "📝 Useful commands:"
+    echo "   ./docker-run --logs     # Show container logs"
+    echo "   ./docker-run --stop     # Stop containers"
+    echo "   docker compose logs -f  # Follow all logs"
+    echo ""
+    
+    if [ "$SHOW_LOGS" = true ]; then
+        echo "📜 Container logs:"
+        docker compose logs -f
+    fi
+else
+    # Run in foreground
+    docker compose up $BUILD_FLAG $NO_CACHE_FLAG
+fi

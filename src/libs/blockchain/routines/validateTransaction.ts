@@ -12,7 +12,7 @@ KyneSys Labs: https://www.kynesys.xyz/
 import { pki } from "node-forge"
 import Chain from "src/libs/blockchain/chain"
 import GCR from "src/libs/blockchain/gcr/gcr"
-import calculateCurrentGas from "src/libs/blockchain/routines/calculateCurrentGas"
+import calculateCurrentGas, { calculateComposedGasWithBreakdown } from "src/libs/blockchain/routines/calculateCurrentGas"
 import executeNativeTransaction from "src/libs/blockchain/routines/executeNativeTransaction"
 import Transaction from "src/libs/blockchain/transaction"
 import Cryptography from "src/libs/crypto/cryptography"
@@ -104,8 +104,20 @@ export async function confirmTransaction(
     console.log(
         "[Tx Validation] Transaction validity verified, compiling ValidityData\n",
     )
-    validityData.data.message =
-        "[Tx Validation] Transaction signature verified\n"
+    
+    // Create fee breakdown message using shared function
+    const feeData = await calculateComposedGasWithBreakdown()
+    const { networkFee, rpcFee } = feeData.breakdown
+    const totalFee = feeData.totalFee
+    const feeBreakdown = `
+[Fee Breakdown]
+• Network Fee: ${networkFee} DEM (fixed)
+• RPC Fee: ${rpcFee} DEM (configurable)
+• Total Fee: ${totalFee} DEM
+`
+    
+    validityData.data.message = `[Tx Validation] Transaction signature verified
+${feeBreakdown}`
     validityData.data.valid = true
     validityData = await signValidityData(validityData)
     return validityData

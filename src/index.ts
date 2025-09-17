@@ -173,7 +173,13 @@ async function warmup() {
     indexState.COMMANDLINE_MODE = null
 
     /* SECTION Environment variables loading and configuration */
-    indexState.RPC_FEE = parseInt(process.env.RPC_FEE) || 10
+    // RPC fee validation (1-4 DEM range)
+    const rpcFeeValue = parseInt(process.env.RPC_FEE) || 1
+    if (rpcFeeValue < 1 || rpcFeeValue > 4) {
+        console.error(`❌ RPC_FEE must be between 1-4 DEM, got: ${rpcFeeValue}`)
+        process.exit(1)
+    }
+    indexState.RPC_FEE = rpcFeeValue
     // Allow overriding pg port through RPC_PG_PORT
     indexState.PG_PORT = parseInt(process.env.RPC_PG_PORT, 10) || 5332
     // Allow overriding server port through RPC_PORT

@@ -1,5 +1,6 @@
 import Hashing from "src/libs/crypto/hashing"
 import { getSharedState } from "src/utilities/sharedState"
+import { calculateComposedGasWithBreakdown } from "src/libs/blockchain/routines/calculateCurrentGas"
 
 import { Operation } from "@kynesyslabs/demosdk/types"
 /* eslint-disable no-unused-vars */
@@ -133,10 +134,11 @@ export async function createOperation(
     operation.params = transaction.content.data
     operation.status = true // TODO Get it from the content itself somehow
 
-    // TODO Fee calculation logic here
-    operation.fees.network_fee = 0
-    operation.fees.rpc_fee = 0
-    operation.fees.additional_fee = 0
+    // Fee calculation using shared function
+    const feeData = await calculateComposedGasWithBreakdown()
+    operation.fees.network_fee = feeData.breakdown.networkFee
+    operation.fees.rpc_fee = feeData.breakdown.rpcFee
+    operation.fees.additional_fee = 0 // No additional fees for now
 
     return operation
 }

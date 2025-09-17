@@ -87,6 +87,20 @@ export async function confirmTransaction(
     */
     // Verify tx validity
 
+    // REVIEW Consensus-level fee validation to prevent malicious fee manipulation
+    const feeValidation = getSharedState.consensusParams.validateTransactionFees(tx)
+    if (!feeValidation.valid) {
+        const shouldReject = getSharedState.consensusParams.shouldRejectTransaction(feeValidation)
+        if (shouldReject) {
+            validityData.data.message = 
+                `[CONSENSUS] Invalid fee structure: ${feeValidation.reason}\n`
+            validityData.data.valid = false
+            validityData = await signValidityData(validityData)
+            return validityData
+        }
+        // If not rejecting (monitoring mode), continue with warning logged
+    }
+
     const {
         confirmation,
         message,

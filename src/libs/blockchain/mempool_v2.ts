@@ -7,6 +7,7 @@ import { MempoolTx } from "@/model/entities/Mempool"
 import { Transaction } from "@kynesyslabs/demosdk/types"
 import SecretaryManager from "../consensus/v2/types/secretaryManager"
 import Chain from "./chain"
+import { getSharedState } from "@/utilities/sharedState"
 
 export default class Mempool {
     public static repo: Repository<MempoolTx> = null
@@ -80,6 +81,20 @@ export default class Mempool {
                 confirmationBlock: null,
                 error: "Transaction already in mempool",
             }
+        }
+
+        // REVIEW: Consensus fee validation
+        const feeValidation = getSharedState.consensusParams.validateTransactionFees(transaction)
+        if (!feeValidation.valid) {
+            const shouldReject = getSharedState.consensusParams.shouldRejectTransaction(feeValidation)
+            if (shouldReject) {
+                return {
+                    confirmationBlock: null,
+                    error: `[CONSENSUS] Invalid fee structure: ${feeValidation.reason}`,
+                }
+            }
+            // In monitoring mode, log but don't reject
+            log.warning(`[CONSENSUS] Fee validation warning for tx ${transaction.hash}: ${feeValidation.reason}`)
         }
 
         let blockNumber: number

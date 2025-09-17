@@ -8,6 +8,7 @@ import { Identity } from "src/libs/identity"
 // eslint-disable-next-line no-unused-vars
 import * as ntpClient from "ntp-client"
 import { Peer, PeerManager } from "src/libs/peer"
+import { ConsensusParameters, getConsensusParameters } from "./consensusParameters"
 import { SigningAlgorithm } from "@kynesyslabs/demosdk/types"
 import { uint8ArrayToHex } from "@kynesyslabs/demosdk/encryption"
 
@@ -137,8 +138,12 @@ export default class SharedState {
     // TODO The following variables should be in the genesis
     maxMessageSize = parseInt(process.env.MAX_MESSAGE_SIZE) // TODO Implement // 5 GB just for debug purpose
 
+    // Consensus parameters for network-wide validation rules
+    consensusParams: ConsensusParameters
+
     constructor() {
         this.identity = Identity.getInstance()
+        this.consensusParams = getConsensusParameters()
     }
 
     public static getInstance(): SharedState {

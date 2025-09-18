@@ -8,7 +8,10 @@ import { Identity } from "src/libs/identity"
 // eslint-disable-next-line no-unused-vars
 import * as ntpClient from "ntp-client"
 import { Peer, PeerManager } from "src/libs/peer"
-import { ConsensusParameters, getConsensusParameters } from "./consensusParameters"
+import {
+    ConsensusParameters,
+    getConsensusParameters,
+} from "./consensusParameters"
 import { SigningAlgorithm } from "@kynesyslabs/demosdk/types"
 import { uint8ArrayToHex } from "@kynesyslabs/demosdk/encryption"
 
@@ -19,9 +22,11 @@ export default class SharedState {
 
     // !SECTION Constants
     prod = process.env.PROD == "true" || false
-    version = "0.9.5"
-    version_name = "Entangled Polymer"
+    version = "0.9.6"
+    version_name = "Shy Porcupine"
     signingAlgorithm = "ed25519" as SigningAlgorithm
+
+    networkFee: number = parseInt(process.env.NETWORK_FEE) || 1 // Configurable network fee
 
     block_time = 10 // TODO Get it from the genesis (or see Consensus module)
 

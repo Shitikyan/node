@@ -3,8 +3,13 @@ import { getSharedState } from "src/utilities/sharedState"
 
 // INFO Calculating transaction fees based on the size of the transaction and the status of the chain
 async function calculateComposedGas(): Promise<number> {
-    const networkFee = 1 // Fixed 1 DEM network fee
-    const rpcFee = getSharedState.rpcFee // 1-4 DEM from environment
+    const networkFee = getSharedState.networkFee ?? 1 // Configurable network fee with fallback
+    const rpcFee = getSharedState.rpcFee
+
+    if (typeof rpcFee !== "number" || rpcFee < 0) {
+        throw new Error("Invalid rpcFee: must be a non-negative number")
+    }
+
     const totalFee = networkFee + rpcFee
     return totalFee
 }
@@ -14,10 +19,12 @@ export async function calculateComposedGasWithBreakdown(): Promise<{
     breakdown: {
         networkFee: number
         rpcFee: number
-    }}> {
-    const networkFee = 1 // Fixed 1 DEM network fee
-    const rpcFee = getSharedState.rpcFee // 1-4 DEM from environment
-    const totalFee = networkFee + rpcFee
+    }
+}> {
+    const totalFee = await calculateComposedGas()
+    const networkFee = getSharedState.networkFee ?? 1
+    const rpcFee = getSharedState.rpcFee
+
     return {
         totalFee,
         breakdown: {
@@ -29,8 +36,13 @@ export async function calculateComposedGasWithBreakdown(): Promise<{
 
 // REVIEW Why is this just a nested call
 export default async function calculateCurrentGas(
-    payload: any,
+    payload?: any, // Deprecated: payload size no longer affects gas calculation
 ): Promise<number> {
+    if (payload !== undefined) {
+        console.warn(
+            "calculateCurrentGas: payload parameter is deprecated and ignored in fixed-fee model",
+        )
+    }
     // Simple fixed fee calculation - no payload size multiplication
     const totalFee = await calculateComposedGas()
     return totalFee

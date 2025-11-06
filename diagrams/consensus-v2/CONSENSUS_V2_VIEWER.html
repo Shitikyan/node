@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consensus v2 (PoRBFT) - Interactive Diagrams</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            padding: 40px 20px;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .key-features {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .key-features h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .key-features ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .key-features li {
+            padding: 8px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        .key-features li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        nav {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+        }
+
+        nav h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        nav ul {
+            list-style: none;
+        }
+
+        nav li {
+            margin: 8px 0;
+        }
+
+        nav a {
+            color: #555;
+            text-decoration: none;
+            display: block;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        nav a:hover {
+            background: #f0f0f0;
+            border-left-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .diagram-section {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .diagram-section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .diagram-section.architecture h2 { border-bottom-color: #667eea; }
+        .diagram-section.lifecycle h2 { border-bottom-color: #48bb78; }
+        .diagram-section.phases h2 { border-bottom-color: #ed8936; }
+        .diagram-section.cvsa h2 { border-bottom-color: #9f7aea; }
+        .diagram-section.shard h2 { border-bottom-color: #38b2ac; }
+        .diagram-section.coordination h2 { border-bottom-color: #f56565; }
+        .diagram-section.mempool h2 { border-bottom-color: #4299e1; }
+        .diagram-section.voting h2 { border-bottom-color: #ed64a6; }
+        .diagram-section.gcr h2 { border-bottom-color: #ecc94b; }
+        .diagram-section.failure h2 { border-bottom-color: #fc8181; }
+
+        .key-concepts {
+            background: #f7fafc;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .key-concepts h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .key-concepts ul {
+            margin-left: 20px;
+        }
+
+        .key-concepts li {
+            margin: 5px 0;
+        }
+
+        .mermaid {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        .file-references {
+            background: #f7fafc;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .file-references h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .file-references code {
+            background: #edf2f7;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #d6336c;
+        }
+
+        footer {
+            text-align: center;
+            color: white;
+            padding: 30px;
+            margin-top: 40px;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            nav {
+                display: none;
+            }
+            .diagram-section {
+                page-break-inside: avoid;
+            }
+        }
+
+        .print-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .print-btn:hover {
+            background: #5568d3;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔗 Consensus Mechanism v2 (PoRBFT)</h1>
+            <p>Interactive Mermaid Diagram Documentation</p>
+        </header>
+
+        <div class="key-features">
+            <h2>Key Features of PoRBFT Consensus</h2>
+            <ul>
+                <li><strong>7 synchronized validation phases</strong> for all shard members</li>
+                <li><strong>Secretary-based coordination</strong> using green light system</li>
+                <li><strong>CVSA</strong> (Common Validator Seed Algorithm) for deterministic shard selection</li>
+                <li><strong>Byzantine fault tolerance</strong> with 67% threshold</li>
+                <li><strong>Integrated GCR operations</strong> during consensus</li>
+                <li><strong>Automatic failure recovery</strong> and secretary failover</li>
+            </ul>
+        </div>
+
+        <nav>
+            <h3>📋 Navigation</h3>
+            <ul>
+                <li><a href="#architecture">1. PoRBFT Consensus Architecture Overview</a></li>
+                <li><a href="#lifecycle">2. Complete Consensus Routine Lifecycle</a></li>
+                <li><a href="#phases">3. 7 Validation Phases Synchronization</a></li>
+                <li><a href="#cvsa">4. CVSA - Common Validator Seed Algorithm</a></li>
+                <li><a href="#shard">5. Shard Selection & Secretary Election</a></li>
+                <li><a href="#coordination">6. Secretary-Member Coordination</a></li>
+                <li><a href="#mempool">7. Mempool Merging & Transaction Ordering</a></li>
+                <li><a href="#voting">8. Block Forging & Voting</a></li>
+                <li><a href="#gcr">9. GCR Integration in Consensus</a></li>
+                <li><a href="#failure">10. Failure Handling & Recovery</a></li>
+            </ul>
+        </nav>
+
+        <section id="architecture" class="diagram-section architecture">
+            <h2>1. PoRBFT Consensus Architecture Overview</h2>
+
+            <div class="key-concepts">
+                <h3>Key Concepts</h3>
+                <ul>
+                    <li><strong>ConsensusRoutine</strong>: Main entry point triggered for each block</li>
+                    <li><strong>SecretaryManager</strong>: Singleton managing shard coordination</li>
+                    <li><strong>CVSA</strong>: Deterministic seed algorithm for shard selection</li>
+                    <li><strong>7 Phases</strong>: All validators synchronize through phases</li>
+                    <li><strong>Green Light System</strong>: Waiter-based semaphore coordination</li>
+                    <li><strong>Block Validation</strong>: 67% vote threshold for Byzantine fault tolerance</li>
+                </ul>
+            </div>
+
+            <div class="mermaid">
+graph TB
+    subgraph "Consensus Entry Point"
+        START[consensusRoutine triggered]
+        CHECK{Consensus<br/>already running?}
+        START --> CHECK
+        CHECK -->|yes| SKIP[Skip - already running]
+        CHECK -->|no| INIT[Initialize Consensus State]
+    end
+
+    subgraph "Core Components"
+        INIT --> SECMGR[SecretaryManager.getInstance<br/>blockRef plus 1]
+        SECMGR --> CVSA[Get Common Validator Seed<br/>CVSA Algorithm]
+        CVSA --> SHARD[Initialize Shard<br/>getShard from CVSA]
+    end
+
+    subgraph "Shard Structure"
+        SHARD --> SHARDDATA[Shard Object]
+        SHARDDATA --> MEMBERS[members: Peer array]
+        SHARDDATA --> PHASES[validationPhases: map]
+        SHARDDATA --> SECRETARY[secretaryKey: first member]
+        SHARDDATA --> BLOCKREF[blockRef: N plus 1]
+        SHARDDATA --> CVSAVAL[CVSA: seed string]
+    end
+
+    subgraph "Secretary System"
+        SECRETARY --> CHECKSECRETARY{Are we<br/>secretary?}
+        CHECKSECRETARY -->|yes| SECRETARYROUTINE[Start secretaryRoutine<br/>coordinate shard]
+        CHECKSECRETARY -->|no| MEMBER[Regular member<br/>follow secretary]
+
+        SECRETARYROUTINE --> WAITSYSTEM[Waiter System<br/>GREEN_LIGHT and SET_WAIT_STATUS]
+        SECRETARYROUTINE --> GREENLIGHTLOGIC[Release waiting members<br/>when all ready]
+        SECRETARYROUTINE --> TIMESTAMP[Set block timestamp<br/>Date.now]
+    end
+
+    subgraph "7 Validation Phases"
+        MEMBER --> PHASE1[Phase 1: enteredConsensus]
+        SECRETARYROUTINE --> PHASE1
+
+        PHASE1 --> PHASE2[Phase 2: synchronizedTime]
+        PHASE2 --> PHASE3[Phase 3: mergedMempool]
+        PHASE3 --> PHASE4[Phase 4: appliedGCR]
+        PHASE4 --> PHASE5[Phase 5: forgedBlock]
+        PHASE5 --> PHASE6[Phase 6: votedOnBlock]
+        PHASE6 --> PHASE7[Phase 7: readyToEndConsensus]
+    end
+
+    subgraph "Consensus Actions"
+        PHASE1 --> ACTION1[ACTION 1: Initialize shard]
+        PHASE3 --> ACTION2[ACTION 2: Merge and order mempools]
+        PHASE4 --> ACTION3[ACTION 3: Apply GCR operations]
+        PHASE5 --> ACTION4[ACTION 4: Forge block]
+        PHASE6 --> ACTION5[ACTION 5: Vote on block]
+        PHASE7 --> ACTION6[ACTION 6: Finalize or rollback]
+    end
+
+    subgraph "Block Validation & Finalization"
+        ACTION5 --> COLLECTVOTES[Collect votes from shard]
+        COLLECTVOTES --> CHECKVOTES{Votes greater or equal<br/>67% threshold?}
+
+        CHECKVOTES -->|yes| VALID[Block Valid]
+        CHECKVOTES -->|no| INVALID[Block Invalid]
+
+        VALID --> FINALIZE[Finalize block<br/>add to chain]
+        INVALID --> ROLLBACK[Rollback GCR edits]
+
+        FINALIZE --> CLEANUP[Cleanup consensus state]
+        ROLLBACK --> CLEANUP
+
+        CLEANUP --> END[End consensus routine]
+    end
+
+    subgraph "Failure Handling"
+        WAITSYSTEM -->|timeout| CHECKOFFLINE[Check offline nodes]
+        CHECKOFFLINE --> REMOVEOFFLINE[Remove from shard]
+        REMOVEOFFLINE --> RELEASEWAITING[Release waiting members]
+
+        SECRETARY -->|goes offline| ELECTNEW[Elect second member<br/>as new secretary]
+        ELECTNEW --> NEWSECRETARYROUTINE[New secretary<br/>starts routine]
+    end
+
+    style START fill:#e1f5ff
+    style SECMGR fill:#fff4e1
+    style CVSA fill:#e8f5e9
+    style SECRETARYROUTINE fill:#f3e5f5
+    style VALID fill:#c8e6c9
+    style INVALID fill:#ffcdd2
+    style FINALIZE fill:#c8e6c9
+    style ROLLBACK fill:#ffcdd2
+            </div>
+        </section>
+
+        <section id="lifecycle" class="diagram-section lifecycle">
+            <h2>2. Complete Consensus Routine Lifecycle</h2>
+
+            <div class="key-concepts">
+                <h3>Key Concepts</h3>
+                <ul>
+                    <li><strong>inConsensusLoop Flag</strong>: Prevents concurrent consensus execution</li>
+                    <li><strong>Try-Catch-Finally</strong>: Error handling with guaranteed cleanup</li>
+                    <li><strong>NotInShardError</strong>: Node not selected for current shard</li>
+                    <li><strong>BlockInvalidError</strong>: Less than 67% votes, triggers rollback</li>
+                    <li><strong>GCR Rollback</strong>: All state changes reversed on failure</li>
+                    <li><strong>Cleanup</strong>: Always executed, resets state for next round</li>
+                </ul>
+            </div>
+
+            <div class="mermaid">
+flowchart TD
+    START([Consensus Routine Triggered])
+
+    START --> GUARD{inConsensusLoop<br/>flag set?}
+    GUARD -->|yes| RETURN[Return - already running]
+    GUARD -->|no| SETFLAG[Set inConsensusLoop true]
+
+    SETFLAG --> GETBLOCKREF[blockRef = lastBlockNumber plus 1]
+    GETBLOCKREF --> CREATEMGR[SecretaryManager.getInstance<br/>blockRef, initialize]
+
+    CREATEMGR --> TRYCATCH{Try-Catch-Finally Block}
+
+    subgraph "TRY Block - Main Consensus Flow"
+        TRYCATCH --> INITSTATE[initializeConsensusState]
+        INITSTATE --> INITSHARD[initializeShard<br/>Phase 1]
+
+        INITSHARD --> CHECKINSH{Are we<br/>in shard?}
+        CHECKINSH -->|no| THROW1[Throw NotInShardError]
+        CHECKINSH -->|yes| UPDATE1[updateValidatorPhase 1]
+
+        UPDATE1 --> MERGEMEM[mergeAndOrderMempools<br/>Phase 3]
+        MERGEMEM --> TEMPPOOL[Store tempMempool]
+
+        TEMPPOOL --> APPLYGCR[applyGCREditsFromMergedMempool<br/>Phase 4]
+        APPLYGCR --> CHECKFAILED{Failed<br/>txs exist?}
+
+        CHECKFAILED -->|yes| PRUNEMEMPOOL[Remove failed txs<br/>from mempool]
+        CHECKFAILED -->|no| GETTIMESTAMP
+        PRUNEMEMPOOL --> GETTIMESTAMP
+
+        GETTIMESTAMP[Get secretary block timestamp]
+        GETTIMESTAMP --> TIMESTAMPOK{Timestamp<br/>available?}
+
+        TIMESTAMPOK -->|no| REQUESTTS[Request from secretary]
+        TIMESTAMPOK -->|yes| FORGE
+        REQUESTTS --> TSAVAIL{Timestamp<br/>resolved?}
+        TSAVAIL -->|no| THROW2[Return - cannot resolve]
+        TSAVAIL -->|yes| FORGE
+
+        FORGE[forgeBlock<br/>Phase 5]
+        FORGE --> VOTE[voteOnBlock<br/>Phase 6]
+
+        VOTE --> COLLECTVOTES[Collect pro and con votes]
+        COLLECTVOTES --> CHECKVALID{isBlockValid<br/>pro greater or equal 67%?}
+
+        CHECKVALID -->|yes| FINALIZE[finalizeBlock<br/>add to chain]
+        CHECKVALID -->|no| THROW3[Throw BlockInvalidError]
+
+        FINALIZE --> UPDATE7[updateValidatorPhase 7]
+    end
+
+    subgraph "CATCH Block - Error Handling"
+        THROW1 --> CATCH
+        THROW2 --> CATCH
+        THROW3 --> CATCH
+
+        CATCH{Error Type?}
+
+        CATCH -->|NotInShardError| LOG1[Log: Not in shard<br/>waiting for block]
+        CATCH -->|ForgingEndedError| LOG2[Log: Forging ended<br/>exit routine]
+        CATCH -->|BlockInvalidError| ROLLBACKGCR[Rollback GCR edits<br/>from successful txs]
+        CATCH -->|other| CRASH[Log error<br/>process.exit 1]
+
+        ROLLBACKGCR --> REMOVETXS[Remove successful txs<br/>from mempool]
+        REMOVETXS --> LOG3[Log: Block invalid<br/>rolled back]
+    end
+
+    subgraph "FINALLY Block - Cleanup"
+        UPDATE7 --> FINALLY
+        LOG1 --> FINALLY
+        LOG2 --> FINALLY
+        LOG3 --> FINALLY
+        CRASH --> FINALLY
+
+        FINALLY[Finally - Always Executed]
+        FINALLY --> CLEANUP[cleanupConsensusState<br/>set inConsensusLoop false]
+        CLEANUP --> ENDMGR[manager.endConsensusRoutine<br/>stop secretary routine]
+    end
+
+    ENDMGR --> END([Consensus Routine Complete])
+    RETURN -.-> END
+
+    style START fill:#e1f5ff
+    style CREATEMGR fill:#fff4e1
+    style FINALIZE fill:#c8e6c9
+    style ROLLBACKGCR fill:#ffcdd2
+    style THROW3 fill:#ffcdd2
+    style CLEANUP fill:#f3e5f5
+            </div>
+        </section>
+
+        <section id="phases" class="diagram-section phases">
+            <h2>3. 7 Validation Phases Synchronization</h2>
+
+            <div class="key-concepts">
+                <h3>Key Concepts</h3>
+                <ul>
+                    <li><strong>Phase 1</strong>: Entered Consensus - shard initialized</li>
+                    <li><strong>Phase 2</strong>: Synchronized Time - skipped in v2</li>
+                    <li><strong>Phase 3</strong>: Merged Mempool - all mempools combined and ordered</li>
+                    <li><strong>Phase 4</strong>: Applied GCR - state changes applied, failed txs pruned</li>
+                    <li><strong>Phase 5</strong>: Forged Block - block created with signatures</li>
+                    <li><strong>Phase 6</strong>: Voted On Block - signatures collected from shard</li>
+                    <li><strong>Phase 7</strong>: Ready to End Consensus - finalize or rollback</li>
+                </ul>
+            </div>
+
+            <div class="mermaid">
+sequenceDiagram
+    participant Node as Local Node
+    participant Secretary
+    participant Shard as Other Shard Members
+
+    Note over Node,Shard: All nodes start consensus routine concurrently
+
+    rect rgb(200, 230, 255)
+        Note over Node,Shard: Phase 1: Entered Consensus
+        Node->>Node: Initialize shard and manager
+        Node->>Secretary: setValidatorPhase 1
+        Secretary->>Secretary: Update phase tracking
+        Secretary->>Secretary: Check if all members at phase 1
+        alt All members ready
+            Secretary->>Node: greenlight phase 1
+            Secretary->>Shard: greenlight phase 1
+        else Some members not ready
+            Secretary->>Secretary: Wait for SET_WAIT_STATUS
+        end
+        Node->>Node: Proceed to next phase
+    end
+
+    rect rgb(230, 255, 230)
+        Note over Node,Shard: Phase 2: Synchronized Time (skipped in v2)
+        Node->>Secretary: setValidatorPhase 2
+        Secretary->>Node: greenlight phase 2
+    end
+
+    rect rgb(255, 245, 230)
+        Note over Node,Shard: Phase 3: Merged Mempool
+        Node->>Shard: Send local mempool
+        Shard->>Node: Receive remote mempools
+        Node->>Node: Merge all mempools
+        Node->>Node: Order transactions by timestamp
+        Node->>Secretary: setValidatorPhase 3
+        Secretary->>Secretary: Wait for all members
+        Secretary->>Node: greenlight phase 3
+        Secretary->>Shard: greenlight phase 3
+    end
+
+    rect rgb(245, 230, 255)
+        Note over Node,Shard: Phase 4: Applied GCR
+        Node->>Node: Apply GCR edits from mempool
+        Node->>Node: Track successful and failed txs
+        Node->>Node: Prune failed txs from mempool
+        Node->>Secretary: setValidatorPhase 4
+        Secretary->>Node: greenlight phase 4
+    end
+
+    rect rgb(255, 235, 245)
+        Note over Node,Shard: Phase 5: Forged Block
+        Node->>Node: Create block with ordered txs
+        Node->>Node: Hash native tables (GCR)
+        Node->>Node: Sign block hash
+        Node->>Node: Calculate next proposer (CVSA)
+        Node->>Secretary: setValidatorPhase 5
+        Secretary->>Node: greenlight phase 5
+    end
+
+    rect rgb(230, 245, 255)
+        Note over Node,Shard: Phase 6: Voted On Block
+        Node->>Shard: Broadcast block hash and signature
+        Shard->>Node: Return signatures if hash matches
+        Node->>Node: Verify all incoming signatures
+        Node->>Node: Add valid signatures to block
+        Node->>Node: Count pro and con votes
+        Node->>Secretary: setValidatorPhase 6
+        Secretary->>Node: greenlight phase 6
+    end
+
+    rect rgb(200, 255, 230)
+        Note over Node,Shard: Phase 7: Ready to End Consensus
+        Node->>Node: Check if block valid (67% votes)
+        alt Block Valid
+            Node->>Node: Finalize block - add to chain
+        else Block Invalid
+            Node->>Node: Rollback GCR edits
+            Node->>Node: Remove txs from mempool
+        end
+        Node->>Secretary: setValidatorPhase 7
+        Secretary->>Secretary: Stop secretary routine
+        Secretary->>Node: greenlight phase 7
+        Note over Node,Shard: End consensus routine
+    end
+            </div>
+        </section>
+
+        <section id="cvsa" class="diagram-section cvsa">
+            <h2>4. CVSA - Common Validator Seed Algorithm</h2>
+
+            <div class="key-concepts">
+                <h3>Key Concepts</h3>
+                <ul>
+                    <li><strong>Deterministic Seed</strong>: Same blockchain state produces same seed</li>
+                    <li><strong>Last 3 Blocks</strong>: Uses hash:number of recent blocks</li>
+                    <li><strong>Genesis Anchor</strong>: Genesis hash ensures chain integrity</li>
+                    <li><strong>SHA256</strong>: Collision-resistant hash function</li>
+                    <li><strong>Security</strong>: Prevents block manipulation, genesis substitution</li>
+                    <li><strong>Byzantine Resistance</strong>: Fork requires 67%+ malicious validators</li>
+                </ul>
+            </div>
+
+            <div class="mermaid">
+flowchart TD
+    START([CVSA Calculation])
+
+    START --> INPUT{Input<br/>provided?}
+    INPUT -->|lastBlock provided| USELAST[Use provided lastBlock]
+    INPUT -->|no input| GETLAST[Chain.getLastBlock]
+
+    USELAST --> BLOCKCOUNT
+    GETLAST --> BLOCKCOUNT[blockCount = 3]
+
+    BLOCKCOUNT --> ARRAY[lastFewBlocks = empty array]
+    ARRAY --> ADDLAST[Add lastBlock to array]
+
+    ADDLAST --> LOOP{array.length<br/>less than 3?}
+    LOOP -->|yes| GETPREV[Get block N minus array.length]
+    LOOP -->|no| GENESIS
+
+    GETPREV --> EXISTS{Block<br/>exists?}
+    EXISTS -->|yes| ADDTOARRAY[Add to array]
+    EXISTS -->|no| GENESIS
+    ADDTOARRAY --> LOOP
+
+    GENESIS[Get genesis block hash]
+    GENESIS --> GENEXISTS{Genesis<br/>exists?}
+
+    GENEXISTS -->|no and lastBlock is 0| USELASTGEN[Use lastBlock.hash as genesis]
+    GENEXISTS -->|no and lastBlock not 0| THROW[Throw: Genesis not found]
+    GENEXISTS -->|yes| BUILD
+    USELASTGEN --> BUILD
+
+    BUILD["Build hash string<br/>hash1:number1 | hash2:number2 | hash3:number3 | genesis:genesisHash"]
+
+    BUILD --> EXAMPLE["Example<br/>abc123:100 | def456:99 | ghi789:98 | genesis:000genesis"]
+
+    EXAMPLE --> SHA256[Calculate SHA256 of hash string]
+    SHA256 --> RESULT[commonValidatorSeed]
+
+    RESULT --> SECURITY[Security Properties]
+
+    subgraph "Security Guarantees"
+        SECURITY --> PROP1[Block hashes commit to<br/>complete block content]
+        SECURITY --> PROP2[Genesis hash anchors<br/>entire chain history]
+        SECURITY --> PROP3[Block numbers ensure<br/>sequential integrity]
+        SECURITY --> PROP4[SHA256 provides<br/>collision resistance]
+
+        PROP1 --> ATTACK1[Attack: Block Content Manipulation<br/>PREVENTED - changes hash]
+        PROP2 --> ATTACK2[Attack: Genesis Substitution<br/>PREVENTED - different CVSA]
+        PROP3 --> ATTACK3[Attack: Block Number Manipulation<br/>PREVENTED - breaks sequence]
+        PROP4 --> ATTACK4[Attack: Chain Fork<br/>REQUIRES Byzantine majority 67%]
+    end
+
+    RESULT --> USAGE[Usage: Deterministic Shard Selection]
+    USAGE --> END([Return CVSA and lastBlockNumber])
+
+    style START fill:#e1f5ff
+    style RESULT fill:#c8e6c9
+    style SHA256 fill:#fff4e1
+    style SECURITY fill:#f3e5f5
+    style ATTACK1 fill:#ffcdd2
+    style ATTACK2 fill:#ffcdd2
+    style ATTACK3 fill:#ffcdd2
+    style ATTACK4 fill:#ffe0b2
+            </div>
+        </section>
+
+        <section id="shard" class="diagram-section shard">
+            <h2>5. Shard Selection & Secretary Election</h2>
+
+            <div class="key-concepts">
+                <h3>Key Concepts</h3>
+                <ul>
+                    <li><strong>Alea PRNG</strong>: Deterministic pseudorandom number generator seeded by CVSA</li>
+                    <li><strong>Lexicographic Sort</strong>: Peers sorted by identity before selection</li>
+                    <li><strong>Deterministic Selection</strong>: Same seed always produces same shard</li>
+                    <li><strong>Secretary Election</strong>: First member always becomes secretary</li>
+                    <li><strong>Shard Size</strong>: Configurable, minimum 3 for security</li>
+                    <li><strong>Malicious Node Protection</strong>: Unsynced nodes calculate different CVSA</li>
+                </ul>
+            </div>
+
+            <div class="mermaid">
+flowchart TD
+    START([getShard with CVSA seed])
+
+    START --> GETPEERS[PeerManager.getInstance<br/>getOnlinePeers]
+    GETPEERS --> FILTERSYNCED[Filter peers<br/>where sync.status is true]
+
+    FILTERSYNCED --> CHECKCOUNT{Peer count<br/>less than shardSize?}
+    CHECKCOUNT -->|yes| ADJUSTSIZE[maxShardSize = peer count]
+    CHECKCOUNT -->|no| USECONFIGURED[maxShardSize = configured value]
+
+    ADJUSTSIZE --> INITRANDOM
+    USECONFIGURED --> INITRANDOM[Initialize Alea PRNG<br/>with CVSA seed]
+
+    INITRANDOM --> COPY[availablePeers = copy of peers]
+    COPY --> SORT[Sort availablePeers by identity<br/>lexicographic order]
+
+    SORT --> LOOPSTART[shard = empty array]
+    LOOPSTART --> LOOPCHECK{i less than maxShardSize<br/>and peers available?}
+
+    LOOPCHECK -->|no| VALIDATE
+    LOOPCHECK -->|yes| RANDOM[index = floor of<br/>random times availablePeers.length]
+
+    RANDOM --> SELECT[Add availablePeers at index to shard]
+    SELECT --> REMOVE[Remove selected peer from availablePeers]
+    REMOVE --> INCREMENT[i plus plus]
+    INCREMENT --> LOOPCHECK
+
+    VALIDATE{Shard size<br/>less than 3?}
+    VALIDATE -->|yes| WARN[Log warning:<br/>Security issue with small shard]
+    VALIDATE -->|no| SECRETARY
+    WARN --> SECRETARY
+
+    SECRETARY[Secretary Election]
+    SECRETARY --> FIRST[Secretary = shard member at index 0]
+
+    FIRST --> PROPERTIES[Shard Properties]
+
+    subgraph "Shard Object Structure"
+        PROPERTIES --> PROP1[CVSA: seed string]
+        PROPERTIES --> PROP2[members: Peer array]
+        PROPERTIES --> PROP3[secretaryKey: first member identity]
+        PROPERTIES --> PROP4[blockRef: N plus 1]
+        PROPERTIES --> PROP5[validationPhases: map of member states]
+    end
+
+    subgraph "Deterministic Properties"
+        FIRST --> DET1[Same CVSA seed produces<br/>same shard selection]
+        DET1 --> DET2[All synced nodes<br/>calculate identical CVSA]
+        DET2 --> DET3[Secretary always first<br/>in deterministic order]
+        DET3 --> DET4[Malicious nodes produce<br/>different CVSA if unsynced]
+    end
+
+    subgraph "Secretary Responsibilities"
+        SECRETARY --> RESP1[Coordinate validation phases]
+        RESP1 --> RESP2[Track member progress]
+        RESP2 --> RESP3[Release green lights]
+        RESP3 --> RESP4[Set block timestamp]
+        RESP4 --> RESP5[Handle offline nodes]
+        RESP5 --> RESP6[Manage semaphore system]
+    end
+
+    PROP5 --> RETURN([Return shard array])
+
+    style START fill:#e1f5ff
+    style INITRANDOM fill:#fff4e1
+    style SECRETARY fill:#f3e5f5
+    style FIRST fill:#c8e6c9
+    style WARN fill:#ffe0b2
+            </div>
+        </section>
+
+        <section id="coordination" class="diagram-section coordination">
+            <h2>6. Secretary-Member Coordination (Green Light System)</h2>
+
+            <div class="key-concepts">
+                <h3>Key Concepts</h3>
+                <ul>
+                    <li><strong>Green Light Waiter</strong>: Members wait for secretary approval to proceed</li>
+                    <li><strong>SET_WAIT_STATUS Waiter</strong>: Secretary waits for all members to report phase</li>
+                    <li><strong>PreHold System</strong>: Greenlight can arrive before member requests it</li>
+                    <li><strong>Timeouts</strong>: Members wait 30s, secretary waits 15s</li>
+                    <li><strong>Offline Detection</strong>: Secretary pings and removes offline members</li>
+                    <li><strong>Secretary Failover</strong>: Second member becomes secretary if first fails</li>
+                </ul>
+            </div>
+
+            <div class="mermaid">
+stateDiagram-v2
+    [*] --> Member_WaitPhase: Member completes phase work
+
+    state "Member State" as Member {
+        Member_WaitPhase: Member sets waitStatus = true
+        Member_SendPhase: Send setValidatorPhase to secretary
+        Member_CreateWaiter: Create GREEN_LIGHT waiter with timeout
+        Member_WaitGreenLight: Wait for green light or timeout
+
+        Member_WaitPhase --> Member_SendPhase
+        Member_SendPhase --> Member_CreateWaiter
+        Member_CreateWaiter --> Member_WaitGreenLight
+
+        state Member_WaitGreenLight {
+            [*] --> Waiting
+            Waiting --> Resolved: Secretary sends greenlight
+            Waiting --> Timeout: 30s timeout expires
+            Waiting --> PreHeld: Greenlight arrived early
+        }
+    }
+
+    state "Secretary State" as Secretary {
+        Sec_ReceivePhase: Receive setValidatorPhase from member
+        Sec_UpdateTracking: Update validationPhases map
+        Sec_CheckBehind: Check if member behind us
+        Sec_ReleaseBehind: Release if behind
+        Sec_CheckAllReady: Check if all members ready
+        Sec_ReleaseAll: Release all waiting members
+        Sec_WaitMore: Wait for more members
+
+        Sec_ReceivePhase --> Sec_UpdateTracking
+        Sec_UpdateTracking --> Sec_CheckBehind
+
+        state Sec_CheckBehind {
+            [*] --> Check
+            Check --> Behind: Member phase less than ours
+            Check --> SameOrAhead: Member phase greater or equal
+            Behind --> [*]: Release member immediately
+            SameOrAhead --> CheckReady
+        }
+
+        Sec_CheckBehind --> Sec_CheckAllReady
+        Sec_CheckAllReady --> Sec_ReleaseAll: All at same phase
+        Sec_CheckAllReady --> Sec_WaitMore: Some not ready
+
+        state Sec_ReleaseAll {
+            [*] --> ResolveWaiter
+            ResolveWaiter: Resolve SET_WAIT_STATUS waiter
+            ResolveWaiter --> SendGreenlights
+            SendGreenlights: Send greenlight RPC to all members
+            SendGreenlights --> UpdateWaitStatus
+            UpdateWaitStatus: Set waitStatus = false for all
+            UpdateWaitStatus --> [*]
+        }
+
+        state Sec_WaitMore {
+            [*] --> WaitSETWAIT
+            WaitSETWAIT: Wait for SET_WAIT_STATUS
+            WaitSETWAIT --> TimeoutCheck: 15s timeout
+            WaitSETWAIT --> NextMember: Another member updates
+
+            state TimeoutCheck {
+                [*] --> PingOffline
+                PingOffline: Ping missing members
+                PingOffline --> RemoveOffline: Remove offline nodes
+                RemoveOffline --> ReleaseRemaining: Release online members
+                ReleaseRemaining --> [*]
+            }
+        }
+    }
+
+    state "Greenlight Received" as Received {
+        Recv_CheckPhase: Check if phase matches
+        Recv_UpdateTimestamp: Update blockTimestamp if newer
+        Recv_ResolveWaiter: Resolve GREEN_LIGHT waiter
+        Recv_SetWaitFalse: Set waitStatus = false
+
+        [*] --> Recv_CheckPhase
+        Recv_CheckPhase --> Recv_UpdateTimestamp: Phase matches
+        Recv_CheckPhase --> Recv_PreHold: Phase higher than ours
+        Recv_CheckPhase --> Recv_Ignore: Phase lower than ours
+        Recv_UpdateTimestamp --> Recv_ResolveWaiter
+        Recv_ResolveWaiter --> Recv_SetWaitFalse
+        Recv_SetWaitFalse --> [*]
+
+        Recv_PreHold: PreHold for future phase
+        Recv_Ignore: Ignore stale greenlight
+    }
+
+    state "Secretary Failover" as Failover {
+        Detect_Offline: Member timeout waiting for greenlight
+        Ping_Secretary: Ping secretary twice
+        Check_Response: Check if online
+        Elect_New: Elect second member as secretary
+        Start_New_Routine: New secretary starts routine
+        Sync_Phases: New secretary requests all member phases
+
+        [*] --> Detect_Offline
+        Detect_Offline --> Ping_Secretary
+        Ping_Secretary --> Check_Response
+        Check_Response --> Elect_New: Both pings fail
+        Check_Response --> [*]: Secretary responds
+        Elect_New --> Start_New_Routine
+        Start_New_Routine --> Sync_Phases
+        Sync_Phases --> [*]
+    }
+
+    Member_WaitGreenLight --> Received: Greenlight arrives
+    Member_WaitGreenLight --> Failover: Timeout expires
+    Sec_ReleaseAll --> Received: Members receive
+    Failover --> Secretary: New secretary elected
+
+    Received --> [*]: Proceed to next phase
+
+    note right of Secretary
+        Secretary Routine Loop:
+        1. Wait for SET_WAIT_STATUS
+        2. Check if all members ready
+        3. Release if ready, else timeout
+        4. Handle offline nodes
+        5. Repeat until phase 7
+    end note
+
+    note right of Member
+        Member Coordination:
+        1. Complete phase work
+        2. Send phase to secretary
+        3. Wait for greenlight
+        4. Proceed or handle timeout
+    end note
+            </div>
+        </section>
+
+        <section id="mempool" class="diagram-section mempool">
+            <h2>7. Mempool Merging & Transaction Ordering</h2>
+
+            <div class="key-concepts">
+                <h3>Key Concepts</h3>
+                <ul>
+                    <li><strong>RPC Call</strong>: Each member sends mempool to all shard members</li>
+                    <li><strong>Deduplication</strong>: Transactions merged by hash to avoid duplicates</li>
+                    <li><strong>Timestamp Ordering</strong>: Transactions sorted by timestamp ascending</li>
+                    <li><strong>Retry Logic</strong>: 3 retries with 250ms delay for network failures</li>
+                    <li><strong>Phase 3</strong>: Mempool merging occurs during validation phase 3</li>
+                    <li><strong>Mempool v2 Table</strong>: Merged mempool stored with blockNumber reference</li>
+                </ul>
+            </div>
+
+            <div class="mermaid">
+flowchart TD
+    START([mergeAndOrderMempools])
+
+    START --> GETLOCAL[Get local mempool<br/>Mempool.getMempool blockRef]
+    GETLOCAL --> LOG1[Log: Our mempool retrieved]
+
+    LOG1 --> CREATEPROMISES[Create array of RPC promises]
+    CREATEPROMISES --> LOOP{For each<br/>shard member}
+
+    LOOP -->|yes| CREATECALL[Create longCall RPC request]
+    CREATECALL --> ADDPROMISE[Add to promises array]
+    ADDPROMISE --> LOOP
+
+    subgraph "RPC Call Structure"
+        CREATECALL --> METHOD["method: mempool"]
+        CREATECALL --> PARAMS["params: local mempool data"]
+        CREATECALL --> RETRY["retry: 3 times, 250ms delay"]
+    end
+
+    LOOP -->|no| SENDALL[Promise.all - wait for all responses]
+
+    SENDALL --> PROCESSRESP{For each<br/>response}
+
+    PROCESSRESP -->|more| CHECKSTATUS{Response<br/>result is 200?}
+    PROCESSRESP -->|done| UPDATE
+
+    CHECKSTATUS -->|yes| RECEIVEMEM[Mempool.receive<br/>remote mempool]
+    CHECKSTATUS -->|no| LOGERROR[Log error response]
+
+    RECEIVEMEM --> MERGE[Merge into local mempool<br/>avoid duplicates by hash]
+    LOGERROR --> PROCESSRESP
+    MERGE --> PROCESSRESP
+
+    UPDATE[updateValidatorPhase 3]
+    UPDATE --> GETMERGED[Get merged mempool<br/>Mempool.getMempool blockRef]
+
+    GETMERGED --> ORDER[orderTransactions]
+
+    subgraph "Transaction Ordering"
+        ORDER --> SORT[Sort by timestamp ascending]
+        SORT --> EXAMPLE["Example<br/>tx1 timestamp 1000<br/>tx2 timestamp 1001<br/>tx3 timestamp 999<br/>Result: tx3, tx1, tx2"]
+    end
+
+    SORT --> RETURN([Return ordered transactions])
+
+    subgraph "Mempool Structure"
+        GETLOCAL --> STRUCTURE["Mempool Data<br/>transactions array<br/>each tx has hash and timestamp"]
+        MERGE --> DEDUP[Deduplication by hash<br/>if hash exists skip]
+        DEDUP --> STORE[Store in mempool_v2 table<br/>with blockNumber reference]
+    end
+
+    style START fill:#e1f5ff
+    style MERGE fill:#c8e6c9
+    style ORDER fill:#fff4e1
+    style RETURN fill:#c8e6c9
+            </div>
+        </section>
+
+        <section id="voting" class="diagram-section voting">
+            <h2>8. Block Forging & Voting</h2>
+
+            <div class="key-concepts">
+                <h3>Key Concepts</h3>
+                <ul>
+                    <li><strong>Native Tables Hashing</strong>: GCR tables hashed and included in block</li>
+                    <li><strong>Secretary Timestamp</strong>: All shard members use same timestamp</li>
+                    <li><strong>Block Hash</strong>: SHA256 of block.content</li>
+                    <li><strong>Ed25519 Signatures</strong>: Each validator signs block hash</li>
+                    <li><strong>Hash Matching</strong>: Members only sign if their block hash matches</li>
+                    <li><strong>67% Threshold</strong>: Block valid if at least 67% of shard signs</li>
+                </ul>
+            </div>
+
+            <div class="mermaid">
+sequenceDiagram
+    participant Node as Local Node
+    participant Manager as SecretaryManager
+    participant GCR as GCR System
+    participant Block as Block Creation
+    participant Shard as Shard Members
+
+    Note over Node,Shard: Phase 5 - Forge Block
+
+    Node->>Node: Get previous block hash
+    Node->>Node: Calculate CVSA for current block
+    Node->>Block: createBlock(orderedTxs, CVSA, prevHash, blockNumber)
+
+    Block->>GCR: hashGCRTables()
+    GCR->>GCR: Hash GCRTracker table (SHA256)
+    GCR->>GCR: Hash GCRSubnetsTxs table (SHA256)
+    GCR->>Block: Return native_tables_hashes
+
+    Block->>Manager: Get lastConsensusTime
+    Manager->>Block: Return secretary block timestamp
+    Block->>Block: Set block.content.timestamp
+
+    Block->>Block: Create block.content structure
+    Note right of Block: ordered_transactions: hashes<br/>previousHash<br/>peerlist<br/>timestamp<br/>native_tables_hashes
+
+    Block->>Block: Calculate block.hash = SHA256(content)
+    Block->>Block: Sign block hash with ed25519
+    Block->>Block: Add signature to validation_data
+
+    Block->>Node: Calculate next proposer (CVSA of this block)
+    Node->>Node: Set block.next_proposer
+    Node->>Node: Store as candidateBlock in sharedState
+
+    Node->>Manager: updateValidatorPhase(5)
+    Manager->>Node: Wait for greenlight
+
+    Note over Node,Shard: Phase 6 - Vote On Block
+
+    Node->>Shard: broadcastBlockHash(block, shard)
+    Note right of Node: RPC: proposeBlockHash<br/>params: hash, validation_data, ourId
+
+    loop For each shard member
+        Shard->>Shard: Check if in consensus mode
+        Shard->>Shard: Verify we are in same shard
+        Shard->>Shard: Compare our block.hash with proposed
+
+        alt Hashes match
+            Shard->>Shard: Sign block hash
+            Shard->>Node: Return 200 with signature
+            Node->>Node: Verify signature with ed25519
+            alt Signature valid
+                Node->>Node: Add signature to block.validation_data
+                Node->>Node: Increment pro vote count
+            else Signature invalid
+                Node->>Node: Log error - reject signature
+            end
+        else Hashes do not match
+            Shard->>Node: Return error code
+            Node->>Node: Increment con vote count
+        end
+    end
+
+    Node->>Node: Wait for all promises to resolve
+    Node->>Node: Count total valid signatures
+    Node->>Manager: updateValidatorPhase(6)
+
+    Note over Node,Shard: Determine Block Validity
+
+    Node->>Node: Calculate: signatureCount / shardSize
+    Node->>Node: Check if ratio greater or equal 0.67 (67%)
+
+    alt Block Valid (67%+ votes)
+        Node->>Node: Mark block as valid
+        Note right of Node: Proceed to finalization
+    else Block Invalid (less than 67%)
+        Node->>Node: Mark block as invalid
+        Note right of Node: Trigger rollback
+    end
+            </div>
+        </section>
+
+        <section id="gcr" class="diagram-section gcr">
+            <h2>9. GCR Integration in Consensus</h2>
+
+            <div class="key-concepts">
+                <h3>Key Concepts</h3>
+                <ul>
+                    <li><strong>Phase 4 Application</strong>: GCR edits applied during consensus phase 4</li>
+                    <li><strong>Successful vs Failed</strong>: Transactions tracked separately</li>
+                    <li><strong>Failed Tx Pruning</strong>: Duplicate or invalid txs removed from mempool</li>
+                    <li><strong>Rollback on Invalid Block</strong>: All successful GCR edits reversed</li>
+                    <li><strong>Edit Routing</strong>: Balance, nonce, identity edits routed to appropriate routines</li>
+                    <li><strong>Atomic Semantics</strong>: All or nothing - block finalized or fully rolled back</li>
+                </ul>
+            </div>
+
+            <div class="mermaid">
+flowchart TD
+    START([applyGCREditsFromMergedMempool])
+
+    START --> INIT[Initialize arrays<br/>successfulTxs and failedTxs]
+    INIT --> LOOP{For each tx<br/>in mempool}
+
+    LOOP -->|more txs| CHECKEXISTS{Does tx<br/>exist in chain?}
+    LOOP -->|done| PHASE4
+
+    CHECKEXISTS -->|yes| ADDFAILED[Add tx.hash to failedTxs]
+    CHECKEXISTS -->|no| GETEDITS[Extract tx.content.gcr_edits]
+
+    ADDFAILED --> LOOP
+
+    GETEDITS --> LOOPEDITS{For each<br/>GCREdit}
+
+    LOOPEDITS -->|more edits| APPLYEDIT[HandleGCR.apply edit, tx]
+    LOOPEDITS -->|done| LOOP
+
+    APPLYEDIT --> CHECKRESULT{Apply<br/>successful?}
+
+    CHECKRESULT -->|yes| ADDSUCCESS[Add tx.hash to successfulTxs]
+    CHECKRESULT -->|no| ADDFAIL[Add tx.hash to failedTxs]
+
+    ADDSUCCESS --> LOOPEDITS
+    ADDFAIL --> LOOPEDITS
+
+    PHASE4[updateValidatorPhase 4]
+    PHASE4 --> RETURNRESULT([Return successfulTxs, failedTxs])
+
+    subgraph "Caller Processing"
+        RETURNRESULT --> CHECKCALLER{Failed txs<br/>exist?}
+        CHECKCALLER -->|yes| PRUNE[Remove failed txs from mempool]
+        CHECKCALLER -->|no| CONTINUE
+        PRUNE --> CONTINUE[Continue to forge block]
+    end
+
+    subgraph "Rollback on Block Invalid"
+        CONTINUE --> FORGE[Forge block with successful txs]
+        FORGE --> VOTE[Vote on block]
+        VOTE --> INVALID{Block<br/>invalid?}
+
+        INVALID -->|yes| ROLLBACKSTART[rollbackGCREditsFromTxs]
+        INVALID -->|no| FINALIZE[Finalize block]
+
+        ROLLBACKSTART --> ROLLBACKLOOP{For each<br/>successful tx}
+        ROLLBACKLOOP -->|more| ROLLBACKAPPLY[HandleGCR.applyToTx<br/>tx, isRollback true]
+        ROLLBACKLOOP -->|done| REMOVETXS
+
+        ROLLBACKAPPLY --> ROLLBACKCHECK{Rollback<br/>success?}
+        ROLLBACKCHECK -->|yes| TRACKROLLBACK[Track rollback success]
+        ROLLBACKCHECK -->|no| TRACKFAIL[Track rollback failure]
+
+        TRACKROLLBACK --> ROLLBACKLOOP
+        TRACKFAIL --> ROLLBACKLOOP
+
+        REMOVETXS[Remove successful txs from mempool]
+        REMOVETXS --> ROLLBACKDONE[Rollback complete]
+    end
+
+    subgraph "GCREdit Routing"
+        APPLYEDIT --> ROUTETYPE{Edit<br/>type?}
+
+        ROUTETYPE -->|balance| BALROUTINE[GCRBalanceRoutines.apply]
+        ROUTETYPE -->|nonce| NONCEROUTINE[GCRNonceRoutines.apply]
+        ROUTETYPE -->|identity| IDROUTINE[GCRIdentityRoutines.apply]
+
+        BALROUTINE --> OPERATION{Operation?}
+        OPERATION -->|add| BALADD[Add to balance]
+        OPERATION -->|remove| BALCHECK{Sufficient<br/>balance?}
+        BALCHECK -->|yes| BALREM[Remove from balance]
+        BALCHECK -->|no| BALFAIL[Return failure]
+
+        BALADD --> BALSAVE[Save to GCR_Main]
+        BALREM --> BALSAVE
+        BALSAVE --> BALSUCCESS[Return success]
+    end
+
+    style START fill:#e1f5ff
+    style APPLYEDIT fill:#fff4e1
+    style RETURNRESULT fill:#c8e6c9
+    style ROLLBACKSTART fill:#ffcdd2
+    style FINALIZE fill:#c8e6c9
+            </div>
+        </section>
+
+        <section id="failure" class="diagram-section failure">
+            <h2>10. Failure Handling & Recovery</h2>
+
+            <div class="key-concepts">
+                <h3>Key Concepts</h3>
+                <ul>
+                    <li><strong>Member Timeout</strong>: 30s for green light, 15s for SET_WAIT_STATUS</li>
+                    <li><strong>Offline Detection</strong>: Secretary pings missing members and removes offline</li>
+                    <li><strong>Secretary Failover</strong>: Second member becomes secretary if first offline</li>
+                    <li><strong>Double Ping</strong>: Two pings to avoid false negatives</li>
+                    <li><strong>Network Partition</strong>: Each partition continues if 67% threshold met</li>
+                    <li><strong>Block Invalid Rollback</strong>: All GCR edits reversed if less than 67% votes</li>
+                </ul>
+            </div>
+
+            <div class="mermaid">
+stateDiagram-v2
+    [*] --> Normal: Consensus running normally
+
+    state "Normal Operation" as Normal {
+        [*] --> AllOnline
+        AllOnline: All shard members online
+        AllOnline --> PhaseSync: Members progress through phases
+        PhaseSync --> GreenLight: Secretary releases green lights
+        GreenLight --> NextPhase: All proceed together
+        NextPhase --> AllOnline
+    }
+
+    Normal --> MemberOffline: Member timeout detected
+    Normal --> SecretaryOffline: Secretary timeout detected
+    Normal --> MemberLate: Member slow or stuck
+    Normal --> NetworkIssue: Network partition
+
+    state "Member Offline Detection" as MemberOffline {
+        [*] --> SecretaryWait
+        SecretaryWait: Secretary waits for SET_WAIT_STATUS
+        SecretaryWait --> Timeout: 15s timeout expires
+        Timeout --> IdentifyMissing: Get list of non-waiting members
+        IdentifyMissing --> PingMissing: Ping each missing member
+
+        state PingMissing {
+            [*] --> SendPing
+            SendPing: member.connect()
+            SendPing --> CheckResponse: Wait for response
+            CheckResponse --> Online: Response received
+            CheckResponse --> Offline: No response
+        }
+
+        PingMissing --> ProcessResults: Collect ping results
+        ProcessResults --> RemoveOffline: Remove offline members from shard
+        RemoveOffline --> UpdatePhases: Delete validationPhases for offline
+        UpdatePhases --> ReleaseOnline: Release remaining online members
+        ReleaseOnline --> [*]: Continue consensus
+    }
+
+    state "Secretary Offline Detection" as SecretaryOffline {
+        [*] --> MemberTimeout
+        MemberTimeout: Member timeout waiting for greenlight
+        MemberTimeout --> PingSecretary: Ping secretary
+        PingSecretary --> FirstPing: First attempt
+        FirstPing --> SecondPing: Retry for false negative
+
+        state SecondPing {
+            [*] --> Check
+            Check --> StillOffline: Both pings fail
+            Check --> FalseAlarm: Second ping succeeds
+            FalseAlarm --> [*]: Continue waiting
+        }
+
+        SecondPing --> ElectNew: Secretary confirmed offline
+        ElectNew: Elect second member as new secretary
+        ElectNew --> CheckIfUs: Are we the new secretary?
+
+        state CheckIfUs {
+            [*] --> WeAreSecretary
+            [*] --> WeAreNotSecretary
+
+            WeAreSecretary --> StartRoutine: Start secretaryRoutine
+            StartRoutine --> SyncState: Request phases from all members
+            SyncState --> InheritTimestamp: Use original secretary timestamp
+            InheritTimestamp --> [*]: Resume coordination
+
+            WeAreNotSecretary --> UpdateSecretary: Update secretary reference
+            UpdateSecretary --> ResendPhase: Send phase to new secretary
+            ResendPhase --> [*]: Wait for new greenlight
+        }
+    }
+
+    state "Member Late or Stuck" as MemberLate {
+        [*] --> Behind
+        Behind: Member phase less than current phase
+        Behind --> SecretaryReceives: Secretary receives old phase
+        SecretaryReceives --> ImmediateRelease: Release member immediately
+        ImmediateRelease --> MemberCatchesUp: Member proceeds to current phase
+        MemberCatchesUp --> [*]: Rejoins at current phase
+    }
+
+    state "Network Partition" as NetworkIssue {
+        [*] --> PartitionDetected
+        PartitionDetected: Members cannot reach each other
+        PartitionDetected --> SplitShard: Shard splits into partitions
+
+        state SplitShard {
+            [*] --> Partition1
+            [*] --> Partition2
+
+            Partition1: Partition with secretary
+            Partition1 --> RemoveUnreachable1: Remove unreachable members
+            RemoveUnreachable1 --> ContinueIfQuorum1: Check if 67% threshold met
+            ContinueIfQuorum1 --> Success1: Continue consensus
+            ContinueIfQuorum1 --> Fail1: Abort - insufficient members
+
+            Partition2: Partition without secretary
+            Partition2 --> ElectNewSecretary: Elect new secretary from partition
+            ElectNewSecretary --> RemoveUnreachable2: Remove unreachable members
+            RemoveUnreachable2 --> ContinueIfQuorum2: Check if 67% threshold met
+            ContinueIfQuorum2 --> Success2: Continue consensus
+            ContinueIfQuorum2 --> Fail2: Abort - insufficient members
+        }
+
+        SplitShard --> Rejoin: Network heals
+        Rejoin --> Resync: Nodes resync blockchain state
+        Resync --> [*]: Return to normal
+    }
+
+    state "Block Invalid Rollback" as BlockInvalid {
+        [*] --> VotingComplete
+        VotingComplete: Less than 67% votes for block
+        VotingComplete --> RollbackGCR: Rollback all successful GCR edits
+        RollbackGCR --> ReverseEdits: Apply edits with isRollback true
+        ReverseEdits --> RemoveTxs: Remove txs from mempool
+        RemoveTxs --> CleanupState: Cleanup consensus state
+        CleanupState --> [*]: Wait for next consensus round
+    }
+
+    MemberOffline --> Normal: Members removed, continue
+    SecretaryOffline --> Normal: New secretary elected
+    MemberLate --> Normal: Member catches up
+    NetworkIssue --> Normal: Network heals
+
+    Normal --> BlockInvalid: Block voting fails
+    BlockInvalid --> [*]: Consensus complete
+
+    note right of MemberOffline
+        Timeout Detection:
+        - Secretary waits 15s for SET_WAIT_STATUS
+        - Members wait 30s for GREEN_LIGHT
+        - Double ping for false negatives
+    end note
+
+    note right of SecretaryOffline
+        Secretary Failover:
+        - Second member becomes secretary
+        - Inherits block timestamp
+        - Syncs member phases
+        - Continues coordination
+    end note
+
+    note right of BlockInvalid
+        Byzantine Fault Tolerance:
+        - Requires 67% agreement
+        - Rollback on failure
+        - All or nothing semantics
+    end note
+            </div>
+        </section>
+
+        <div class="file-references">
+            <h3>📁 Key File References</h3>
+
+            <h4>Core Consensus Files</h4>
+            <ul>
+                <li><strong>PoRBFT Main</strong>: <code>src/libs/consensus/v2/PoRBFT.ts</code> (consensus routine entry point)</li>
+                <li><strong>Secretary Manager</strong>: <code>src/libs/consensus/v2/types/secretaryManager.ts</code> (1,005 lines - coordination logic)</li>
+            </ul>
+
+            <h4>Consensus Routines</h4>
+            <ul>
+                <li><strong>CVSA</strong>: <code>src/libs/consensus/v2/routines/getCommonValidatorSeed.ts</code> (133 lines)</li>
+                <li><strong>Shard Selection</strong>: <code>src/libs/consensus/v2/routines/getShard.ts</code> (58 lines)</li>
+                <li><strong>Block Creation</strong>: <code>src/libs/consensus/v2/routines/createBlock.ts</code> (74 lines)</li>
+                <li><strong>Mempool Merge</strong>: <code>src/libs/consensus/v2/routines/mergeMempools.ts</code> (35 lines)</li>
+                <li><strong>Transaction Ordering</strong>: <code>src/libs/consensus/v2/routines/orderTransactions.ts</code> (28 lines)</li>
+                <li><strong>Block Voting</strong>: <code>src/libs/consensus/v2/routines/broadcastBlockHash.ts</code> (130 lines)</li>
+            </ul>
+
+            <h4>Type Definitions</h4>
+            <ul>
+                <li><strong>Interfaces</strong>: <code>src/libs/consensus/v2/interfaces.ts</code></li>
+                <li><strong>Validation Phases</strong>: <code>src/libs/consensus/v2/types/validationStatusTypes.ts</code> (55 lines - 7 phases)</li>
+                <li><strong>Shard Types</strong>: <code>src/libs/consensus/v2/types/shardTypes.ts</code></li>
+            </ul>
+        </div>
+
+        <div class="key-features">
+            <h2>PoRBFT Architecture Principles</h2>
+            <ol>
+                <li><strong>Deterministic Shard Selection</strong>: CVSA algorithm ensures all synced nodes calculate identical shard membership</li>
+                <li><strong>Byzantine Fault Tolerance</strong>: 67% vote threshold provides resistance to up to 33% malicious validators</li>
+                <li><strong>Secretary Coordination</strong>: First shard member coordinates phases using green light semaphore system</li>
+                <li><strong>7 Phase Synchronization</strong>: All validators proceed through phases together, preventing desynchronization</li>
+                <li><strong>Automatic Failure Recovery</strong>: System handles offline validators, secretary failover, and network partitions</li>
+                <li><strong>GCR Integration</strong>: State changes applied during consensus, rolled back on block invalidity</li>
+                <li><strong>Cryptographic Security</strong>: Block hashes, signatures, and CVSA provide tamper-proof coordination</li>
+                <li><strong>Waiter System</strong>: Semaphore-based coordination enables async coordination</li>
+                <li><strong>Block Timestamp Consistency</strong>: Secretary sets canonical timestamp, all members use same value</li>
+                <li><strong>Next Proposer Calculation</strong>: Each block calculates CVSA for next block, enabling smooth rotation</li>
+            </ol>
+        </div>
+
+        <footer>
+            <p>Generated with ❤️ for Demos Blockchain</p>
+            <p>PoRBFT Consensus v2 - Interactive Diagram Documentation</p>
+        </footer>
+    </div>
+
+    <button class="print-btn" onclick="window.print()">🖨️ Print</button>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            securityLevel: 'loose',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                wrap: true
+            },
+            stateDiagram: {
+                useMaxWidth: true
+            }
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('nav a').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+
+        // Highlight active section in navigation
+        window.addEventListener('scroll', () => {
+            let current = '';
+            document.querySelectorAll('.diagram-section').forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (pageYOffset >= sectionTop - 100) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            document.querySelectorAll('nav a').forEach(link => {
+                link.style.fontWeight = 'normal';
+                link.style.background = 'transparent';
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.style.fontWeight = 'bold';
+                    link.style.background = '#f0f0f0';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

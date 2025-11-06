@@ -368,7 +368,7 @@ graph TB
         NEAR --> XMDATA
         BTC --> XMDATA
 
-        XMDATA -->|structure| XMSTRUCT["{<br/>  chain: string,<br/>  subchain: string,<br/>  address: string,<br/>  signature: string,<br/>  publicKey?: string<br/>}"]
+        XMDATA -->|structure| XMSTRUCT["chain: string<br/>subchain: string<br/>address: string<br/>signature: string<br/>publicKey: optional"]
     end
 
     subgraph "Web2 Social Identities"
@@ -383,14 +383,14 @@ graph TB
         GITHUB --> WEB2VERIFY
         DISCORD --> WEB2VERIFY
 
-        WEB2VERIFY -->|standard| SHA256[SHA256 Hash Verification<br/>sha256(proof) == proofHash]
+        WEB2VERIFY -->|standard| SHA256[SHA256 Hash Verification<br/>sha256 proof match]
 
-        TELEGRAM --> TELVERIFY[Telegram Attestation<br/>User signature + Bot signature]
+        TELEGRAM --> TELVERIFY[Telegram Attestation<br/>User + Bot signature]
 
         SHA256 --> WEB2DATA[Web2 Identity Data]
         TELVERIFY --> WEB2DATA
 
-        WEB2DATA -->|structure| WEB2STRUCT["{<br/>  context: string,<br/>  username: string,<br/>  userId: string,<br/>  proof: string | TelegramSignedAttestation,<br/>  proofHash: string,<br/>  timestamp: Date<br/>}"]
+        WEB2DATA -->|structure| WEB2STRUCT["context: string<br/>username: string<br/>userId: string<br/>proof: string<br/>proofHash: string<br/>timestamp: Date"]
     end
 
     subgraph "PQC Post-Quantum Identities"
@@ -404,7 +404,7 @@ graph TB
 
         PQCVERIFY --> PQCDATA[PQC Identity Data]
 
-        PQCDATA -->|structure| PQCSTRUCT["{<br/>  algorithm: 'ml-dsa' | 'sl-dsa',<br/>  address: string,<br/>  signature: string,<br/>  timestamp: Date<br/>}"]
+        PQCDATA -->|structure| PQCSTRUCT["algorithm: ml-dsa or sl-dsa<br/>address: string<br/>signature: string<br/>timestamp: Date"]
     end
 
     subgraph "First-Time Linking Incentives"
@@ -429,12 +429,12 @@ graph TB
         POINTS --> GCRPOINTS[GCR_Main.points field]
     end
 
-    subgraph "Identity Storage - GCR_Main.identities JSONB"
+    subgraph "Identity Storage"
         XMSTRUCT -.->|stored in| GCRID[(GCR_Main.identities)]
         WEB2STRUCT -.->|stored in| GCRID
         PQCSTRUCT -.->|stored in| GCRID
 
-        GCRID -->|structure| IDSTRUCT["{<br/>  xm: { [chain]: { [subchain]: Identity[] } },<br/>  web2: { [context]: Web2Data[] },<br/>  pqc: { [algorithm]: PqcData[] }<br/>}"]
+        GCRID -->|JSONB structure| IDSTRUCT["xm: by chain and subchain<br/>web2: by context<br/>pqc: by algorithm"]
     end
 
     style IDTYPES fill:#e1f5ff
@@ -451,20 +451,20 @@ graph TB
 stateDiagram-v2
     [*] --> CheckEditType: GCREdit received
 
-    CheckEditType --> BalanceEdit: type == "balance"
+    CheckEditType --> BalanceEdit: type is balance
     CheckEditType --> [*]: other types
 
     state BalanceEdit {
         [*] --> CheckRollback
 
-        CheckRollback --> ReverseOperation: isRollback == true
-        CheckRollback --> NormalOperation: isRollback == false
+        CheckRollback --> ReverseOperation: isRollback is true
+        CheckRollback --> NormalOperation: isRollback is false
 
-        ReverseOperation --> DetermineOp: Swap add↔remove
+        ReverseOperation --> DetermineOp: Swap add and remove
         NormalOperation --> DetermineOp
 
-        DetermineOp --> AddOperation: operation == "add"
-        DetermineOp --> RemoveOperation: operation == "remove"
+        DetermineOp --> AddOperation: operation is add
+        DetermineOp --> RemoveOperation: operation is remove
 
         state AddOperation {
             [*] --> GetCurrentBalance_Add
@@ -487,8 +487,8 @@ stateDiagram-v2
         AddOperation --> CheckSimulate
         RemoveOperation --> CheckSimulate
 
-        CheckSimulate --> SkipPersist: simulate == true
-        CheckSimulate --> PersistToDB: simulate == false
+        CheckSimulate --> SkipPersist: simulate is true
+        CheckSimulate --> PersistToDB: simulate is false
 
         PersistToDB --> UpdateTracker: gcrMainRepository.save()
         SkipPersist --> ReturnSuccess
@@ -538,7 +538,7 @@ stateDiagram-v2
         - Reverse array of applied edits
         - Set isRollback = true
         - Reapply in reverse order
-        - Operations swap (add↔remove)
+        - Operations swap add and remove
 
         File: handleGCR.ts:383-420
     end note
@@ -550,11 +550,11 @@ stateDiagram-v2
 flowchart TD
     START([GCR Nonce Edit])
 
-    START --> VALIDATETYPE{Edit type<br/>== nonce?}
+    START --> VALIDATETYPE{Edit type<br/>is nonce?}
     VALIDATETYPE -->|no| INVALID[Return: Invalid type]
     VALIDATETYPE -->|yes| CHECKROLLBACK{isRollback?}
 
-    CHECKROLLBACK -->|yes| REVERSE[Reverse operation<br/>add ↔ remove]
+    CHECKROLLBACK -->|yes| REVERSE[Reverse operation<br/>swap add and remove]
     CHECKROLLBACK -->|no| GETACCOUNT
     REVERSE --> GETACCOUNT
 
@@ -567,11 +567,11 @@ flowchart TD
 
     GETCURRENT --> OPERATION{Operation<br/>type?}
 
-    OPERATION -->|add| ADD[Increment nonce<br/>nonce += amount]
-    OPERATION -->|remove| CHECKSUFFICIENT{nonce >=<br/>amount?}
+    OPERATION -->|add| ADD[Increment nonce<br/>nonce plus amount]
+    OPERATION -->|remove| CHECKSUFFICIENT{nonce greater or equal<br/>to amount?}
 
     CHECKSUFFICIENT -->|no| INSUFFICENT[Return: Insufficient nonce]
-    CHECKSUFFICIENT -->|yes| REMOVE[Decrement nonce<br/>nonce -= amount]
+    CHECKSUFFICIENT -->|yes| REMOVE[Decrement nonce<br/>nonce minus amount]
 
     ADD --> SIMULATE{Simulate<br/>mode?}
     REMOVE --> SIMULATE
@@ -853,7 +853,7 @@ flowchart TD
         SHA256GCR --> COMBINE[Combine hashes]
         SHA256SUBNETS --> COMBINE
 
-        COMBINE --> NATIVEHASH["{<br/>  native_gcr: hash1,<br/>  native_subnets_txs: hash2<br/>}"]
+        COMBINE --> NATIVEHASH["Combined Hash Object<br/>native_gcr: hash1<br/>native_subnets_txs: hash2"]
 
         NATIVEHASH --> INSERTGCRHASH[Insert to GCRHashes<br/>block, hash]
         INSERTGCRHASH --> BLOCKTRACKED[Block state tracked]
@@ -971,9 +971,9 @@ stateDiagram-v2
 
                 state ProcessEdit {
                     [*] --> RouteByType
-                    RouteByType --> BalanceRoutine: type: balance
-                    RouteByType --> NonceRoutine: type: nonce
-                    RouteByType --> IdentityRoutine: type: identity
+                    RouteByType --> BalanceRoutine: type balance
+                    RouteByType --> NonceRoutine: type nonce
+                    RouteByType --> IdentityRoutine: type identity
 
                     state BalanceRoutine {
                         [*] --> CheckRollback_B
@@ -1000,9 +1000,9 @@ stateDiagram-v2
 
                     state IdentityRoutine {
                         [*] --> DetermineSubtype
-                        DetermineSubtype --> XMIdentity: xm_add/remove
-                        DetermineSubtype --> Web2Identity: web2_add/remove
-                        DetermineSubtype --> PQCIdentity: pqc_add/remove
+                        DetermineSubtype --> XMIdentity: xm add or remove
+                        DetermineSubtype --> Web2Identity: web2 add or remove
+                        DetermineSubtype --> PQCIdentity: pqc add or remove
 
                         XMIdentity --> VerifyXMSignature
                         Web2Identity --> VerifyWeb2Proof

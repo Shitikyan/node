@@ -980,8 +980,8 @@ flowchart TD
 flowchart TD
     START([Transaction with<br/>type: native])
 
-    START --> EXTRACT[Extract native payload<br/>tx.content.data]
-    EXTRACT --> PARSE[Parse INativePayload<br/>"native", payload]
+    START --> EXTRACT["Extract native payload<br/>from tx.content.data"]
+    EXTRACT --> PARSE["Parse INativePayload<br/>native and payload"]
 
     PARSE --> OPERATION{nativeOperation<br/>type?}
 
@@ -989,18 +989,18 @@ flowchart TD
     OPERATION -->|other| UNKNOWN[Unknown operation<br/>Log error]
 
     subgraph "Send Native Tokens"
-        SEND --> EXTRACTARGS[Extract args<br/>to: address, amount: bigint]
+        SEND --> EXTRACTARGS["Extract arguments<br/>to address and amount"]
 
         EXTRACTARGS --> CREATEEDITS[Create 2 GCREdits]
 
-        CREATEEDITS --> EDIT1[Edit 1: Remove from sender]
-        CREATEEDITS --> EDIT2[Edit 2: Add to receiver]
+        CREATEEDITS --> EDIT1["Edit 1<br/>Remove from sender"]
+        CREATEEDITS --> EDIT2["Edit 2<br/>Add to receiver"]
 
-        EDIT1 --> EDIT1DETAILS["{<br/>  type: 'balance',<br/>  operation: 'remove',<br/>  account: tx.content.from,<br/>  amount: amount,<br/>  txhash: tx.hash,<br/>  isRollback: false<br/>}"]
+        EDIT1 --> EDIT1DETAILS["Edit 1 Details<br/>type: balance<br/>operation: remove<br/>account: sender<br/>amount: value<br/>txhash: hash<br/>isRollback: false"]
 
-        EDIT2 --> EDIT2DETAILS["{<br/>  type: 'balance',<br/>  operation: 'add',<br/>  account: to,<br/>  amount: amount,<br/>  txhash: tx.hash,<br/>  isRollback: false<br/>}"]
+        EDIT2 --> EDIT2DETAILS["Edit 2 Details<br/>type: balance<br/>operation: add<br/>account: receiver<br/>amount: value<br/>txhash: hash<br/>isRollback: false"]
 
-        EDIT1DETAILS --> ARRAYEDITS[edits = edit1, edit2]
+        EDIT1DETAILS --> ARRAYEDITS["Array of edits<br/>edit1 and edit2"]
         EDIT2DETAILS --> ARRAYEDITS
     end
 
@@ -1011,11 +1011,11 @@ flowchart TD
 
     APPLYTOTX --> LOOPEDITS[Loop through edits]
 
-    LOOPEDITS --> APPLYEDIT1[Apply Edit 1: Remove balance]
+    LOOPEDITS --> APPLYEDIT1["Apply Edit 1<br/>Remove balance"]
     APPLYEDIT1 --> CHECKEDIT1{Edit 1<br/>success?}
 
     CHECKEDIT1 -->|no| ROLLBACK[Rollback all edits]
-    CHECKEDIT1 -->|yes| APPLYEDIT2[Apply Edit 2: Add balance]
+    CHECKEDIT1 -->|yes| APPLYEDIT2["Apply Edit 2<br/>Add balance"]
 
     APPLYEDIT2 --> CHECKEDIT2{Edit 2<br/>success?}
     CHECKEDIT2 -->|no| ROLLBACK

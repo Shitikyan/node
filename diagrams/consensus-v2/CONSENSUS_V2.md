@@ -546,19 +546,19 @@ stateDiagram-v2
 
     note right of Secretary
         Secretary Routine Loop:
-        1. Wait for SET_WAIT_STATUS
-        2. Check if all members ready
-        3. Release if ready, else timeout
-        4. Handle offline nodes
-        5. Repeat until phase 7
+        - Wait for SET_WAIT_STATUS
+        - Check if all members ready
+        - Release if ready, else timeout
+        - Handle offline nodes
+        - Repeat until phase 7
     end note
 
     note right of Member
         Member Coordination:
-        1. Complete phase work
-        2. Send phase to secretary
-        3. Wait for greenlight
-        4. Proceed or handle timeout
+        - Complete phase work
+        - Send phase to secretary
+        - Wait for greenlight
+        - Proceed or handle timeout
     end note
 ```
 

@@ -252,7 +252,7 @@ flowchart TD
 
     BuildResult --> UpdateSession[Update Session<br/>lastAccess = now
 
-    UpdateSession --> Success([Return Success<br/>Web2Result])
+    UpdateSession --> Success([Return Success Web2Result])
 
 ```
 
@@ -385,7 +385,7 @@ flowchart TD
 
     AllChecksPass --> BuildResult[Build Normalized Result<br/>- Original URL<br/>- Normalized URL<br/>- Components]
 
-    BuildResult --> Success([Return Success<br/>Normalized URL])
+    BuildResult --> Success([Return Success Normalized URL])
 
 ```
 

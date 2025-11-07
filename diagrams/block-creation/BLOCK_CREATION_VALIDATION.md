@@ -193,7 +193,7 @@ flowchart TD
     COUNTRESULT[Count total valid signatures]
     COUNTRESULT --> CALCULATE[Calculate: signatures div shard size]
 
-    CALCULATE --> THRESHOLD{Ratio greater or equal<br/>0.67 (67%)?}
+    CALCULATE --> THRESHOLD{Ratio >= 0.67<br/>67 percent?}
 
     THRESHOLD -->|yes| BLOCKVALID[Block is valid]
     THRESHOLD -->|no| BLOCKINVALID[Block is invalid]

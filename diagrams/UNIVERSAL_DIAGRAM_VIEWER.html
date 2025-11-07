@@ -450,7 +450,13 @@
         function enableZoomPan() {
             // Clear previous instances
             panZoomInstances.forEach(instance => {
-                if (instance) instance.destroy();
+                if (instance) {
+                    try {
+                        instance.destroy();
+                    } catch (e) {
+                        // Ignore destroy errors
+                    }
+                }
             });
             panZoomInstances = [];
 

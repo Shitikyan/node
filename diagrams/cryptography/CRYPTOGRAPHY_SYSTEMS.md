@@ -90,11 +90,6 @@ graph TB
     Prover -.->|Enables| ProofAuth
     Enigma -.->|Enables| QuantumSafe
 
-    style FHEInstance fill:#e1f5ff
-    style Prover fill:#fff4e1
-    style Enigma fill:#e8f5e9
-    style SEALLib fill:#f3e5f5
-    style SuperDilithium fill:#ffebee
 ```
 
 **Description**: Complete cryptography systems architecture showing FHE (Microsoft SEAL with BFV), ZK (interactive proof system), and PQC (SuperDilithium) components and their integration into the blockchain application layer.
@@ -193,11 +188,6 @@ graph TD
 
     InitFlag -->|Yes| FHEReady
 
-    style Instance fill:#e1f5ff
-    style EncParams fill:#fff4e1
-    style ContextReady fill:#e8f5e9
-    style FHEReady fill:#e8f5e9
-    style Error fill:#ffcccc
 ```
 
 **Description**: Detailed FHE architecture showing singleton pattern, Microsoft SEAL library initialization with BFV scheme parameters (4096 poly degree, tc128 security), component setup (KeyGenerator, Encryptor, Decryptor, Evaluator, BatchEncoder), and API exposure.
@@ -284,11 +274,6 @@ sequenceDiagram
         end
     end
 
-    style FHE fill:#e1f5ff
-    style Encoder fill:#fff4e1
-    style Encryptor fill:#e8f5e9
-    style Decryptor fill:#f3e5f5
-    style Storage fill:#ffebee
 ```
 
 **Description**: Complete encryption and decryption flow showing how integers are encoded to polynomials, encrypted with BFV scheme using public key, stored securely, and later decrypted with secret key and decoded back to integers.
@@ -354,12 +339,6 @@ flowchart TD
         Ex6 --> Ex7
     end
 
-    style AddOp fill:#e8f5e9
-    style MulOp fill:#fff4e1
-    style NegOp fill:#f3e5f5
-    style CheckNoise fill:#ffebee
-    style Success fill:#e8f5e9
-    style ErrorRelin fill:#ffcccc
 ```
 
 **Description**: Complete homomorphic operations flowchart showing how to perform addition, multiplication, and negation on encrypted data without decryption, including noise budget management, relinearization for multiplication, and operation chaining.
@@ -447,10 +426,6 @@ graph TB
     PrimeGen --> Modulus
     RandomGen --> RandomValue
 
-    style ProverClass fill:#e1f5ff
-    style VerifierClass fill:#fff4e1
-    style Step5 fill:#e8f5e9
-    style ZeroKnowledge fill:#f3e5f5
 ```
 
 **Description**: Complete ZK proof system architecture showing Prover and Verifier components, protocol flow (setup, commitment, challenge, response, verification), security properties (completeness, soundness, zero-knowledge), and mathematical foundation using modular arithmetic.
@@ -571,9 +546,6 @@ sequenceDiagram
         App->>App: Reject proof<br/>Prover does not know secret
     end
 
-    style Prover fill:#e1f5ff
-    style Verifier fill:#fff4e1
-    style Math fill:#e8f5e9
 ```
 
 **Description**: Detailed interactive protocol sequence showing setup with large primes, repeated proof rounds (commitment, challenge, response, verification), and how soundness probability increases exponentially with iterations (k=20 rounds → 2^-20 error rate).
@@ -649,12 +621,6 @@ flowchart TD
         Probability --> Security
     end
 
-    style GenRandom fill:#e1f5ff
-    style GenChallenge fill:#fff4e1
-    style VerifyCheck fill:#e8f5e9
-    style AcceptProof fill:#e8f5e9
-    style Reject fill:#ffcccc
-    style Security fill:#f3e5f5
 ```
 
 **Description**: Complete challenge-response flow showing how security is achieved through repeated rounds, with detailed verification logic for both challenge cases (b=0 and b=1), and security analysis showing exponential decrease in cheating probability.
@@ -765,12 +731,6 @@ graph TB
     SuperDil -.->|Follows| MLDSA
     SuperDil -.->|Based on| LatticeSecurity
 
-    style EnigmaClass fill:#e8f5e9
-    style SuperDil fill:#e1f5ff
-    style KeyPair fill:#fff4e1
-    style QuantumSafe fill:#f3e5f5
-    style Accept fill:#e8f5e9
-    style Reject fill:#ffcccc
 ```
 
 **Description**: Complete PQC Enigma architecture showing the wrapper class around SuperDilithium library, key pair structure with Uint8Arrays, cryptographic operations (key generation, signing, verification), and quantum-safe security properties based on lattice problems.
@@ -897,10 +857,6 @@ sequenceDiagram
         deactivate Enigma
     end
 
-    style Enigma fill:#e8f5e9
-    style SuperDil fill:#e1f5ff
-    style Lattice fill:#fff4e1
-    style Random fill:#f3e5f5
 ```
 
 **Description**: Complete sequence showing PQC key lifecycle including quantum-random key generation with lattice operations, signing messages with ML-DSA algorithm, verifying signatures with public keys, and optional secure key export with passphrase encryption.

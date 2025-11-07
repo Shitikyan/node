@@ -368,7 +368,7 @@ sequenceDiagram
         end
         Demos-->>Tool: Return data
         Tool-->>Handler: Return result
-        Handler->>Handler: Format result as {content: [{type: "text", text: JSON}]}
+        Handler->>Handler: Format result as content array
         Handler-->>Server: Return formatted result
         Server-->>Transport: Format response
         Transport-->>Client: Return result
@@ -609,7 +609,7 @@ flowchart TD
     ThrowError --> ReturnError3([Return error response])
 
     FormatResult --> LogSuccess[Log: Tool executed successfully]
-    LogSuccess --> WrapContent[Wrap in {content: [{type: "text", text: JSON}]}]
+    LogSuccess --> WrapContent[Wrap in content array with type text]
     WrapContent --> ReturnSuccess([Return success response])
 
     style Start fill:#e1f5ff
@@ -697,16 +697,16 @@ sequenceDiagram
 
     rect rgb(200, 240, 240)
         Note over Client,Logger: Success Case
-        Client->>Server: CallToolRequest {name: "get_chain_height"}
+        Client->>Server: CallToolRequest get_chain_height
         Server->>Handler: Process request
         Handler->>Handler: Get tool and validate
         Handler->>Tool: Execute handler
         Tool->>Tool: Chain.getLastBlock()
-        Tool-->>Handler: {height: 12345, lastBlockHash: "0x..."}
+        Tool-->>Handler: Return height and lastBlockHash
         Handler->>Logger: Log: Tool executed successfully
         Handler->>Handler: Format result
         Handler-->>Server: Success response
-        Server-->>Client: {content: [{type: "text", text: JSON}]}
+        Server-->>Client: Success with content array
     end
 ```
 

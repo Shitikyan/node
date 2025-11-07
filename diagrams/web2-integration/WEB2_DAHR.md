@@ -70,11 +70,6 @@ graph TB
     Proxy2 -.->|SSL Verify| SSLConfig
     Proxy3 -.->|SSL Verify| SSLConfig
 
-    style Factory fill:#e1f5ff
-    style SessionStore fill:#fff4e1
-    style DAHR1 fill:#e8f5e9
-    style Proxy1 fill:#f3e5f5
-    style HashVerifier fill:#ffebee
 ```
 
 **Description**: Complete DAHR architecture showing the factory pattern for managing multiple DAHR instances, each with its own proxy server for forwarding requests to external Web2 services with cryptographic verification.
@@ -255,18 +250,10 @@ flowchart TD
 
     HashResponse --> BuildResult[Build IWeb2Result<br/>- requestHash<br/>- responseHash<br/>- responseHeadersHash<br/>- statusCode<br/>- data]
 
-    BuildResult --> UpdateSession[Update Session<br/>lastAccess = now()]
+    BuildResult --> UpdateSession[Update Session<br/>lastAccess = now
 
     UpdateSession --> Success([Return Success<br/>Web2Result])
 
-    style ValidateURL fill:#fff4e1
-    style CheckProxy fill:#e1f5ff
-    style HashRequest fill:#ffebee
-    style HashResponse fill:#ffebee
-    style Success fill:#e8f5e9
-    style ErrorInvalidURL fill:#ffcccc
-    style ErrorTimeout fill:#ffcccc
-    style ErrorNetwork fill:#ffcccc
 ```
 
 **Description**: Complete flowchart showing the end-to-end HTTP request flow from parameter parsing through URL validation, proxy initialization, request forwarding, response handling, and cryptographic hashing for integrity verification.
@@ -329,12 +316,6 @@ flowchart TB
     StoreSession -.-> SessionMap
     Execute -.-> SessionMap
 
-    style CreateReq fill:#e8f5e9
-    style SessionMap fill:#fff4e1
-    style Lookup fill:#e1f5ff
-    style CheckAge fill:#fff4e1
-    style Remove fill:#ffebee
-    style Config fill:#f3e5f5
 ```
 
 **Description**: Comprehensive view of session lifecycle management including creation with unique IDs, access pattern with timestamp updates, and automatic cleanup of expired sessions after 24 hours of inactivity.
@@ -406,17 +387,6 @@ flowchart TD
 
     BuildResult --> Success([Return Success<br/>Normalized URL])
 
-    style CheckEmpty fill:#fff4e1
-    style ValidParse fill:#fff4e1
-    style ValidateProtocol fill:#e1f5ff
-    style ValidateHostname fill:#e1f5ff
-    style SecurityCheck fill:#ffebee
-    style Success fill:#e8f5e9
-    style ErrorEmpty fill:#ffcccc
-    style ErrorFormat fill:#ffcccc
-    style ErrorProtocol fill:#ffcccc
-    style ErrorHostname fill:#ffcccc
-    style ErrorPort fill:#ffcccc
 ```
 
 **Description**: Detailed URL validation and normalization process ensuring only valid, secure HTTP/HTTPS URLs are processed, with protocol inference, component extraction, and security checks against localhost and private IPs in production.
@@ -490,12 +460,6 @@ flowchart LR
         Client --> ClientVerify[Client Can Verify<br/>- Recalculate hashes<br/>- Compare with received<br/>- Detect tampering]
     end
 
-    style CanonHeaders fill:#e1f5ff
-    style HashHeaders fill:#ffebee
-    style HashBody fill:#ffebee
-    style HashRespHeaders fill:#ffebee
-    style HashRespBody fill:#ffebee
-    style ClientVerify fill:#e8f5e9
 ```
 
 **Description**: Complete request/response integrity hashing system showing header canonicalization, deterministic hashing with SHA256, and how clients can verify data integrity by recalculating and comparing hashes.
@@ -671,21 +635,6 @@ flowchart TD
     HashError -->|No| SuccessProxy[Success: Return Web2Result<br/>200 OK]
     SuccessProxy --> End
 
-    style ParseAction fill:#e1f5ff
-    style FactoryError fill:#fff4e1
-    style NetworkError fill:#fff4e1
-    style SuccessCreate fill:#e8f5e9
-    style SuccessProxy fill:#e8f5e9
-    style ErrorUnknownAction fill:#ffcccc
-    style ErrorNoURL fill:#ffcccc
-    style ErrorBadMethod fill:#ffcccc
-    style ErrorFactory fill:#ffcccc
-    style ErrorNoSession fill:#ffcccc
-    style ErrorSessionNotFound fill:#ffcccc
-    style ErrorInvalidURL fill:#ffcccc
-    style ErrorNetwork fill:#ffcccc
-    style ErrorTimeout fill:#ffcccc
-    style ErrorSSL fill:#ffcccc
 ```
 
 **Description**: Comprehensive error handling flowchart covering all validation points and potential failure modes including action validation, session management errors, network failures, timeouts, SSL errors, and response integrity issues.

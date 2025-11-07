@@ -848,6 +848,7 @@ stateDiagram-v2
         - Recursive peer discovery
     end note
 
+
     note right of Synchronization
         Sync Features:
         - Fast sync from highest peer
@@ -856,6 +857,7 @@ stateDiagram-v2
         - GCR state rebuilding
         - Native hash verification
     end note
+
 
     note right of OperationalMode
         Operational Features:
@@ -866,6 +868,7 @@ stateDiagram-v2
         - Peer gossip protocol
         - Rate limiting
     end note
+
 ```
 
 ---

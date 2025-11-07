@@ -432,9 +432,12 @@
         // Render mermaid diagrams
         async function renderMermaidDiagrams() {
             const mermaidElements = document.querySelectorAll('.mermaid');
-            for (const element of mermaidElements) {
+            for (let i = 0; i < mermaidElements.length; i++) {
+                const element = mermaidElements[i];
                 try {
-                    const { svg } = await mermaid.render(`mermaid-svg-${Date.now()}-${Math.random()}`, element.textContent);
+                    // Generate valid CSS ID (no dots allowed)
+                    const id = `mermaid-svg-${Date.now()}-${Math.floor(Math.random() * 1000000)}-${i}`;
+                    const { svg } = await mermaid.render(id, element.textContent);
                     element.innerHTML = svg;
                 } catch (error) {
                     console.error('Mermaid render error:', error);

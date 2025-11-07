@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Test Transaction Diagram 3</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f5f5f5; }
+        .test-box { background: white; padding: 20px; margin: 20px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h2 { color: #333; }
+        pre { background: #f0f0f0; padding: 10px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Mermaid Diagram 3 Debug Test</h1>
+    
+    <div class="test-box">
+        <h2>Mermaid Version</h2>
+        <pre id="version"></pre>
+    </div>
+
+    <div class="test-box">
+        <h2>Console Output (Check Browser DevTools F12)</h2>
+        <p>Open browser console (F12) to see detailed debug output</p>
+        <pre id="console-output"></pre>
+    </div>
+
+    <div class="test-box">
+        <h2>Test 1: Simple Flowchart (Should Work)</h2>
+        <div class="mermaid">
+flowchart TD
+    A[Start] --> B{Decision}
+    B -->|Yes| C[End]
+    B -->|No| D[End]
+        </div>
+    </div>
+
+    <div class="test-box">
+        <h2>Test 2: Flowchart with br tag</h2>
+        <div class="mermaid">
+flowchart TD
+    START --> CHECK{Sender<br>provided?}
+    CHECK -->|yes| END1[Done]
+    CHECK -->|no| END2[Failed]
+        </div>
+    </div>
+
+    <div class="test-box">
+        <h2>Test 3: Actual Diagram 3 (First 10 nodes)</h2>
+        <div class="mermaid">
+flowchart TD
+    START([validateSignature called]) --> CHECKSENDER{Sender<br>provided?}
+    CHECKSENDER -->|yes| VERIFYSENDER{content.from<br>matches sender?}
+    CHECKSENDER -->|no| CHECKPQC
+    VERIFYSENDER -->|no| FAIL1[Return: Signer does not match sender]
+    VERIFYSENDER -->|yes| CHECKPQC
+    CHECKPQC{Signature type<br>is PQC?} -->|no ed25519| SETED25519TRUE[ed25519SignatureVerified = true]
+        </div>
+    </div>
+
+    <script>
+        console.log('%c=== MERMAID TEST START ===', 'color: blue; font-weight: bold; font-size: 16px');
+        
+        // Display version
+        document.getElementById('version').textContent = 'Mermaid version: ' + (typeof mermaid !== 'undefined' ? mermaid.version : 'NOT LOADED');
+        console.log('Mermaid version:', mermaid.version);
+
+        let consoleOutput = [];
+        const originalConsoleLog = console.log;
+        const originalConsoleError = console.error;
+        
+        console.log = function(...args) {
+            consoleOutput.push(['LOG', ...args].join(' '));
+            originalConsoleLog.apply(console, args);
+        };
+        
+        console.error = function(...args) {
+            consoleOutput.push(['ERROR', ...args].join(' '));
+            originalConsoleError.apply(console, args);
+        };
+
+        // Capture parse errors
+        mermaid.parseError = function(err, hash) {
+            console.error('❌ PARSE ERROR CAUGHT:', err.message);
+            console.error('Error string:', err.str);
+            console.error('Error hash:', hash);
+            console.error('Full error:', err);
+            
+            document.getElementById('console-output').textContent += 
+                `\n❌ PARSE ERROR: ${err.message}\n${err.str || ''}\n`;
+        };
+
+        // Initialize
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            securityLevel: 'loose',
+            logLevel: 'debug',
+            flowchart: {
+                htmlLabels: true,
+                useMaxWidth: true,
+                curve: 'basis'
+            }
+        });
+
+        console.log('Mermaid initialized');
+
+        // After page loads
+        window.addEventListener('DOMContentLoaded', function() {
+            const mermaidDivs = document.querySelectorAll('.mermaid');
+            console.log(`Found ${mermaidDivs.length} mermaid blocks`);
+            
+            mermaidDivs.forEach((div, i) => {
+                const content = div.textContent.trim();
+                console.log(`\nBlock ${i}:`);
+                console.log('First line:', content.split('\n')[0]);
+                console.log('Length:', content.length, 'chars');
+                console.log('Content:', content.substring(0, 300));
+            });
+
+            // Display captured output after 2 seconds
+            setTimeout(() => {
+                document.getElementById('console-output').textContent = 
+                    consoleOutput.join('\n');
+            }, 2000);
+        });
+
+        window.addEventListener('error', function(e) {
+            console.error('Window error:', e.message);
+            document.getElementById('console-output').textContent += 
+                `\n❌ Window error: ${e.message}\n`;
+        });
+
+        console.log('%c=== MERMAID TEST SETUP COMPLETE ===', 'color: green; font-weight: bold');
+        console.log('If diagrams don\'t render, check console for errors above');
+    </script>
+</body>
+</html>

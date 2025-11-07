@@ -764,13 +764,13 @@ stateDiagram-v2
 
     note right of ProcessingRequest
         Request Execution:
-        1. URL validation
-        2. Proxy initialization
-        3. Request building
-        4. SHA256 hashing
-        5. HTTP forwarding
-        6. Response hashing
-        7. Result assembly
+        - URL validation
+        - Proxy initialization
+        - Request building
+        - SHA256 hashing
+        - HTTP forwarding
+        - Response hashing
+        - Result assembly
     end note
 
     note right of Expiring

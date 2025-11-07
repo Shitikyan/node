@@ -786,12 +786,12 @@ stateDiagram-v2
 
     note right of Finalized
         Finalization Steps:
-        1. Save GCR state
-        2. Save transactions
-        3. Remove from mempool
-        4. Save block to database
-        5. Update sharedState
-        6. Broadcast to network
+        - Save GCR state
+        - Save transactions
+        - Remove from mempool
+        - Save block to database
+        - Update sharedState
+        - Broadcast to network
     end note
 ```
 

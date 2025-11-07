@@ -1068,11 +1068,11 @@ stateDiagram-v2
 
     note right of ZKOperations
         ZK Protocol:
-        1. Commitment (r² mod N)
-        2. Challenge (0 or 1)
-        3. Response (r or r×s)
-        4. Verify (check response²)
-        5. Repeat k times
+        - Commitment (r² mod N)
+        - Challenge (0 or 1)
+        - Response (r or r×s)
+        - Verify (check response²)
+        - Repeat k times
     end note
 ```
 

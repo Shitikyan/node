@@ -361,17 +361,15 @@ sequenceDiagram
                 <div class="diagram-container">
                     <div class="mermaid">
 flowchart TD
-    START([validateSignature called])
 
-    START --> CHECKSENDER{Sender<br>provided?}
+    START([validateSignature called]) --> CHECKSENDER{Sender<br>provided?}
     CHECKSENDER -->|yes| VERIFYSENDER{content.from<br>matches sender?}
     CHECKSENDER -->|no| CHECKPQC
 
     VERIFYSENDER -->|no| FAIL1[Return: Signer does not match sender]
     VERIFYSENDER -->|yes| CHECKPQC
 
-    CHECKPQC{Signature type<br>is PQC?}
-    CHECKPQC -->|no ed25519| SETED25519TRUE[ed25519SignatureVerified = true]
+    CHECKPQC{Signature type<br>is PQC?} -->|no ed25519| SETED25519TRUE[ed25519SignatureVerified = true]
     CHECKPQC -->|yes ml-dsa or sl-dsa| HASBACKUP{Has<br>ed25519_signature?}
 
     HASBACKUP -->|no| CHECKGCR[Check GCR for PQC identity]
@@ -391,19 +389,17 @@ flowchart TD
     end
 
     subgraph "Backup Ed25519 Verification"
-        VERIFYED25519BACKUP[Verify ed25519_signature field]
-        VERIFYED25519BACKUP --> VERIFYED25519HASH[ucrypto.verify ed25519<br>message: tx.hash<br>publicKey: from_ed25519_address<br>signature: ed25519_signature]
+        VERIFYED25519BACKUP[Verify ed25519_signature field] --> VERIFYED25519HASH[ucrypto.verify ed25519<br>message: tx.hash<br>publicKey: from_ed25519_address<br>signature: ed25519_signature]
 
         VERIFYED25519HASH --> ED25519VALID{Signature<br>valid?}
         ED25519VALID -->|yes| SETED25519TRUEBACKUP[ed25519SignatureVerified = true]
         ED25519VALID -->|no| FAIL4[Return: Ed25519 backup signature invalid]
     end
 
-    SETED25519TRUE --> VERIFYMAIN
+    SETED25519TRUE --> VERIFYMAIN[Verify main signature]
     SETED25519TRUEGCR --> VERIFYMAIN
     SETED25519TRUEBACKUP --> VERIFYMAIN
 
-    VERIFYMAIN[Verify main signature]
     VERIFYMAIN --> VERIFYMAINDETAILS[ucrypto.verify<br>algorithm: signature.type<br>message: tx.hash<br>publicKey: content.from<br>signature: signature.data]
 
     VERIFYMAINDETAILS --> MAINVALID{Main signature<br>valid?}
@@ -533,9 +529,8 @@ graph TB
                 <div class="diagram-container">
                     <div class="mermaid">
 flowchart TD
-    START([Transaction Received])
 
-    START --> EXTRACT[Extract transaction fields]
+    START([Transaction Received]) --> EXTRACT[Extract transaction fields]
     EXTRACT --> CONTENT[content object]
     EXTRACT --> HASH[hash string]
     EXTRACT --> SIGNATURE[signature object]
@@ -584,8 +579,7 @@ flowchart TD
         HASHASH -->|yes| ALLPRESENT
         HASSIG -->|yes| ALLPRESENT
 
-        ALLPRESENT[All fields present]
-        ALLPRESENT --> VALIDATETO[validateToField content.to]
+        ALLPRESENT[All fields present] --> VALIDATETO[validateToField content.to]
     end
 
     subgraph "TO Field Validation"
@@ -735,9 +729,8 @@ sequenceDiagram
                 <div class="diagram-container">
                     <div class="mermaid">
 flowchart TD
-    START([Transaction Creation])
 
-    START --> GETACCOUNT[Get sender account from GCR]
+    START([Transaction Creation]) --> GETACCOUNT[Get sender account from GCR]
     GETACCOUNT --> READNONCE[Read current nonce from GCR_Main]
 
     READNONCE --> ACCOUNTEXISTS{Account<br>exists?}
@@ -771,30 +764,26 @@ flowchart TD
     end
 
     subgraph "Nonce Scenarios"
-        SUCCESS --> SCENARIO1
-        REJECT --> SCENARIO2
+        SUCCESS --> SCENARIO1[Scenario 1: Sequential Success]
+        REJECT --> SCENARIO2[Scenario 2: Out of Order]
 
-        SCENARIO1[Scenario 1: Sequential Success]
         SCENARIO1 --> SEQ1[Account nonce: 5]
         SEQ1 --> SEQ2[Submit tx with nonce 6: SUCCESS]
         SEQ2 --> SEQ3[Account nonce now: 6]
         SEQ3 --> SEQ4[Submit tx with nonce 7: SUCCESS]
 
-        SCENARIO2[Scenario 2: Out of Order]
         SCENARIO2 --> OOO1[Account nonce: 5]
         OOO1 --> OOO2[Submit tx with nonce 8: FAIL]
         OOO2 --> OOO3[Nonce must be 6, not 8]
 
-        SCENARIO2 --> SCENARIO3
-        SCENARIO3[Scenario 3: Duplicate Nonce]
+        SCENARIO2 --> SCENARIO3[Scenario 3: Duplicate Nonce]
         SCENARIO3 --> DUP1[Account nonce: 5]
         DUP1 --> DUP2[Submit tx with nonce 6: SUCCESS]
         DUP2 --> DUP3[Account nonce now: 6]
         DUP3 --> DUP4[Submit another tx with nonce 6: FAIL]
         DUP4 --> DUP5[Nonce 6 already used]
 
-        SCENARIO3 --> SCENARIO4
-        SCENARIO4[Scenario 4: Rollback Behavior]
+        SCENARIO3 --> SCENARIO4[Scenario 4: Rollback Behavior]
         SCENARIO4 --> RB1[Account nonce: 5]
         RB1 --> RB2[Submit tx with nonce 6: in mempool]
         RB2 --> RB3[Consensus fails, block invalid]

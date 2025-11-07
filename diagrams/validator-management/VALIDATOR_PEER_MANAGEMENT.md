@@ -833,7 +833,7 @@ flowchart TD
     subgraph "Peer Synchronization"
         STARTGOSSIP --> GOSSIPHASH[Hash our peer list]
         GOSSIPHASH --> SENDHASHREQUESTS[Send hash to 10 random peers]
-        SENDHASHREQUESTS --> COMPAREHASHE S[Compare hashes]
+        SENDHASHREQUESTS --> COMPAREHASHES[Compare hashes]
         COMPAREHASHES --> REQUESTLISTS[Request full lists from different peers]
         REQUESTLISTS --> MERGELISTS[Merge all peer lists]
         MERGELISTS --> UPDATEPEERLIST[Update local peer list]

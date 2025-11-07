@@ -462,8 +462,8 @@ flowchart TD
 
     CREATECOMPILED[Create NativeBridgeOperationCompiled object]
     CREATECOMPILED --> SETCONTENT[Set content with derived data]
-    CREATECOMPILED --> SETSIG[Set signature: empty (to be signed by client)]
-    CREATECOMPILED --> SETRPC[Set rpc: node ed25519 public key]
+    CREATECOMPILED --> SETSIG[Set signature empty to be signed by client]
+    CREATECOMPILED --> SETRPC[Set rpc node ed25519 public key]
 
     SETRPC --> RESPONSE[Create RPCResponse]
     RESPONSE --> SETRESULT[result: 200]

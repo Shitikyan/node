@@ -339,14 +339,14 @@ sequenceDiagram
         loop For each tool
             Handler->>Handler: Extract name, description, inputSchema
         end
-        Handler-->>Server: Return {tools: Tool[]}
+        Handler-->>Server: Return tools array
         Server-->>Transport: Format response
         Transport-->>Client: Return tool list
     end
 
     rect rgb(220, 240, 200)
         Note over Client,Demos: CallTool Request Flow
-        Client->>Transport: CallToolRequest {name, arguments}
+        Client->>Transport: CallToolRequest with name and arguments
         Transport->>Server: Forward request
         Server->>Handler: Process CallToolRequest
         Handler->>ToolMap: Get tool by name

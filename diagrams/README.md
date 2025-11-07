@@ -8,6 +8,8 @@ This directory contains comprehensive Mermaid diagram documentation for all majo
 **Total Diagrams:** 130
 **Diagram Types:** Flowcharts, Sequence Diagrams, State Machines, Class Diagrams, ER Diagrams, Graph Diagrams
 
+**View All Diagrams:** Open [UNIVERSAL_DIAGRAM_VIEWER.html](./UNIVERSAL_DIAGRAM_VIEWER.html) for an interactive dark-themed viewer with zoom, pan, and navigation for all 130 diagrams.
+
 ---
 
 ## Quick Navigation
@@ -16,7 +18,6 @@ This directory contains comprehensive Mermaid diagram documentation for all majo
 
 #### 1. [Blockchain Core](./blockchain-core/BLOCKCHAIN_CORE.md)
 **Location:** `diagrams/blockchain-core/`
-**Viewer:** [BLOCKCHAIN_CORE_VIEWER.html](./blockchain-core/BLOCKCHAIN_CORE_VIEWER.html)
 
 Complete blockchain fundamentals including block structure, chain management, genesis initialization, database operations, and native hashing.
 
@@ -36,7 +37,6 @@ Complete blockchain fundamentals including block structure, chain management, ge
 
 #### 2. [Global Change Registry (GCR)](./gcr/GCR.md)
 **Location:** `diagrams/gcr/`
-**Viewer:** [GCR_VIEWER.html](./gcr/GCR_VIEWER.html)
 
 Global mutable state registry managing balances, identities, nonces, and incentives with cryptographic traceability.
 
@@ -62,7 +62,6 @@ Global mutable state registry managing balances, identities, nonces, and incenti
 
 #### 3. [PoR-BFT Consensus](./consensus-v2/CONSENSUS_V2.md)
 **Location:** `diagrams/consensus-v2/`
-**Viewer:** [CONSENSUS_V2_VIEWER.html](./consensus-v2/CONSENSUS_V2_VIEWER.html)
 
 Advanced Proof of Representation Byzantine Fault Tolerant consensus mechanism with validator voting, finalization, and supermajority requirements.
 
@@ -90,7 +89,6 @@ Advanced Proof of Representation Byzantine Fault Tolerant consensus mechanism wi
 
 #### 4. [Validator & Peer Management](./validator-management/VALIDATOR_PEER_MANAGEMENT.md)
 **Location:** `diagrams/validator-management/`
-**Viewer:** [VALIDATOR_PEER_MANAGEMENT_VIEWER.html](./validator-management/VALIDATOR_PEER_MANAGEMENT_VIEWER.html)
 
 Complete peer and validator lifecycle management including discovery, registration, authentication, and health monitoring.
 
@@ -116,7 +114,6 @@ Complete peer and validator lifecycle management including discovery, registrati
 
 #### 5. [P2P Network & Synchronization](./p2p-network/P2P_NETWORK_SYNC.md)
 **Location:** `diagrams/p2p-network/`
-**Viewer:** [P2P_NETWORK_SYNC_VIEWER.html](./p2p-network/P2P_NETWORK_SYNC_VIEWER.html)
 
 Peer-to-peer networking infrastructure with fast sync, RPC server, block propagation, and rate limiting.
 
@@ -144,7 +141,6 @@ Peer-to-peer networking infrastructure with fast sync, RPC server, block propaga
 
 #### 6. [Transaction Processing & Mempool](./transactions-mempool/TRANSACTIONS_MEMPOOL.md)
 **Location:** `diagrams/transactions-mempool/`
-**Viewer:** [TRANSACTIONS_MEMPOOL_VIEWER.html](./transactions-mempool/TRANSACTIONS_MEMPOOL_VIEWER.html)
 
 Complete transaction lifecycle from creation through mempool management to block inclusion with post-quantum signatures.
 
@@ -170,7 +166,6 @@ Complete transaction lifecycle from creation through mempool management to block
 
 #### 7. [Block Creation & Validation](./block-creation/BLOCK_CREATION_VALIDATION.md)
 **Location:** `diagrams/block-creation/`
-**Viewer:** [BLOCK_CREATION_VALIDATION_VIEWER.html](./block-creation/BLOCK_CREATION_VALIDATION_VIEWER.html)
 
 Block assembly, validation voting, finalization, rollback, and complete block lifecycle management.
 
@@ -199,7 +194,6 @@ Block assembly, validation voting, finalization, rollback, and complete block li
 
 #### 8. [Bridges & Multichain Integration](./bridges-multichain/BRIDGES_MULTICHAIN.md)
 **Location:** `diagrams/bridges-multichain/`
-**Viewer:** [BRIDGES_MULTICHAIN_VIEWER.html](./bridges-multichain/BRIDGES_MULTICHAIN_VIEWER.html)
 
 Cross-chain bridges enabling interoperability with EVM chains, Solana, Aptos, and multi-chain transaction execution.
 
@@ -225,7 +219,6 @@ Cross-chain bridges enabling interoperability with EVM chains, Solana, Aptos, an
 
 #### 9. [Web2 Integration & DAHR](./web2-integration/WEB2_DAHR.md)
 **Location:** `diagrams/web2-integration/`
-**Viewer:** [WEB2_DAHR_VIEWER.html](./web2-integration/WEB2_DAHR_VIEWER.html)
 
 Data Agnostic HTTPS Relay enabling blockchain applications to interact with traditional Web2 services with cryptographic integrity.
 
@@ -252,7 +245,6 @@ Data Agnostic HTTPS Relay enabling blockchain applications to interact with trad
 
 #### 10. [Cryptography Systems (FHE, ZK, PQC)](./cryptography/CRYPTOGRAPHY_SYSTEMS.md)
 **Location:** `diagrams/cryptography/`
-**Viewer:** [CRYPTOGRAPHY_SYSTEMS_VIEWER.html](./cryptography/CRYPTOGRAPHY_SYSTEMS_VIEWER.html)
 
 Advanced cryptography with Fully Homomorphic Encryption, Zero-Knowledge Proofs, and Post-Quantum Cryptography.
 
@@ -288,7 +280,6 @@ Advanced cryptography with Fully Homomorphic Encryption, Zero-Knowledge Proofs, 
 
 #### 11. [ActivityPub Integration](./activitypub/ACTIVITYPUB_INTEGRATION.md)
 **Location:** `diagrams/activitypub/`
-**Viewer:** [ACTIVITYPUB_INTEGRATION_VIEWER.html](./activitypub/ACTIVITYPUB_INTEGRATION_VIEWER.html)
 
 Federated social networking protocol implementation with Express.js server, SQLite storage, and ActivityStreams support.
 
@@ -315,7 +306,6 @@ Federated social networking protocol implementation with Express.js server, SQLi
 
 #### 12. [Incentive Management](./incentive/INCENTIVE_MANAGEMENT.md)
 **Location:** `diagrams/incentive/`
-**Viewer:** [INCENTIVE_MANAGEMENT_VIEWER.html](./incentive/INCENTIVE_MANAGEMENT_VIEWER.html)
 
 Comprehensive point-based incentive system with referrals, levels, rewards, and gamification for network participation.
 
@@ -342,7 +332,6 @@ Comprehensive point-based incentive system with referrals, levels, rewards, and 
 
 #### 13. [MCP Protocol](./mcp/MCP_PROTOCOL.md)
 **Location:** `diagrams/mcp/`
-**Viewer:** [MCP_PROTOCOL_VIEWER.html](./mcp/MCP_PROTOCOL_VIEWER.html)
 
 Model Context Protocol server enabling AI assistants to interact with blockchain operations via standardized tools.
 
@@ -374,13 +363,13 @@ Each feature documentation includes:
 1. **10 Comprehensive Diagrams** covering all aspects of the feature
 2. **Mermaid Syntax** for interactive, version-controllable diagrams
 3. **Detailed Descriptions** explaining each diagram's purpose and components
-4. **Interactive HTML Viewer** with navigation between diagrams
-5. **Architecture Overviews** showing system-wide integration
-6. **Sequence Diagrams** for time-based workflows
-7. **State Machines** for lifecycle management
-8. **Flowcharts** for decision logic and processes
-9. **Database Schemas** where applicable
-10. **Complete System Lifecycles** from initialization to shutdown
+4. **Architecture Overviews** showing system-wide integration
+5. **Sequence Diagrams** for time-based workflows
+6. **State Machines** for lifecycle management
+7. **Flowcharts** for decision logic and processes
+8. **Database Schemas** where applicable
+9. **Complete System Lifecycles** from initialization to shutdown
+10. **Universal Viewer Integration** - all diagrams accessible from one interface
 
 ---
 
@@ -433,80 +422,86 @@ Each feature documentation includes:
 
 ```
 diagrams/
-├── README.md                           # This file - Master Index
-├── DIAGRAMS_INDEX.html                 # Interactive HTML Master Index
+├── README.md                           # This file - Documentation index
+├── UNIVERSAL_DIAGRAM_VIEWER.html       # Universal viewer for all 130 diagrams
+├── server.ts                           # Bun development server with no-cache
 │
 ├── blockchain-core/
-│   ├── BLOCKCHAIN_CORE.md              # 10 blockchain core diagrams
-│   └── BLOCKCHAIN_CORE_VIEWER.html     # Interactive viewer
+│   └── BLOCKCHAIN_CORE.md              # 10 blockchain core diagrams
 │
 ├── gcr/
-│   ├── GCR.md                          # 10 GCR diagrams
-│   └── GCR_VIEWER.html                 # Interactive viewer
+│   └── GCR.md                          # 10 GCR diagrams
 │
 ├── consensus-v2/
-│   ├── CONSENSUS_V2.md                 # 10 consensus diagrams
-│   └── CONSENSUS_V2_VIEWER.html        # Interactive viewer
+│   └── CONSENSUS_V2.md                 # 10 consensus diagrams
 │
 ├── validator-management/
-│   ├── VALIDATOR_PEER_MANAGEMENT.md    # 10 validator/peer diagrams
-│   └── VALIDATOR_PEER_MANAGEMENT_VIEWER.html
+│   └── VALIDATOR_PEER_MANAGEMENT.md    # 10 validator/peer diagrams
 │
 ├── transactions-mempool/
-│   ├── TRANSACTIONS_MEMPOOL.md         # 10 transaction diagrams
-│   └── TRANSACTIONS_MEMPOOL_VIEWER.html
+│   └── TRANSACTIONS_MEMPOOL.md         # 10 transaction diagrams
 │
 ├── block-creation/
-│   ├── BLOCK_CREATION_VALIDATION.md    # 10 block creation diagrams
-│   └── BLOCK_CREATION_VALIDATION_VIEWER.html
+│   └── BLOCK_CREATION_VALIDATION.md    # 10 block creation diagrams
 │
 ├── p2p-network/
-│   ├── P2P_NETWORK_SYNC.md             # 10 P2P network diagrams
-│   └── P2P_NETWORK_SYNC_VIEWER.html
+│   └── P2P_NETWORK_SYNC.md             # 10 P2P network diagrams
 │
 ├── bridges-multichain/
-│   ├── BRIDGES_MULTICHAIN.md           # 10 bridge diagrams
-│   └── BRIDGES_MULTICHAIN_VIEWER.html
+│   └── BRIDGES_MULTICHAIN.md           # 10 bridge diagrams
 │
 ├── web2-integration/
-│   ├── WEB2_DAHR.md                    # 10 Web2/DAHR diagrams
-│   └── WEB2_DAHR_VIEWER.html
+│   └── WEB2_DAHR.md                    # 10 Web2/DAHR diagrams
 │
 ├── cryptography/
-│   ├── CRYPTOGRAPHY_SYSTEMS.md         # 10 cryptography diagrams
-│   └── CRYPTOGRAPHY_SYSTEMS_VIEWER.html
+│   └── CRYPTOGRAPHY_SYSTEMS.md         # 10 cryptography diagrams
 │
 ├── activitypub/
-│   ├── ACTIVITYPUB_INTEGRATION.md      # 10 ActivityPub diagrams
-│   └── ACTIVITYPUB_INTEGRATION_VIEWER.html
+│   └── ACTIVITYPUB_INTEGRATION.md      # 10 ActivityPub diagrams
 │
 ├── incentive/
-│   ├── INCENTIVE_MANAGEMENT.md         # 10 incentive system diagrams
-│   └── INCENTIVE_MANAGEMENT_VIEWER.html
+│   └── INCENTIVE_MANAGEMENT.md         # 10 incentive system diagrams
 │
 └── mcp/
-    ├── MCP_PROTOCOL.md                 # 10 MCP protocol diagrams
-    └── MCP_PROTOCOL_VIEWER.html
+    └── MCP_PROTOCOL.md                 # 10 MCP protocol diagrams
 ```
 
 ---
 
 ## Usage
 
+### Development Server
+
+For the best viewing experience with automatic cache-busting and no-cache headers, use the included Bun development server:
+
+```bash
+# Install Bun (if not already installed)
+curl -fsSL https://bun.sh/install | bash
+source ~/.bashrc
+
+# Start the development server
+cd diagrams
+bun run server.ts
+```
+
+The server will run at `http://localhost:8000/` and automatically serve the Universal Diagram Viewer with proper headers to prevent caching issues.
+
 ### Viewing Diagrams
 
-#### Option 1: Markdown Files
+#### Option 1: Universal Diagram Viewer (Recommended)
+Open [UNIVERSAL_DIAGRAM_VIEWER.html](./UNIVERSAL_DIAGRAM_VIEWER.html) for the complete interactive experience:
+- **Dark theme** inspired by demos.sh
+- **All 130 diagrams** accessible from a single interface
+- **Zoom & pan** functionality on all diagrams
+- **Sidebar navigation** with 13 feature sets
+- **Cache-busting** to ensure fresh content
+- Responsive design for mobile and desktop
+
+#### Option 2: Markdown Files
 Navigate to any feature's markdown file and view directly in GitHub or any markdown viewer with Mermaid support.
 
-#### Option 2: Interactive HTML Viewers
-Open any `*_VIEWER.html` file in a web browser for an interactive experience with:
-- Navigation buttons for all 10 diagrams
-- Smooth transitions between diagrams
-- Responsive design for mobile and desktop
-- Mermaid.js live rendering
-
-#### Option 3: Master Index
-Open [DIAGRAMS_INDEX.html](./DIAGRAMS_INDEX.html) for a complete overview and navigation to all features.
+#### Option 3: Development Server (Best Performance)
+Use `bun run server.ts` to serve diagrams with no-cache headers for the freshest content during development.
 
 ### Editing Diagrams
 
@@ -519,9 +514,12 @@ Open [DIAGRAMS_INDEX.html](./DIAGRAMS_INDEX.html) for a complete overview and na
 
 1. Create a new directory: `diagrams/feature-name/`
 2. Create markdown file: `FEATURE_NAME.md` with 10 diagrams
-3. Create HTML viewer: `FEATURE_NAME_VIEWER.html` based on existing templates
+3. Add the new feature to `UNIVERSAL_DIAGRAM_VIEWER.html` in the `diagrams` array:
+   ```javascript
+   { name: 'Feature Name', path: 'feature-name/FEATURE_NAME.md', icon: '📦' }
+   ```
 4. Update this README.md to include the new feature
-5. Update DIAGRAMS_INDEX.html with navigation links
+5. Test with the development server: `bun run server.ts`
 
 ---
 
@@ -555,16 +553,26 @@ Open [DIAGRAMS_INDEX.html](./DIAGRAMS_INDEX.html) for a complete overview and na
 When adding or updating diagrams:
 
 1. **Maintain Quality:** Follow the 10-diagram standard for each feature
-2. **Use Mermaid:** All diagrams must use Mermaid syntax
-3. **Create Viewers:** Each feature needs an HTML viewer
-4. **Update Index:** Update this README and the master HTML index
-5. **Test Rendering:** Verify diagrams render correctly in both markdown and HTML
+2. **Use Mermaid:** All diagrams must use Mermaid syntax (avoid numbered lists in state diagram notes)
+3. **Update Universal Viewer:** Add new features to the diagrams array in UNIVERSAL_DIAGRAM_VIEWER.html
+4. **Update Index:** Update this README with the new feature documentation
+5. **Test Rendering:** Verify diagrams render correctly using `bun run server.ts`
 6. **Add Descriptions:** Include clear descriptions for each diagram
 7. **Follow Structure:** Use the established directory and file naming conventions
+8. **Mermaid Syntax:** Avoid numbered lists (1., 2., 3.) in state diagram notes - use bullet points (-) instead
 
 ---
 
 ## Version History
+
+- **v1.2** - Universal Viewer and Development Server (Current)
+  - Added UNIVERSAL_DIAGRAM_VIEWER.html with dark theme
+  - Created Bun TypeScript development server (server.ts)
+  - Removed 14 individual HTML viewers (unified into one)
+  - Added zoom & pan functionality to all diagrams
+  - Implemented cache-busting for fresh content
+  - Fixed all Mermaid syntax errors (numbered lists in state diagrams)
+  - Dark theme inspired by demos.sh with white diagram containers
 
 - **v1.1** - Added 3 new feature sets (130 diagrams total)
   - ActivityPub Integration
@@ -603,22 +611,25 @@ This documentation is part of the Demos blockchain project.
 
 ## Quick Links
 
-| Feature | Markdown | HTML Viewer |
-|---------|----------|-------------|
-| Blockchain Core | [BLOCKCHAIN_CORE.md](./blockchain-core/BLOCKCHAIN_CORE.md) | [View](./blockchain-core/BLOCKCHAIN_CORE_VIEWER.html) |
-| Global Change Registry | [GCR.md](./gcr/GCR.md) | [View](./gcr/GCR_VIEWER.html) |
-| PoR-BFT Consensus | [CONSENSUS_V2.md](./consensus-v2/CONSENSUS_V2.md) | [View](./consensus-v2/CONSENSUS_V2_VIEWER.html) |
-| Validator Management | [VALIDATOR_PEER_MANAGEMENT.md](./validator-management/VALIDATOR_PEER_MANAGEMENT.md) | [View](./validator-management/VALIDATOR_PEER_MANAGEMENT_VIEWER.html) |
-| Transactions & Mempool | [TRANSACTIONS_MEMPOOL.md](./transactions-mempool/TRANSACTIONS_MEMPOOL.md) | [View](./transactions-mempool/TRANSACTIONS_MEMPOOL_VIEWER.html) |
-| Block Creation | [BLOCK_CREATION_VALIDATION.md](./block-creation/BLOCK_CREATION_VALIDATION.md) | [View](./block-creation/BLOCK_CREATION_VALIDATION_VIEWER.html) |
-| P2P Network | [P2P_NETWORK_SYNC.md](./p2p-network/P2P_NETWORK_SYNC.md) | [View](./p2p-network/P2P_NETWORK_SYNC_VIEWER.html) |
-| Bridges & Multichain | [BRIDGES_MULTICHAIN.md](./bridges-multichain/BRIDGES_MULTICHAIN.md) | [View](./bridges-multichain/BRIDGES_MULTICHAIN_VIEWER.html) |
-| Web2 Integration | [WEB2_DAHR.md](./web2-integration/WEB2_DAHR.md) | [View](./web2-integration/WEB2_DAHR_VIEWER.html) |
-| Cryptography Systems | [CRYPTOGRAPHY_SYSTEMS.md](./cryptography/CRYPTOGRAPHY_SYSTEMS.md) | [View](./cryptography/CRYPTOGRAPHY_SYSTEMS_VIEWER.html) |
-| ActivityPub Integration | [ACTIVITYPUB_INTEGRATION.md](./activitypub/ACTIVITYPUB_INTEGRATION.md) | [View](./activitypub/ACTIVITYPUB_INTEGRATION_VIEWER.html) |
-| Incentive Management | [INCENTIVE_MANAGEMENT.md](./incentive/INCENTIVE_MANAGEMENT.md) | [View](./incentive/INCENTIVE_MANAGEMENT_VIEWER.html) |
-| MCP Protocol | [MCP_PROTOCOL.md](./mcp/MCP_PROTOCOL.md) | [View](./mcp/MCP_PROTOCOL_VIEWER.html) |
+| Feature | Documentation |
+|---------|---------------|
+| Blockchain Core | [BLOCKCHAIN_CORE.md](./blockchain-core/BLOCKCHAIN_CORE.md) |
+| Global Change Registry | [GCR.md](./gcr/GCR.md) |
+| PoR-BFT Consensus | [CONSENSUS_V2.md](./consensus-v2/CONSENSUS_V2.md) |
+| Validator Management | [VALIDATOR_PEER_MANAGEMENT.md](./validator-management/VALIDATOR_PEER_MANAGEMENT.md) |
+| Transactions & Mempool | [TRANSACTIONS_MEMPOOL.md](./transactions-mempool/TRANSACTIONS_MEMPOOL.md) |
+| Block Creation | [BLOCK_CREATION_VALIDATION.md](./block-creation/BLOCK_CREATION_VALIDATION.md) |
+| P2P Network | [P2P_NETWORK_SYNC.md](./p2p-network/P2P_NETWORK_SYNC.md) |
+| Bridges & Multichain | [BRIDGES_MULTICHAIN.md](./bridges-multichain/BRIDGES_MULTICHAIN.md) |
+| Web2 Integration | [WEB2_DAHR.md](./web2-integration/WEB2_DAHR.md) |
+| Cryptography Systems | [CRYPTOGRAPHY_SYSTEMS.md](./cryptography/CRYPTOGRAPHY_SYSTEMS.md) |
+| ActivityPub Integration | [ACTIVITYPUB_INTEGRATION.md](./activitypub/ACTIVITYPUB_INTEGRATION.md) |
+| Incentive Management | [INCENTIVE_MANAGEMENT.md](./incentive/INCENTIVE_MANAGEMENT.md) |
+| MCP Protocol | [MCP_PROTOCOL.md](./mcp/MCP_PROTOCOL.md) |
 
 ---
 
-**For the best experience, open [DIAGRAMS_INDEX.html](./DIAGRAMS_INDEX.html) in your browser.**
+**For the best experience:**
+1. Run `bun run server.ts` from the diagrams directory
+2. Open `http://localhost:8000/` in your browser
+3. Or directly open [UNIVERSAL_DIAGRAM_VIEWER.html](./UNIVERSAL_DIAGRAM_VIEWER.html)

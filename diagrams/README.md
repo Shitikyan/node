@@ -4,8 +4,8 @@
 
 This directory contains comprehensive Mermaid diagram documentation for all major features of the Demos blockchain. Each feature has 10 detailed diagrams covering architecture, flows, state machines, and complete system lifecycles.
 
-**Total Features Documented:** 10
-**Total Diagrams:** 100
+**Total Features Documented:** 13
+**Total Diagrams:** 130
 **Diagram Types:** Flowcharts, Sequence Diagrams, State Machines, Class Diagrams, ER Diagrams, Graph Diagrams
 
 ---
@@ -286,6 +286,87 @@ Advanced cryptography with Fully Homomorphic Encryption, Zero-Knowledge Proofs, 
 
 ---
 
+#### 11. [ActivityPub Integration](./activitypub/ACTIVITYPUB_INTEGRATION.md)
+**Location:** `diagrams/activitypub/`
+**Viewer:** [ACTIVITYPUB_INTEGRATION_VIEWER.html](./activitypub/ACTIVITYPUB_INTEGRATION_VIEWER.html)
+
+Federated social networking protocol implementation with Express.js server, SQLite storage, and ActivityStreams support.
+
+**Key Topics:**
+- ActivityPub Server Architecture (Express.js + SQLite)
+- Actor Model & Collections (Person, Note, Activity types)
+- SQLite Storage Schema (14 collections)
+- REST API Endpoints (GET/PUT/:collection/:id)
+- ActivityStreams Object Model (core objects, activities, collections)
+- Inbox/Outbox Message Flow (federated delivery)
+- Federation Protocol (WebFinger, HTTP signatures)
+- Collection Management (Followers, Following, Liked, etc.)
+- Data Persistence & Retrieval (CRUD operations)
+- Complete ActivityPub Lifecycle
+
+**Features:**
+- Express.js REST API with universal handlers
+- 14 SQLite collections with JSON blob storage
+- ActivityStreams protocol compliance
+- HTTP signature verification for federation
+- Session-based inbox/outbox management
+
+---
+
+#### 12. [Incentive Management](./incentive/INCENTIVE_MANAGEMENT.md)
+**Location:** `diagrams/incentive/`
+**Viewer:** [INCENTIVE_MANAGEMENT_VIEWER.html](./incentive/INCENTIVE_MANAGEMENT_VIEWER.html)
+
+Comprehensive point-based incentive system with referrals, levels, rewards, and gamification for network participation.
+
+**Key Topics:**
+- Incentive System Architecture (points, levels, rewards)
+- Point Earning Mechanisms (transactions, referrals, validation)
+- Referral System (multi-level tracking, commissions)
+- Level Progression (Bronze → Diamond tiers)
+- Reward Distribution (automatic payouts)
+- Point Validation & Security
+- User Progress Tracking
+- Leaderboard & Rankings
+- Incentive Database Schema
+- Complete Incentive Lifecycle
+
+**Features:**
+- Multi-level referral system with commission tiers
+- 5-tier level progression (Bronze, Silver, Gold, Platinum, Diamond)
+- Activity-based point earning (tx fees, referrals, staking, validation)
+- Automatic reward distribution
+- Anti-gaming protection and validation
+
+---
+
+#### 13. [MCP Protocol](./mcp/MCP_PROTOCOL.md)
+**Location:** `diagrams/mcp/`
+**Viewer:** [MCP_PROTOCOL_VIEWER.html](./mcp/MCP_PROTOCOL_VIEWER.html)
+
+Model Context Protocol server enabling AI assistants to interact with blockchain operations via standardized tools.
+
+**Key Topics:**
+- MCP Server Architecture (stdio + SSE transports)
+- Tool Registration & Management
+- Request/Response Flow (ListTools, CallTool)
+- Transport Layer (stdio for local, SSE for remote)
+- Blockchain Tools (blocks, transactions, chain status)
+- Network Tools (peers, node identity, health)
+- Tool Execution & Validation
+- Session Management
+- MCP Protocol Compliance
+- Complete MCP Lifecycle
+
+**Features:**
+- Dual transport support (stdio + Server-Sent Events)
+- Comprehensive blockchain tool suite
+- Tool validation with Zod schemas
+- Remote network access via SSE/HTTP
+- Full MCP SDK compliance
+
+---
+
 ## Documentation Standards
 
 Each feature documentation includes:
@@ -391,9 +472,21 @@ diagrams/
 │   ├── WEB2_DAHR.md                    # 10 Web2/DAHR diagrams
 │   └── WEB2_DAHR_VIEWER.html
 │
-└── cryptography/
-    ├── CRYPTOGRAPHY_SYSTEMS.md         # 10 cryptography diagrams
-    └── CRYPTOGRAPHY_SYSTEMS_VIEWER.html
+├── cryptography/
+│   ├── CRYPTOGRAPHY_SYSTEMS.md         # 10 cryptography diagrams
+│   └── CRYPTOGRAPHY_SYSTEMS_VIEWER.html
+│
+├── activitypub/
+│   ├── ACTIVITYPUB_INTEGRATION.md      # 10 ActivityPub diagrams
+│   └── ACTIVITYPUB_INTEGRATION_VIEWER.html
+│
+├── incentive/
+│   ├── INCENTIVE_MANAGEMENT.md         # 10 incentive system diagrams
+│   └── INCENTIVE_MANAGEMENT_VIEWER.html
+│
+└── mcp/
+    ├── MCP_PROTOCOL.md                 # 10 MCP protocol diagrams
+    └── MCP_PROTOCOL_VIEWER.html
 ```
 
 ---
@@ -473,6 +566,11 @@ When adding or updating diagrams:
 
 ## Version History
 
+- **v1.1** - Added 3 new feature sets (130 diagrams total)
+  - ActivityPub Integration
+  - Incentive Management
+  - MCP Protocol
+
 - **v1.0** - Initial release with 10 complete feature sets (100 diagrams total)
   - Blockchain Core
   - Global Cluster Registry (GCR)
@@ -517,6 +615,9 @@ This documentation is part of the Demos blockchain project.
 | Bridges & Multichain | [BRIDGES_MULTICHAIN.md](./bridges-multichain/BRIDGES_MULTICHAIN.md) | [View](./bridges-multichain/BRIDGES_MULTICHAIN_VIEWER.html) |
 | Web2 Integration | [WEB2_DAHR.md](./web2-integration/WEB2_DAHR.md) | [View](./web2-integration/WEB2_DAHR_VIEWER.html) |
 | Cryptography Systems | [CRYPTOGRAPHY_SYSTEMS.md](./cryptography/CRYPTOGRAPHY_SYSTEMS.md) | [View](./cryptography/CRYPTOGRAPHY_SYSTEMS_VIEWER.html) |
+| ActivityPub Integration | [ACTIVITYPUB_INTEGRATION.md](./activitypub/ACTIVITYPUB_INTEGRATION.md) | [View](./activitypub/ACTIVITYPUB_INTEGRATION_VIEWER.html) |
+| Incentive Management | [INCENTIVE_MANAGEMENT.md](./incentive/INCENTIVE_MANAGEMENT.md) | [View](./incentive/INCENTIVE_MANAGEMENT_VIEWER.html) |
+| MCP Protocol | [MCP_PROTOCOL.md](./mcp/MCP_PROTOCOL.md) | [View](./mcp/MCP_PROTOCOL_VIEWER.html) |
 
 ---
 

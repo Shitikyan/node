@@ -213,7 +213,7 @@
                 <h2>1. ActivityPub Architecture Overview</h2>
                 <p>
                     This diagram shows the complete architecture of the ActivityPub integration, including the Express.js server layer,
-                    SQLite storage with 12 collections, ActivityStreams protocol support, and the universal REST API for collection access.
+                    SQLite storage with 14 collections, ActivityStreams protocol support, and the universal REST API for collection access.
                 </p>
                 <div class="mermaid">
 graph TB
@@ -251,8 +251,10 @@ graph TB
         Followers[Followers]
         Following[Following]
         Liked[Liked]
+        Collections2[Collections]
         Blocked[Blocked]
         Rejections[Rejections]
+        Rejecteds[Rejecteds]
         Shares[Shares]
         Likes[Likes]
     end
@@ -273,8 +275,10 @@ graph TB
     Tables --> Followers
     Tables --> Following
     Tables --> Liked
+    Tables --> Collections2
     Tables --> Blocked
     Tables --> Rejections
+    Tables --> Rejecteds
     Tables --> Shares
     Tables --> Likes
 
@@ -295,7 +299,7 @@ graph TB
                     <h3>Key Architectural Components</h3>
                     <ul>
                         <li><strong>Express.js Server</strong>: REST API with universal collection handlers (GET/PUT/GETALL)</li>
-                        <li><strong>SQLite Storage</strong>: 12 normalized tables for ActivityPub data persistence</li>
+                        <li><strong>SQLite Storage</strong>: 14 normalized tables for ActivityPub data persistence</li>
                         <li><strong>ActivityStreams Protocol</strong>: Full @context support with standard vocabulary</li>
                         <li><strong>Collections</strong>: Actors, Objects, Activities, Inboxes, Outboxes, social interactions</li>
                         <li><strong>Type System</strong>: TypeScript interfaces for ActivityPub objects (feditypes.ts)</li>
@@ -404,7 +408,7 @@ classDiagram
             <section id="diagram-3" class="diagram-section">
                 <h2>3. SQLite Storage Schema</h2>
                 <p>
-                    This entity-relationship diagram shows the complete SQLite database schema with 12 tables, their fields,
+                    This entity-relationship diagram shows the complete SQLite database schema with 14 tables, their fields,
                     relationships, and foreign key constraints for maintaining data integrity in the ActivityPub storage layer.
                 </p>
                 <div class="mermaid">
@@ -418,11 +422,6 @@ erDiagram
         TEXT followers
         TEXT following
         TEXT liked
-        TEXT preferredUsername
-        TEXT summary
-        TEXT publicKeyId
-        TEXT publicKeyOwner
-        TEXT publicKeyPem
     }
 
     OBJECTS {
@@ -430,10 +429,6 @@ erDiagram
         TEXT type
         TEXT attributedTo
         TEXT content
-        TEXT published
-        TEXT to
-        TEXT cc
-        TEXT inReplyTo
     }
 
     ACTIVITIES {
@@ -441,86 +436,81 @@ erDiagram
         TEXT type
         TEXT actor
         TEXT object
-        TEXT target
-        TEXT to
-        TEXT cc
-        TEXT published
     }
 
     INBOXES {
         TEXT id PK
-        TEXT actorId
-        TEXT activityId
-        TEXT received
+        TEXT owner
+        TEXT content
     }
 
     OUTBOXES {
         TEXT id PK
-        TEXT actorId
-        TEXT activityId
-        TEXT published
+        TEXT owner
+        TEXT content
     }
 
     FOLLOWERS {
         TEXT id PK
-        TEXT actorId
-        TEXT followerId
-        TEXT accepted
+        TEXT owner
+        TEXT actor
     }
 
     FOLLOWINGS {
         TEXT id PK
-        TEXT actorId
-        TEXT followingId
-        TEXT accepted
+        TEXT owner
+        TEXT actor
     }
 
     LIKEDS {
         TEXT id PK
-        TEXT actorId
-        TEXT objectId
-        TEXT published
+        TEXT owner
+        TEXT object
+    }
+
+    COLLECTIONS {
+        TEXT id PK
+        TEXT owner
+        TEXT items
     }
 
     BLOCKEDS {
         TEXT id PK
-        TEXT actorId
-        TEXT blockedId
-        TEXT published
+        TEXT owner
+        TEXT actor
     }
 
     REJECTIONS {
         TEXT id PK
-        TEXT actorId
-        TEXT activityId
-        TEXT published
+        TEXT owner
+        TEXT activity
+    }
+
+    REJECTEDS {
+        TEXT id PK
+        TEXT owner
+        TEXT activity
     }
 
     SHARES {
         TEXT id PK
-        TEXT actorId
-        TEXT objectId
-        TEXT published
+        TEXT owner
+        TEXT object
     }
 
     LIKES {
         TEXT id PK
-        TEXT actorId
-        TEXT objectId
-        TEXT published
+        TEXT owner
+        TEXT object
     }
 
-    ACTORS ||--o{ INBOXES : "has inbox"
-    ACTORS ||--o{ OUTBOXES : "has outbox"
-    ACTORS ||--o{ FOLLOWERS : "followed by"
-    ACTORS ||--o{ FOLLOWINGS : "follows"
-    ACTORS ||--o{ LIKEDS : "liked items"
-    ACTORS ||--o{ BLOCKEDS : "blocked users"
-    ACTIVITIES ||--o{ INBOXES : "received in"
-    ACTIVITIES ||--o{ OUTBOXES : "sent from"
-    OBJECTS ||--o{ LIKEDS : "liked by"
-    OBJECTS ||--o{ SHARES : "shared by"
-    OBJECTS ||--o{ LIKES : "receives likes"
+    ACTORS ||--o{ INBOXES : "owner"
+    ACTORS ||--o{ OUTBOXES : "owner"
+    ACTORS ||--o{ FOLLOWERS : "owner"
+    ACTORS ||--o{ FOLLOWINGS : "owner"
+    ACTORS ||--o{ LIKEDS : "owner"
+    ACTORS ||--o{ BLOCKEDS : "owner"
+    ACTORS ||--o{ COLLECTIONS : "owner"
                 </div>
                 <div class="key-points">
                     <h3>Storage Schema Details</h3>
@@ -568,8 +558,8 @@ sequenceDiagram
         Client->>ExpressApp: PUT /:collection/:id + JSON body
         ExpressApp->>Router: Route to handler
         Router->>Router: Parse req.body
-        Router->>Storage: saveItem(collection, id, item)
-        Storage->>SQLite: INSERT OR REPLACE INTO collection
+        Router->>Storage: saveItem(collection, req.body)
+        Storage->>SQLite: INSERT INTO collection(id, data) VALUES(?, ?)
         SQLite-->>Storage: Confirm insert
         Storage-->>Router: Success callback
         Router-->>Client: 200 OK "Saved"
@@ -1026,15 +1016,15 @@ sequenceDiagram
                 <div class="key-points">
                     <h3>Data Persistence Features</h3>
                     <ul>
-                        <li><strong>Initialization</strong>: Create SQLite database, initialize 12 tables with proper schemas</li>
-                        <li><strong>Save Operations</strong>: INSERT OR REPLACE for upsert behavior, serialize to JSON</li>
+                        <li><strong>Initialization</strong>: Create SQLite database, initialize 14 tables with proper schemas</li>
+                        <li><strong>Save Operations</strong>: INSERT with JSON blob storage for items</li>
                         <li><strong>Get Operations</strong>: SELECT with WHERE clause, deserialize row to object</li>
                         <li><strong>Get All Operations</strong>: SELECT all rows, map array to objects</li>
                         <li><strong>Delete Operations</strong>: DELETE with WHERE clause, return affected row count</li>
                         <li><strong>Database Closure</strong>: Proper cleanup with db.close() on shutdown</li>
                         <li><strong>File System</strong>: SQLite file stored at configurable dbPath</li>
                     </ul>
-                </div>
+
             </section>
 
             <!-- Diagram 10: Complete ActivityPub Lifecycle -->

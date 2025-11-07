@@ -54,8 +54,10 @@ graph TB
         Followers[Followers]
         Following[Following]
         Liked[Liked]
+        Collections2[Collections]
         Blocked[Blocked]
         Rejections[Rejections]
+        Rejecteds[Rejecteds]
         Shares[Shares]
         Likes[Likes]
     end
@@ -76,8 +78,10 @@ graph TB
     Tables --> Followers
     Tables --> Following
     Tables --> Liked
+    Tables --> Collections2
     Tables --> Blocked
     Tables --> Rejections
+    Tables --> Rejecteds
     Tables --> Shares
     Tables --> Likes
 
@@ -192,11 +196,6 @@ erDiagram
         TEXT followers
         TEXT following
         TEXT liked
-        TEXT preferredUsername
-        TEXT summary
-        TEXT publicKeyId
-        TEXT publicKeyOwner
-        TEXT publicKeyPem
     }
 
     OBJECTS {
@@ -204,10 +203,6 @@ erDiagram
         TEXT type
         TEXT attributedTo
         TEXT content
-        TEXT published
-        TEXT to
-        TEXT cc
-        TEXT inReplyTo
     }
 
     ACTIVITIES {
@@ -215,86 +210,81 @@ erDiagram
         TEXT type
         TEXT actor
         TEXT object
-        TEXT target
-        TEXT to
-        TEXT cc
-        TEXT published
     }
 
     INBOXES {
         TEXT id PK
-        TEXT actorId
-        TEXT activityId
-        TEXT received
+        TEXT owner
+        TEXT content
     }
 
     OUTBOXES {
         TEXT id PK
-        TEXT actorId
-        TEXT activityId
-        TEXT published
+        TEXT owner
+        TEXT content
     }
 
     FOLLOWERS {
         TEXT id PK
-        TEXT actorId
-        TEXT followerId
-        TEXT accepted
+        TEXT owner
+        TEXT actor
     }
 
     FOLLOWINGS {
         TEXT id PK
-        TEXT actorId
-        TEXT followingId
-        TEXT accepted
+        TEXT owner
+        TEXT actor
     }
 
     LIKEDS {
         TEXT id PK
-        TEXT actorId
-        TEXT objectId
-        TEXT published
+        TEXT owner
+        TEXT object
+    }
+
+    COLLECTIONS {
+        TEXT id PK
+        TEXT owner
+        TEXT items
     }
 
     BLOCKEDS {
         TEXT id PK
-        TEXT actorId
-        TEXT blockedId
-        TEXT published
+        TEXT owner
+        TEXT actor
     }
 
     REJECTIONS {
         TEXT id PK
-        TEXT actorId
-        TEXT activityId
-        TEXT published
+        TEXT owner
+        TEXT activity
+    }
+
+    REJECTEDS {
+        TEXT id PK
+        TEXT owner
+        TEXT activity
     }
 
     SHARES {
         TEXT id PK
-        TEXT actorId
-        TEXT objectId
-        TEXT published
+        TEXT owner
+        TEXT object
     }
 
     LIKES {
         TEXT id PK
-        TEXT actorId
-        TEXT objectId
-        TEXT published
+        TEXT owner
+        TEXT object
     }
 
-    ACTORS ||--o{ INBOXES : "has inbox"
-    ACTORS ||--o{ OUTBOXES : "has outbox"
-    ACTORS ||--o{ FOLLOWERS : "followed by"
-    ACTORS ||--o{ FOLLOWINGS : "follows"
-    ACTORS ||--o{ LIKEDS : "liked items"
-    ACTORS ||--o{ BLOCKEDS : "blocked users"
-    ACTIVITIES ||--o{ INBOXES : "received in"
-    ACTIVITIES ||--o{ OUTBOXES : "sent from"
-    OBJECTS ||--o{ LIKEDS : "liked by"
-    OBJECTS ||--o{ SHARES : "shared by"
-    OBJECTS ||--o{ LIKES : "receives likes"
+    ACTORS ||--o{ INBOXES : "owner"
+    ACTORS ||--o{ OUTBOXES : "owner"
+    ACTORS ||--o{ FOLLOWERS : "owner"
+    ACTORS ||--o{ FOLLOWINGS : "owner"
+    ACTORS ||--o{ LIKEDS : "owner"
+    ACTORS ||--o{ BLOCKEDS : "owner"
+    ACTORS ||--o{ COLLECTIONS : "owner"
 ```
 
 ---
@@ -327,11 +317,11 @@ sequenceDiagram
         Client->>ExpressApp: PUT /:collection/:id + JSON body
         ExpressApp->>Router: Route to handler
         Router->>Router: Parse req.body
-        Router->>Storage: saveItem(collection, id, item)
-        Storage->>SQLite: INSERT OR REPLACE INTO collection
+        Router->>Storage: saveItem(collection, req.body)
+        Storage->>SQLite: INSERT INTO collection(id, data) VALUES(?, ?)
         SQLite-->>Storage: Confirm insert
         Storage-->>Router: Success callback
-        Router-->>Client: 200 OK "Saved"
+        Router-->>Client: 200 OK with JSON
     end
 
     rect rgb(240, 220, 200)
@@ -836,9 +826,9 @@ stateDiagram-v2
 
 These diagrams provide comprehensive coverage of the ActivityPub Integration implementation:
 
-1. **Architecture Overview** - Complete system architecture with Express.js, SQLite, and 12 collections
+1. **Architecture Overview** - Complete system architecture with Express.js, SQLite, and 14 collections
 2. **Actor Model** - TypeScript class hierarchy for ActivityPub objects
-3. **Storage Schema** - Complete SQLite database schema with all 12 tables and relationships
+3. **Storage Schema** - Complete SQLite database schema with all 14 tables and relationships
 4. **REST API** - GET/PUT endpoints for item and collection operations
 5. **Object Model** - ActivityStreams vocabulary and object types
 6. **Message Flow** - Inbox/Outbox message delivery sequences
@@ -849,10 +839,10 @@ These diagrams provide comprehensive coverage of the ActivityPub Integration imp
 
 ### Key Features Documented:
 - **Express.js REST API**: GET/PUT endpoints for universal collection access
-- **SQLite Storage**: 12 normalized tables with proper relationships
+- **SQLite Storage**: 14 normalized tables with proper relationships
 - **ActivityStreams Protocol**: Full @context support with standard vocabulary
 - **Federation**: Actor discovery, HTTP signatures, inbox/outbox delivery
-- **Collections**: Followers, Following, Liked, Inbox, Outbox, Blocked, Rejections, Shares, Likes
+- **Collections**: Actors, Objects, Activities, Inboxes, Outboxes, Followers, Following, Liked, Collections, Blocked, Rejections, Rejecteds, Shares, Likes (14 total)
 - **Social Interactions**: Follow/Accept workflow, Like, Announce/Share, Reply
 - **Data Integrity**: Primary keys, foreign key relationships, indexes
 

@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Block Creation & Validation - Mermaid Diagrams</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        nav {
+            background-color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+
+        nav a {
+            color: #667eea;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            border: 1px solid transparent;
+        }
+
+        nav a:hover {
+            background-color: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        nav a.active {
+            background-color: #667eea;
+            color: white;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .diagram-section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .diagram-section h2 {
+            color: #667eea;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .diagram-section h3 {
+            color: #764ba2;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .mermaid {
+            background-color: #fafafa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border: 1px solid #e0e0e0;
+        }
+
+        .key-concepts {
+            background-color: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 5px;
+        }
+
+        .key-concepts h4 {
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .key-concepts ul {
+            margin-left: 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .key-concepts li {
+            margin-bottom: 0.3rem;
+        }
+
+        .file-reference {
+            background-color: #fff9e6;
+            border-left: 4px solid #ffa726;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin: 20px auto;
+            justify-content: center;
+        }
+
+        .btn {
+            background-color: #667eea;
+            color: white;
+            border: none;
+            padding: 1rem 1.5rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+
+        @media print {
+            nav, .controls {
+                display: none;
+            }
+
+            .diagram-section {
+                page-break-inside: avoid;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8rem;
+            }
+
+            nav {
+                padding: 0.5rem;
+            }
+
+            nav a {
+                font-size: 0.85rem;
+                padding: 0.4rem 0.8rem;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+        }
+
+        /* Section-specific colors */
+        #section-1 .diagram-section { border-top: 4px solid #2196F3; }
+        #section-2 .diagram-section { border-top: 4px solid #4CAF50; }
+        #section-3 .diagram-section { border-top: 4px solid #FF9800; }
+        #section-4 .diagram-section { border-top: 4px solid #9C27B0; }
+        #section-5 .diagram-section { border-top: 4px solid #F44336; }
+        #section-6 .diagram-section { border-top: 4px solid #00BCD4; }
+        #section-7 .diagram-section { border-top: 4px solid #3F51B5; }
+        #section-8 .diagram-section { border-top: 4px solid #E91E63; }
+        #section-9 .diagram-section { border-top: 4px solid #009688; }
+        #section-10 .diagram-section { border-top: 4px solid #795548; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🔗 Block Creation & Validation</h1>
+        <p>Comprehensive Mermaid Diagrams for Demos Blockchain</p>
+    </header>
+
+    <nav id="nav">
+        <a href="#section-1" onclick="setActive(this)">1. Structure</a>
+        <a href="#section-2" onclick="setActive(this)">2. Creation</a>
+        <a href="#section-3" onclick="setActive(this)">3. Validation</a>
+        <a href="#section-4" onclick="setActive(this)">4. Finalization</a>
+        <a href="#section-5" onclick="setActive(this)">5. Rollback</a>
+        <a href="#section-6" onclick="setActive(this)">6. Native Hashing</a>
+        <a href="#section-7" onclick="setActive(this)">7. Chain Continuity</a>
+        <a href="#section-8" onclick="setActive(this)">8. Database Schema</a>
+        <a href="#section-9" onclick="setActive(this)">9. Sync & Propagation</a>
+        <a href="#section-10" onclick="setActive(this)">10. Lifecycle</a>
+    </nav>
+
+    <div class="container">
+        <div class="diagram-section" style="background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%); border: none;">
+            <h2>📋 Overview</h2>
+            <p style="margin-bottom: 1rem;">
+                Blocks in Demos blockchain are created through the PoRBFT consensus mechanism. Each block contains ordered transactions, native table hashes (GCR state), signatures from shard validators, and references to previous blocks forming an immutable chain.
+            </p>
+            <div class="key-concepts">
+                <h4>🎯 Key Features</h4>
+                <ul>
+                    <li><strong>Consensus-Driven Creation</strong>: Blocks forged during Phase 5 of consensus</li>
+                    <li><strong>Native Table Hashing</strong>: GCR state integrity via cryptographic hashes</li>
+                    <li><strong>Multi-Signature Validation</strong>: 67% shard agreement required</li>
+                    <li><strong>Chain Continuity</strong>: previousHash links to maintain integrity</li>
+                    <li><strong>CVSA-Based Proposer</strong>: Deterministic next proposer calculation</li>
+                    <li><strong>Timestamp Consistency</strong>: Secretary-coordinated block timestamp</li>
+                    <li><strong>GCR Integration</strong>: Native tables hashed and included</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Section 1: Block Structure & Architecture -->
+        <div id="section-1">
+            <div class="diagram-section">
+                <h2>1. Block Structure & Architecture</h2>
+
+                <div class="key-concepts">
+                    <h4>🔑 Key Concepts</h4>
+                    <ul>
+                        <li><strong>Block Object</strong>: Contains id, number, hash, content, status, proposer, next_proposer, and validation_data</li>
+                        <li><strong>Block Content</strong>: Ordered transactions, previousHash, timestamp, peerlist, native table hashes, web2data, L2PS nodes, encrypted tx hashes</li>
+                        <li><strong>Native Hashes</strong>: GCR table hash and subnets txs hash for state integrity</li>
+                        <li><strong>Block States</strong>: Candidate → Derived → Voting → Confirmed/Rejected → Finalized/Discarded</li>
+                        <li><strong>Chain Linking</strong>: Each block references previous block via previousHash</li>
+                        <li><strong>CVSA Proposer</strong>: Next proposer calculated deterministically from block content</li>
+                    </ul>
+                </div>
+
+                <div class="mermaid">
+graph TB
+    subgraph "Block Structure"
+        BLOCK[Block Object]
+        BLOCK --> ID[id: auto-increment]
+        BLOCK --> NUMBER[number: integer]
+        BLOCK --> HASH[hash: SHA256 of content]
+        BLOCK --> CONTENT[content: BlockContent]
+        BLOCK --> STATUS[status: derived or confirmed]
+        BLOCK --> PROPOSER[proposer: CVSA seed]
+        BLOCK --> NEXTPROPOSER[next_proposer: calculated CVSA]
+        BLOCK --> VALIDATION[validation_data: signatures]
+
+        CONTENT --> ORDEREDTXS[ordered_transactions: hash array]
+        CONTENT --> PREVHASH[previousHash: string]
+        CONTENT --> TIMESTAMP[timestamp: number]
+        CONTENT --> PEERLIST[peerlist: Peer array]
+        CONTENT --> NATIVEHASHES[native_tables_hashes: object]
+        CONTENT --> WEB2DATA[web2data: optional]
+        CONTENT --> L2PS[l2ps_partecipating_nodes: Map]
+        CONTENT --> ENCRYPTED[encrypted_transactions_hashes: Map]
+
+        NATIVEHASHES --> GCRHASH[native_gcr: SHA256]
+        NATIVEHASHES --> SUBNETSHASH[native_subnets_txs: SHA256]
+
+        VALIDATION --> SIGNATURES[signatures: Map of pubkey to signature]
+    end
+
+    subgraph "Block Relationships"
+        GENESIS[Block 0: Genesis]
+        BLOCK1[Block 1]
+        BLOCK2[Block 2]
+        BLOCKN[Block N]
+
+        GENESIS -->|previousHash| BLOCK1
+        BLOCK1 -->|previousHash| BLOCK2
+        BLOCK2 -->|...| BLOCKN
+
+        GENESIS -.->|next_proposer| CVSA1[CVSA for Block 1]
+        BLOCK1 -.->|next_proposer| CVSA2[CVSA for Block 2]
+        BLOCK2 -.->|next_proposer| CVSAN[CVSA for Block N]
+    end
+
+    subgraph "Block States"
+        CANDIDATE[Candidate Block]
+        CANDIDATE --> DERIVED[Status: derived]
+        DERIVED --> VOTING[Shard voting in progress]
+        VOTING --> CHECKTHRESHOLD{67%<br/>votes?}
+
+        CHECKTHRESHOLD -->|yes| CONFIRMED[Status: confirmed]
+        CHECKTHRESHOLD -->|no| REJECTED[Block rejected]
+
+        CONFIRMED --> FINALIZED[Added to blockchain]
+        REJECTED --> DISCARDED[Candidate discarded]
+    end
+
+    style BLOCK fill:#e1f5ff
+    style CONTENT fill:#fff4e1
+    style NATIVEHASHES fill:#e8f5e9
+    style CONFIRMED fill:#c8e6c9
+    style REJECTED fill:#ffcdd2
+    style FINALIZED fill:#c8e6c9
+                </div>
+
+                <div class="file-reference">
+                    <strong>📁 File Reference:</strong> src/libs/blockchain/block.ts:73
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Block Creation Process -->
+        <div id="section-2">
+            <div class="diagram-section">
+                <h2>2. Block Creation Process (Consensus Phase 5)</h2>
+
+                <div class="key-concepts">
+                    <h4>🔑 Key Concepts</h4>
+                    <ul>
+                        <li><strong>Phase 5 Trigger</strong>: Consensus routine reaches block forging phase</li>
+                        <li><strong>Duplicate Prevention</strong>: Check if candidateBlock already exists</li>
+                        <li><strong>Transaction Mapping</strong>: Map full transactions to hashes only in block</li>
+                        <li><strong>Native Tables Hashing</strong>: Hash GCR state (GCRTracker and GCRSubnetsTxs)</li>
+                        <li><strong>Content Hash</strong>: SHA256 of JSON.stringify(content) becomes block.hash</li>
+                        <li><strong>Self-Signature</strong>: Sign block hash with ed25519 and add to validation_data</li>
+                        <li><strong>Next Proposer</strong>: Calculate CVSA from block to determine next proposer</li>
+                    </ul>
+                </div>
+
+                <div class="mermaid">
+sequenceDiagram
+    participant Consensus as Consensus Routine
+    participant Manager as SecretaryManager
+    participant CreateBlock as createBlock Function
+    participant Hashing
+    participant GCR
+    participant Block
+    participant State as SharedState
+
+    Note over Consensus,State: Phase 5: Forge Block
+
+    Consensus->>State: Check if candidateBlock exists
+    State->>Consensus: Return candidateBlock or null
+
+    alt Candidate already exists
+        State->>Consensus: Return existing candidateBlock
+        Note right of State: Prevent duplicate block creation
+    else No candidate exists
+        Consensus->>CreateBlock: createBlock with params
+        Note right of Consensus: orderedTransactions<br/>commonValidatorSeed<br/>previousBlockHash<br/>blockNumber<br/>peerlist
+
+        CreateBlock->>Block: new Block()
+        Block->>CreateBlock: Empty block object
+
+        CreateBlock->>CreateBlock: Set content.ordered_transactions
+        Note right of CreateBlock: Map transactions to hashes only
+
+        CreateBlock->>CreateBlock: Set content.previousHash
+        CreateBlock->>CreateBlock: Set content.peerlist
+        CreateBlock->>CreateBlock: Set proposer equals CVSA
+        CreateBlock->>CreateBlock: Set number equals blockNumber
+
+        CreateBlock->>GCR: hashNativeTables()
+        GCR->>GCR: hashGCRTables()
+        Note right of GCR: Hash GCRTracker table<br/>Hash GCRSubnetsTxs table
+        GCR->>CreateBlock: Return native_tables_hashes
+
+        CreateBlock->>CreateBlock: Set content.native_tables_hashes
+
+        CreateBlock->>Manager: Get lastConsensusTime
+        Manager->>CreateBlock: Return timestamp
+        CreateBlock->>CreateBlock: Set content.timestamp
+
+        CreateBlock->>Hashing: SHA256 of content
+        Hashing->>CreateBlock: Return hash
+        CreateBlock->>CreateBlock: Set block.hash
+
+        Note over CreateBlock,State: Sign Block Hash
+
+        CreateBlock->>Hashing: Sign block.hash with ed25519
+        Hashing->>CreateBlock: Return signature
+        CreateBlock->>CreateBlock: Initialize validation_data.signatures
+        CreateBlock->>CreateBlock: Add our signature to validation_data
+
+        Note over CreateBlock,State: Calculate Next Proposer
+
+        CreateBlock->>CreateBlock: getCommonValidatorSeed from block
+        Note right of CreateBlock: Calculate CVSA from this block<br/>to determine next proposer
+        CreateBlock->>CreateBlock: Set block.next_proposer
+
+        CreateBlock->>State: Set candidateBlock equals block
+        CreateBlock->>Consensus: Return block
+    end
+
+    Consensus->>Consensus: Candidate block ready for voting
+                </div>
+
+                <div class="file-reference">
+                    <strong>📁 File Reference:</strong> src/libs/consensus/v2/routines/createBlock.ts:74
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: Block Validation & Voting -->
+        <div id="section-3">
+            <div class="diagram-section">
+                <h2>3. Block Validation & Voting (Consensus Phase 6)</h2>
+
+                <div class="key-concepts">
+                    <h4>🔑 Key Concepts</h4>
+                    <ul>
+                        <li><strong>Hash Broadcasting</strong>: Secretary broadcasts block hash to all shard members</li>
+                        <li><strong>RPC with Retry</strong>: Send proposeBlockHash RPC with 3 retry attempts</li>
+                        <li><strong>Member Validation</strong>: Each member checks consensus mode, shard membership, and hash match</li>
+                        <li><strong>Signature Collection</strong>: Collect ed25519 signatures from members who agree</li>
+                        <li><strong>67% Threshold</strong>: Byzantine fault tolerance requires 67% agreement</li>
+                        <li><strong>Vote Tallying</strong>: Count pro (valid signature) and con (error/mismatch) votes</li>
+                        <li><strong>Validation Result</strong>: Valid block proceeds to finalization, invalid triggers rollback</li>
+                    </ul>
+                </div>
+
+                <div class="mermaid">
+flowchart TD
+    START([Phase 6: Vote On Block])
+
+    START --> GETCANDIDATE[Get candidateBlock from sharedState]
+    GETCANDIDATE --> BROADCAST[broadcastBlockHash to shard members]
+
+    subgraph "Broadcast Process"
+        BROADCAST --> CREATEREQ[Create RPC request: proposeBlockHash]
+        CREATEREQ --> REQPARAMS[params: block.hash and validation_data and our identity]
+
+        REQPARAMS --> LOOPPEERS{For each<br/>shard member}
+        LOOPPEERS -->|more| SENDREQ[Send RPC with retry: 3 times]
+        LOOPPEERS -->|done| WAITALL
+
+        SENDREQ --> LOOPPEERS
+    end
+
+    WAITALL[Wait for all RPC responses]
+    WAITALL --> PROCESSRESP{For each<br/>response}
+
+    PROCESSRESP -->|more| CHECKSTATUS{Response<br/>status 200?}
+    PROCESSRESP -->|done| COUNTRESULT
+
+    subgraph "Member Response Processing"
+        CHECKSTATUS -->|yes| VERIFYSIG[Verify signature with ed25519]
+        CHECKSTATUS -->|no| CONERROR[Increment con vote]
+
+        VERIFYSIG --> SIGVALID{Signature<br/>valid?}
+        SIGVALID -->|yes| ADDSIG[Add signature to block.validation_data]
+        SIGVALID -->|no| SIGERROR[Log error and increment con vote]
+
+        ADDSIG --> PROVOTE[Increment pro vote]
+    end
+
+    CONERROR --> PROCESSRESP
+    SIGERROR --> PROCESSRESP
+    PROVOTE --> PROCESSRESP
+
+    COUNTRESULT[Count total valid signatures]
+    COUNTRESULT --> CALCULATE[Calculate: signatures divided by shard size]
+
+    CALCULATE --> THRESHOLD{Ratio greater or equal<br/>0.67?}
+
+    THRESHOLD -->|yes| BLOCKVALID[Block is valid]
+    THRESHOLD -->|no| BLOCKINVALID[Block is invalid]
+
+    subgraph "Shard Member Vote Logic"
+        SENDREQ -.-> MEMBERRECEIVE[Member receives proposeBlockHash]
+        MEMBERRECEIVE --> MEMBERCHECK1{In consensus<br/>mode?}
+        MEMBERCHECK1 -->|no| MEMBERERROR1[Return error]
+
+        MEMBERCHECK1 -->|yes| MEMBERCHECK2{In same<br/>shard?}
+        MEMBERCHECK2 -->|no| MEMBERERROR2[Return error]
+
+        MEMBERCHECK2 -->|yes| GETOURBLOCK[Get our candidateBlock]
+        GETOURBLOCK --> COMPAREHASH{Our hash equals<br/>proposed hash?}
+
+        COMPAREHASH -->|yes| SIGNHASH[Sign proposed hash]
+        COMPAREHASH -->|no| MEMBERERROR3[Return hash mismatch]
+
+        SIGNHASH --> MEMBERRETURN[Return 200 with signature]
+        MEMBERERROR1 -.-> CHECKSTATUS
+        MEMBERERROR2 -.-> CHECKSTATUS
+        MEMBERERROR3 -.-> CHECKSTATUS
+        MEMBERRETURN -.-> CHECKSTATUS
+    end
+
+    BLOCKVALID --> PROCEED[Proceed to Phase 7: Finalize]
+    BLOCKINVALID --> ROLLBACK[Trigger BlockInvalidError]
+
+    style START fill:#e1f5ff
+    style BLOCKVALID fill:#c8e6c9
+    style BLOCKINVALID fill:#ffcdd2
+    style PROCEED fill:#c8e6c9
+    style ROLLBACK fill:#ffcdd2
+    style VERIFYSIG fill:#fff4e1
+                </div>
+
+                <div class="file-reference">
+                    <strong>📁 File Reference:</strong> src/libs/consensus/v2/routines/broadcastBlockHash.ts
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 4: Block Finalization & Chain Addition -->
+        <div id="section-4">
+            <div class="diagram-section">
+                <h2>4. Block Finalization & Chain Addition</h2>
+
+                <div class="key-concepts">
+                    <h4>🔑 Key Concepts</h4>
+                    <ul>
+                        <li><strong>GCR State Finalization</strong>: Save GCRTracker, GCRSubnetsTxs, and GCRHashes entries</li>
+                        <li><strong>Transaction Persistence</strong>: Write all transactions to database with status: confirmed</li>
+                        <li><strong>Mempool Cleanup</strong>: Remove finalized transactions from mempool by hashes</li>
+                        <li><strong>Block Database Save</strong>: Insert block into blocks table with all metadata</li>
+                        <li><strong>SharedState Update</strong>: Update lastBlockNumber, lastBlockHash, syncStatus, clear candidateBlock</li>
+                        <li><strong>Block Propagation</strong>: Broadcast finalized block to all network peers</li>
+                        <li><strong>Immutability</strong>: Once finalized, block is permanently in blockchain</li>
+                    </ul>
+                </div>
+
+                <div class="mermaid">
+flowchart TD
+    START([Block Valid: 67%+ Votes])
+
+    START --> PREPARE[Prepare finalization]
+    PREPARE --> SAVEGCR[Save GCR changes to database]
+
+    subgraph "GCR State Finalization"
+        SAVEGCR --> TRACKER[Save GCRTracker entries]
+        TRACKER --> SUBNETS[Save GCRSubnetsTxs entries]
+        SUBNETS --> HASHES[Save GCRHashes for block]
+
+        HASHES --> HASHBLOCK[Create GCRHashes entry]
+        HASHBLOCK --> SETNUMBER[Set blockNumber]
+        HASHBLOCK --> SETHASHES[Set gcr_hash and subnets_txs_hash]
+        HASHBLOCK --> SETTIMESTAMP[Set timestamp]
+    end
+
+    SETTIMESTAMP --> SAVETXS[Save transactions to database]
+
+    subgraph "Transaction Finalization"
+        SAVETXS --> LOOPTXS{For each<br/>transaction}
+
+        LOOPTXS -->|more| CREATETXENTRY[Create Transactions entry]
+        LOOPTXS -->|done| REMOVEFROMMEMPOOL
+
+        CREATETXENTRY --> SETBLOCKNUM[Set blockNumber]
+        CREATETXENTRY --> SETSIGNATURE[Set signature]
+        CREATETXENTRY --> SETHASH[Set hash]
+        CREATETXENTRY --> SETCONTENT[Set content JSON]
+        CREATETXENTRY --> SETSTATUS[Set status: confirmed]
+
+        SETSTATUS --> SAVETX[Save to transactions table]
+        SAVETX --> LOOPTXS
+    end
+
+    REMOVEFROMMEMPOOL[Remove transactions from mempool]
+    REMOVEFROMMEMPOOL --> GETHASHES[Get transaction hashes]
+    GETHASHES --> DELETEMEMPOOL[Mempool.removeTransactionsByHashes]
+
+    DELETEMEMPOOL --> SAVEBLOCK[Save block to database]
+
+    subgraph "Block Database Save"
+        SAVEBLOCK --> CREATEBLOCKENTRY[Create Blocks entry]
+        CREATEBLOCKENTRY --> SETID[Set auto-increment id]
+        CREATEBLOCKENTRY --> SETNUMBERB[Set number]
+        CREATEBLOCKENTRY --> SETHASHB[Set hash]
+        CREATEBLOCKENTRY --> SETCONTENTB[Set content JSON]
+        CREATEBLOCKENTRY --> SETSTATUSB[Set status: confirmed]
+        CREATEBLOCKENTRY --> SETPROPOSERB[Set proposer: CVSA]
+        CREATEBLOCKENTRY --> SETNEXTPROPOSERB[Set next_proposer]
+        CREATEBLOCKENTRY --> SETVALIDATIONB[Set validation_data JSON]
+
+        SETVALIDATIONB --> INSERTDB[INSERT INTO blocks table]
+    end
+
+    INSERTDB --> UPDATESTATE[Update SharedState]
+
+    subgraph "State Updates"
+        UPDATESTATE --> UPDATELASTBLOCK[lastBlockNumber equals block.number]
+        UPDATESTATE --> UPDATELASTHASH[lastBlockHash equals block.hash]
+        UPDATESTATE --> UPDATESYNC[syncStatus equals true]
+        UPDATESTATE --> CLEARCANDIDATE[candidateBlock equals null]
+    end
+
+    CLEARCANDIDATE --> BROADCAST[Broadcast block to network]
+
+    subgraph "Block Propagation"
+        BROADCAST --> SENDPEERS[Send to all peers]
+        SENDPEERS --> PEERSYNC[Peers sync and validate]
+        PEERSYNC --> PEERADD[Peers add to their chain]
+    end
+
+    PEERADD --> COMPLETE[Block finalization complete]
+    COMPLETE --> END([Block permanently in blockchain])
+
+    style START fill:#e1f5ff
+    style SAVEGCR fill:#fff4e1
+    style SAVETXS fill:#e8f5e9
+    style SAVEBLOCK fill:#c8e6c9
+    style COMPLETE fill:#c8e6c9
+    style END fill:#c8e6c9
+                </div>
+
+                <div class="file-reference">
+                    <strong>📁 File Reference:</strong> src/libs/blockchain/chain.ts:400+
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 5: Block Rollback on Validation Failure -->
+        <div id="section-5">
+            <div class="diagram-section">
+                <h2>5. Block Rollback on Validation Failure</h2>
+
+                <div class="key-concepts">
+                    <h4>🔑 Key Concepts</h4>
+                    <ul>
+                        <li><strong>Trigger</strong>: Block validation fails (less than 67% votes)</li>
+                        <li><strong>BlockInvalidError</strong>: Thrown by validation routine and caught by consensus</li>
+                        <li><strong>GCR Rollback</strong>: Reverse all GCREdits from successful transactions using isRollback flag</li>
+                        <li><strong>Edit Reversal Logic</strong>: add becomes remove, remove becomes add, increment becomes decrement</li>
+                        <li><strong>Mempool Cleanup</strong>: Remove unsuccessful transactions from mempool</li>
+                        <li><strong>State Preservation</strong>: Keep lastBlockNumber and lastBlockHash unchanged</li>
+                        <li><strong>User Impact</strong>: Transactions must be resubmitted in next consensus round</li>
+                    </ul>
+                </div>
+
+                <div class="mermaid">
+flowchart TD
+    START([Block Invalid: Less than 67% Votes])
+
+    START --> THROWERROR[Throw BlockInvalidError]
+    THROWERROR --> CATCHBLOCK[Catch in consensus routine]
+
+    CATCHBLOCK --> LOGTXS[Log: Block validation failed]
+    LOGTXS --> GETSUCCESSFUL[Get successfulTxs array]
+
+    GETSUCCESSFUL --> ROLLBACKSTART[Start GCR rollback]
+
+    subgraph "GCR Rollback Process"
+        ROLLBACKSTART --> LOOPSUCCESSFUL{For each<br/>successful tx}
+
+        LOOPSUCCESSFUL -->|more txs| GETTX[Get transaction object]
+        LOOPSUCCESSFUL -->|done| ROLLBACKCOMPLETE
+
+        GETTX --> GETEDITS[Get tx.content.gcr_edits]
+        GETEDITS --> APPLYROLLBACK[HandleGCR.applyToTx with isRollback true]
+
+        APPLYROLLBACK --> REVERSEEDITS[Reverse each GCREdit]
+
+        subgraph "Edit Reversal Logic"
+            REVERSEEDITS --> EDITTYPE{Edit<br/>type?}
+
+            EDITTYPE -->|balance add| BALANCEREMOVE[Reverse: Remove balance]
+            EDITTYPE -->|balance remove| BALANCEADD[Reverse: Add balance back]
+            EDITTYPE -->|nonce increment| NONCEDECREMENT[Reverse: Decrement nonce]
+            EDITTYPE -->|identity add| IDENTITYREMOVE[Reverse: Remove identity]
+
+            BALANCEREMOVE --> ROLLBACKSUCCESS
+            BALANCEADD --> ROLLBACKSUCCESS
+            NONCEDECREMENT --> ROLLBACKSUCCESS
+            IDENTITYREMOVE --> ROLLBACKSUCCESS
+
+            ROLLBACKSUCCESS[Rollback successful for edit]
+            ROLLBACKSUCCESS --> LOOPSUCCESSFUL
+        end
+    end
+
+    ROLLBACKCOMPLETE[All GCR edits rolled back]
+    ROLLBACKCOMPLETE --> REMOVEMEMPOOL[Remove successful txs from mempool]
+
+    REMOVEMEMPOOL --> GETHASHES[Get tx hashes]
+    GETHASHES --> DELETE[Mempool.removeTransactionsByHashes]
+
+    DELETE --> CLEARSTATE[Clear SharedState]
+
+    subgraph "State Cleanup"
+        CLEARSTATE --> CLEARCANDIDATE[candidateBlock equals null]
+        CLEARSTATE --> KEEPBLOCKNUMBER[Keep lastBlockNumber unchanged]
+        CLEARSTATE --> KEEPBLOCKHASH[Keep lastBlockHash unchanged]
+    end
+
+    KEEPBLOCKHASH --> NOTIFYUSER[Log: Transactions discarded]
+    NOTIFYUSER --> USERRESUBMIT[Users must resubmit transactions]
+
+    USERRESUBMIT --> NEXTROUND[Wait for next consensus round]
+    NEXTROUND --> END([Consensus round complete])
+
+    style START fill:#e1f5ff
+    style ROLLBACKSTART fill:#fff4e1
+    style REVERSEEDITS fill:#e8f5e9
+    style ROLLBACKCOMPLETE fill:#ffe0b2
+    style NOTIFYUSER fill:#ffe0b2
+    style END fill:#f3e5f5
+                </div>
+
+                <div class="file-reference">
+                    <strong>📁 File Reference:</strong> src/libs/blockchain/gcr/handleGCR.ts:applyToTx (isRollback mode)
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 6: Native Tables Hashing -->
+        <div id="section-6">
+            <div class="diagram-section">
+                <h2>6. Native Tables Hashing (GCR State Integrity)</h2>
+
+                <div class="key-concepts">
+                    <h4>🔑 Key Concepts</h4>
+                    <ul>
+                        <li><strong>Purpose</strong>: Verify GCR state consistency across all nodes</li>
+                        <li><strong>GCRTracker Hash</strong>: Query all entries, order by pubkey ASC, serialize, SHA256</li>
+                        <li><strong>GCRSubnetsTxs Hash</strong>: Query all entries, order by id ASC, serialize, SHA256</li>
+                        <li><strong>Inclusion in Block</strong>: Add hashes to block.content.native_tables_hashes</li>
+                        <li><strong>Verification</strong>: Peers recalculate hashes when syncing and compare</li>
+                        <li><strong>Tampering Detection</strong>: Any state modification will change hash</li>
+                        <li><strong>Audit Trail</strong>: Historical state verification via block hashes</li>
+                    </ul>
+                </div>
+
+                <div class="mermaid">
+flowchart TD
+    START([hashNativeTables called])
+
+    START --> PROXY[Proxy to hashGCRTables]
+    PROXY --> GETDB[Get database connection]
+
+    GETDB --> TRACKERHASH[Hash GCRTracker table]
+
+    subgraph "GCRTracker Hashing"
+        TRACKERHASH --> QUERYTRACKER[Query all GCRTracker entries]
+        QUERYTRACKER --> ORDERTRACKER[Order by pubkey ASC]
+        ORDERTRACKER --> SERIALIZETRACKER[Serialize to JSON string]
+        SERIALIZETRACKER --> SHA256TRACKER[Calculate SHA256]
+        SHA256TRACKER --> GCRHASH[native_gcr hash result]
+    end
+
+    GCRHASH --> SUBNETSHASH[Hash GCRSubnetsTxs table]
+
+    subgraph "GCRSubnetsTxs Hashing"
+        SUBNETSHASH --> QUERYSUBNETS[Query all GCRSubnetsTxs entries]
+        QUERYSUBNETS --> ORDERSUBNETS[Order by id ASC]
+        ORDERSUBNETS --> SERIALIZESUBNETS[Serialize to JSON string]
+        SERIALIZESUBNETS --> SHA256SUBNETS[Calculate SHA256]
+        SHA256SUBNETS --> SUBNETSHASHRESULT[native_subnets_txs hash result]
+    end
+
+    SUBNETSHASHRESULT --> CREATEOBJ[Create NativeTablesHashes object]
+    CREATEOBJ --> SETGCR[Set native_gcr field]
+    CREATEOBJ --> SETSUBNETS[Set native_subnets_txs field]
+
+    SETSUBNETS --> RETURN[Return hashes object]
+    RETURN --> ADDTOBLOCK[Add to block.content.native_tables_hashes]
+
+    subgraph "Hash Purpose"
+        ADDTOBLOCK --> PURPOSE1[Verify GCR state consistency]
+        PURPOSE1 --> PURPOSE2[Detect state tampering]
+        PURPOSE2 --> PURPOSE3[Enable state sync verification]
+        PURPOSE3 --> PURPOSE4[Audit trail for state changes]
+    end
+
+    PURPOSE4 --> VERIFYLATER[Peers verify hashes when syncing]
+
+    subgraph "Hash Verification"
+        VERIFYLATER --> PEERRECV[Peer receives block]
+        PEERRECV --> PEERHASH[Peer calculates own hashes]
+        PEERHASH --> PEERCOMPARE{Hashes<br/>match?}
+
+        PEERCOMPARE -->|yes| STATEVALID[GCR state is valid]
+        PEERCOMPARE -->|no| STATEINVALID[State mismatch - reject block]
+    end
+
+    STATEVALID --> END([Hash verification complete])
+    STATEINVALID --> END
+
+    style START fill:#e1f5ff
+    style SHA256TRACKER fill:#fff4e1
+    style SHA256SUBNETS fill:#fff4e1
+    style STATEVALID fill:#c8e6c9
+    style STATEINVALID fill:#ffcdd2
+                </div>
+
+                <div class="file-reference">
+                    <strong>📁 File Reference:</strong> src/libs/blockchain/gcr/gcr_routines/hashGCR.ts
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 7: Block Header & Chain Continuity -->
+        <div id="section-7">
+            <div class="diagram-section">
+                <h2>7. Block Header & Chain Continuity</h2>
+
+                <div class="key-concepts">
+                    <h4>🔑 Key Concepts</h4>
+                    <ul>
+                        <li><strong>Block Header</strong>: number, hash, status, previousHash, timestamp</li>
+                        <li><strong>Chain Linking</strong>: Each block references previous block via previousHash</li>
+                        <li><strong>Continuity Verification</strong>: Block N previousHash must equal Block N-1 hash</li>
+                        <li><strong>Number Sequence</strong>: Block N number must equal Block N-1 number + 1</li>
+                        <li><strong>Genesis Block</strong>: Block 0 with null/placeholder previousHash, hardcoded in code</li>
+                        <li><strong>Hash Calculation</strong>: SHA256 of JSON.stringify(content) includes all fields</li>
+                        <li><strong>Retrieval Operations</strong>: getLastBlock, getBlockByNumber, getBlockByHash, etc.</li>
+                    </ul>
+                </div>
+
+                <div class="mermaid">
+graph TB
+    subgraph "Block Header Structure"
+        HEADER[Block Header]
+        HEADER --> HEADERNUMBER[number: integer]
+        HEADER --> HEADERHASH[hash: string]
+        HEADER --> HEADERSTATUS[status: confirmed or derived]
+        HEADER --> HEADERPREV[previousHash: string]
+        HEADER --> HEADERTIMESTAMP[timestamp: number]
+    end
+
+    subgraph "Chain Continuity Verification"
+        VERIFY[Verify Block N]
+        VERIFY --> GETPREV[Get Block N minus 1]
+        GETPREV --> COMPAREHASH{Block N previousHash<br/>equals Block N minus 1 hash?}
+
+        COMPAREHASH -->|yes| CONTINUOUS[Chain is continuous]
+        COMPAREHASH -->|no| BROKEN[Chain is broken]
+
+        CONTINUOUS --> CHECKNUMBER{Block N number<br/>equals N minus 1 number plus 1?}
+        CHECKNUMBER -->|yes| VALIDCHAIN[Valid chain continuity]
+        CHECKNUMBER -->|no| NUMBERMISMATCH[Number sequence broken]
+    end
+
+    subgraph "Genesis Block Special Case"
+        GENESIS[Block 0: Genesis]
+        GENESIS --> GENESISNUMBER[number: 0]
+        GENESIS --> GENESISHASH[hash: calculated from content]
+        GENESIS --> GENESISPREV[previousHash: null or placeholder]
+        GENESIS --> GENESISTIMESTAMP[timestamp: network start time]
+
+        GENESIS -.-> HARDCODED[Genesis block hardcoded in code]
+        GENESIS -.-> CHECKSUM[Genesis hash verified on startup]
+    end
+
+    subgraph "Block Retrieval Operations"
+        GETOPS[Chain Retrieval Operations]
+
+        GETOPS --> GETLAST[getLastBlock]
+        GETOPS --> GETBYNUMBER[getBlockByNumber n]
+        GETOPS --> GETBYHASH[getBlockByHash hash]
+        GETOPS --> GETGENESIS[getGenesisBlock]
+        GETOPS --> GETRANGE[getBlocks start and limit]
+
+        GETLAST --> QUERYLAST[ORDER BY number DESC LIMIT 1]
+        GETBYNUMBER --> QUERYNUMBER[WHERE number equals n]
+        GETBYHASH --> QUERYHASH[WHERE hash equals hash]
+        GETGENESIS --> QUERYGENESIS[WHERE number equals 0]
+        GETRANGE --> QUERYRANGE[WHERE number less than start and LIMIT]
+    end
+
+    subgraph "Block Hash Calculation"
+        HASHCALC[Hash Calculation]
+        HASHCALC --> GETCONTENT[Get block.content object]
+        GETCONTENT --> STRINGIFY[JSON.stringify content]
+        STRINGIFY --> SHA256[Calculate SHA256]
+        SHA256 --> BLOCKHASH[block.hash]
+
+        BLOCKHASH -.-> INCLUDES[Includes all content fields]
+        INCLUDES -.-> ORDEREDTXS[ordered_transactions]
+        INCLUDES -.-> PREVHASH[previousHash]
+        INCLUDES -.-> TIMESTAMP[timestamp]
+        INCLUDES -.-> PEERLIST[peerlist]
+        INCLUDES -.-> NATIVEHASHES[native_tables_hashes]
+    end
+
+    style HEADER fill:#e1f5ff
+    style CONTINUOUS fill:#c8e6c9
+    style VALIDCHAIN fill:#c8e6c9
+    style BROKEN fill:#ffcdd2
+    style NUMBERMISMATCH fill:#ffcdd2
+    style GENESIS fill:#fff4e1
+    style SHA256 fill:#e8f5e9
+                </div>
+
+                <div class="file-reference">
+                    <strong>📁 File Reference:</strong> src/libs/blockchain/chain.ts (retrieval operations)
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 8: Block Database Schema & Indexing -->
+        <div id="section-8">
+            <div class="diagram-section">
+                <h2>8. Block Database Schema & Indexing</h2>
+
+                <div class="key-concepts">
+                    <h4>🔑 Key Concepts</h4>
+                    <ul>
+                        <li><strong>BLOCKS Table</strong>: id (PK), number (UK), hash (UK), content, status, proposer, next_proposer, validation_data</li>
+                        <li><strong>TRANSACTIONS Table</strong>: id (PK), blockNumber (FK), hash (UK), signatures, status, content, type, from, to, amount, nonce</li>
+                        <li><strong>GCR_HASHES Table</strong>: id (PK), blockNumber (FK), gcr_hash, subnets_txs_hash, timestamp</li>
+                        <li><strong>GCR_MAIN Table</strong>: pubkey (PK), balance, nonce, identities, points</li>
+                        <li><strong>MEMPOOL_V2 Table</strong>: hash (PK), blockNumber, timestamp, content</li>
+                        <li><strong>Relationships</strong>: Blocks → Transactions (1:N), Blocks → GCR_HASHES (1:1), Blocks → Blocks (previousHash link)</li>
+                        <li><strong>Indexes</strong>: Optimized queries for number, hash, blockNumber, from/to addresses</li>
+                    </ul>
+                </div>
+
+                <div class="mermaid">
+erDiagram
+    BLOCKS {
+        integer id PK
+        integer number UK
+        varchar hash UK
+        json content
+        varchar status
+        varchar proposer
+        varchar next_proposer
+        json validation_data
+    }
+
+    TRANSACTIONS {
+        integer id PK
+        integer blockNumber FK
+        varchar hash UK
+        varchar signature
+        varchar ed25519_signature
+        varchar status
+        json content
+        varchar type
+        varchar from
+        varchar from_ed25519_address
+        varchar to
+        integer amount
+        integer nonce
+        bigint timestamp
+    }
+
+    GCR_HASHES {
+        integer id PK
+        integer blockNumber FK
+        varchar gcr_hash
+        varchar subnets_txs_hash
+        bigint timestamp
+    }
+
+    GCR_MAIN {
+        varchar pubkey PK
+        bigint balance
+        integer nonce
+        jsonb identities
+        jsonb points
+    }
+
+    MEMPOOL_V2 {
+        varchar hash PK
+        integer blockNumber
+        bigint timestamp
+        json content
+    }
+
+    BLOCKS ||--o{ TRANSACTIONS : contains
+    BLOCKS ||--|| GCR_HASHES : has_state_hash
+    BLOCKS ||--o{ MEMPOOL_V2 : references
+    TRANSACTIONS }o--|| GCR_MAIN : modifies
+    BLOCKS }|--|| BLOCKS : previousHash_links_to
+                </div>
+
+                <p><strong>Database Indexes:</strong></p>
+                <ul>
+                    <li><strong>BLOCKS table indexes:</strong> idx_blocks_number, idx_blocks_hash</li>
+                    <li><strong>TRANSACTIONS table indexes:</strong> idx_transactions_hash, idx_transactions_blockNumber, idx_transactions_from_ed25519_address, idx_transactions_to</li>
+                </ul>
+
+                <div class="file-reference">
+                    <strong>📁 File Reference:</strong> src/model/entities/Blocks.ts:32
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 9: Block Sync & Propagation -->
+        <div id="section-9">
+            <div class="diagram-section">
+                <h2>9. Block Sync & Propagation</h2>
+
+                <div class="key-concepts">
+                    <h4>🔑 Key Concepts</h4>
+                    <ul>
+                        <li><strong>Gap Calculation</strong>: New node compares peer lastBlockNumber with local lastBlockNumber</li>
+                        <li><strong>Block Request</strong>: Request missing blocks one by one from peers</li>
+                        <li><strong>Block Validation</strong>: Verify structure, previousHash, block hash correctness</li>
+                        <li><strong>Transaction Sync</strong>: Request and validate all transactions in each block</li>
+                        <li><strong>GCR State Application</strong>: Apply GCREdits from transactions to rebuild state</li>
+                        <li><strong>Hash Verification</strong>: Recalculate native_tables_hashes and compare with block</li>
+                        <li><strong>State Mismatch Handling</strong>: Reject block and request again or find new peer</li>
+                        <li><strong>Database Persistence</strong>: Save blocks, transactions, and GCR state incrementally</li>
+                    </ul>
+                </div>
+
+                <div class="mermaid">
+sequenceDiagram
+    participant New as New Node
+    participant Peers
+    participant Chain
+    participant GCR
+    participant Mempool
+
+    Note over New,Mempool: Node joins network and needs to sync
+
+    New->>Peers: Request last block number
+    Peers->>New: Return lastBlockNumber
+
+    New->>Chain: Get our lastBlockNumber
+    Chain->>New: Return local lastBlockNumber
+
+    New->>New: Calculate gap: peer number minus local number
+
+    alt Gap is 0
+        New->>New: Already synced
+    else Gap greater than 0
+        New->>New: Start sync process
+
+        loop For each missing block
+            New->>Peers: Request block N
+            Peers->>New: Return block N
+
+            New->>New: Validate block structure
+            New->>New: Verify previousHash matches
+            New->>New: Verify block hash is correct
+
+            New->>New: Get block.content.ordered_transactions
+            loop For each transaction hash
+                New->>Peers: Request transaction by hash
+                Peers->>New: Return transaction
+                New->>New: Validate transaction signature
+                New->>New: Validate transaction hash
+            end
+
+            New->>GCR: Apply GCR edits from transactions
+            GCR->>GCR: Update balances and nonces and identities
+            GCR->>New: GCR edits applied
+
+            New->>GCR: Calculate native_tables_hashes
+            GCR->>New: Return calculated hashes
+
+            New->>New: Compare with block.content.native_tables_hashes
+            alt Hashes match
+                New->>New: GCR state is valid
+            else Hashes do not match
+                New->>New: GCR state mismatch - reject block
+                New->>New: Request block again or find new peer
+            end
+
+            New->>Chain: Save block to database
+            Chain->>Chain: INSERT INTO blocks
+            Chain->>New: Block saved
+
+            New->>Chain: Save transactions to database
+            Chain->>Chain: INSERT INTO transactions
+            Chain->>New: Transactions saved
+
+            New->>GCR: Save GCR state
+            GCR->>GCR: Save GCRTracker and GCRHashes
+            GCR->>New: State saved
+
+            New->>New: Increment local lastBlockNumber
+        end
+
+        New->>New: Sync complete
+        New->>New: Set syncStatus equals true
+    end
+
+    New->>Mempool: Clear old mempool entries
+    Mempool->>Mempool: Remove txs from old blocks
+    New->>New: Ready for consensus
+                </div>
+
+                <div class="file-reference">
+                    <strong>📁 File Reference:</strong> src/libs/blockchain/chain.ts (sync operations)
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 10: Complete Block Lifecycle State Machine -->
+        <div id="section-10">
+            <div class="diagram-section">
+                <h2>10. Complete Block Lifecycle State Machine</h2>
+
+                <div class="key-concepts">
+                    <h4>🔑 Key Concepts</h4>
+                    <ul>
+                        <li><strong>Not Created State</strong>: Waiting in Phases 1-4, ready for forging when Phase 5 begins</li>
+                        <li><strong>Creating State</strong>: Initialize block, fill content, hash native tables, calculate hash, sign, calculate next proposer</li>
+                        <li><strong>Candidate State</strong>: Stored in sharedState.candidateBlock, ready for voting in Phase 6</li>
+                        <li><strong>Voting State</strong>: Broadcast hash, collect signatures, verify, count votes for 67% threshold</li>
+                        <li><strong>Validated State</strong>: Save GCR, save txs, remove from mempool, save block, update sharedState</li>
+                        <li><strong>Invalid State</strong>: Rollback GCR edits, remove txs, clear candidate, users resubmit</li>
+                        <li><strong>Finalized State</strong>: Permanently in blockchain, status confirmed, immutable</li>
+                        <li><strong>Discarded State</strong>: Not added to blockchain, transactions must be resubmitted</li>
+                    </ul>
+                </div>
+
+                <div class="mermaid">
+stateDiagram-v2
+    [*] --> NotCreated: Consensus round begins
+
+    state "Block Not Created" as NotCreated {
+        [*] --> WaitingPhases
+        WaitingPhases: Phases 1-4 executing
+        WaitingPhases --> ReadyToForge: Phase 5 begins
+        ReadyToForge --> [*]
+    }
+
+    NotCreated --> Creating: Phase 5 starts
+
+    state "Block Creation" as Creating {
+        [*] --> InitializeBlock
+        InitializeBlock: new Block()
+        InitializeBlock --> FillContent: Set content fields
+        FillContent --> HashNativeTables: Hash GCR state
+        HashNativeTables --> CalculateHash: SHA256 of content
+        CalculateHash --> SignHash: Sign with ed25519
+        SignHash --> CalculateNextProposer: Determine next CVSA
+        CalculateNextProposer --> [*]: Candidate block ready
+    }
+
+    Creating --> Candidate: Block created
+
+    state "Candidate Block" as Candidate {
+        [*] --> Stored
+        Stored: Stored in sharedState.candidateBlock
+        Stored --> Broadcasting: Phase 6 begins
+        Broadcasting --> [*]
+    }
+
+    Candidate --> Voting: Phase 6 in progress
+
+    state "Block Voting" as Voting {
+        [*] --> BroadcastHash
+        BroadcastHash: Send hash to all shard members
+        BroadcastHash --> CollectSignatures: Wait for responses
+        CollectSignatures --> VerifySignatures: Validate ed25519 signatures
+        VerifySignatures --> CountVotes: Tally pro and con votes
+        CountVotes --> [*]: Voting complete
+    }
+
+    Voting --> Validated: 67%+ votes
+    Voting --> Invalid: Less than 67% votes
+
+    state "Block Validated" as Validated {
+        [*] --> SaveGCR
+        SaveGCR: Persist GCR state changes
+        SaveGCR --> SaveTransactions: Write txs to database
+        SaveTransactions --> RemoveFromMempool: Clear mempool
+        RemoveFromMempool --> SaveBlock: Write block to database
+        SaveBlock --> UpdateState: Update sharedState
+        UpdateState --> [*]: Finalization complete
+    }
+
+    state "Block Invalid" as Invalid {
+        [*] --> RollbackGCR
+        RollbackGCR: Reverse all GCR edits
+        RollbackGCR --> RemoveTxs: Clear mempool
+        RemoveTxs --> ClearCandidate: Remove from sharedState
+        ClearCandidate --> [*]: Cleanup complete
+    }
+
+    Validated --> Finalized: Block added to chain
+
+    state "Block Finalized" as Finalized {
+        [*] --> InChain
+        InChain: Permanently in blockchain
+        InChain --> Confirmed: Status equals confirmed
+        Confirmed --> Immutable: Cannot be modified
+        Immutable --> [*]
+    }
+
+    Invalid --> Discarded: Block discarded
+
+    state "Block Discarded" as Discarded {
+        [*] --> NotInChain
+        NotInChain: Not added to blockchain
+        NotInChain --> UsersResubmit: Transactions must be resubmitted
+        UsersResubmit --> [*]
+    }
+
+    Finalized --> [*]: Consensus round complete
+    Discarded --> [*]: Consensus round complete
+
+    note right of Creating
+        Block Creation Requirements:
+        - Ordered transactions from mempool
+        - CVSA seed for proposer
+        - Previous block hash
+        - Current block number
+        - Peer list
+        - Native tables hashes
+        - Secretary timestamp
+    end note
+
+    note right of Voting
+        Voting Rules:
+        - Each shard member votes independently
+        - Vote equals signature if hash matches
+        - 67% threshold for Byzantine fault tolerance
+        - Invalid blocks trigger GCR rollback
+    end note
+
+    note right of Finalized
+        Finalization Steps:
+        1. Save GCR state
+        2. Save transactions
+        3. Remove from mempool
+        4. Save block to database
+        5. Update sharedState
+        6. Broadcast to network
+    end note
+                </div>
+
+                <div class="file-reference">
+                    <strong>📁 File Reference:</strong> src/libs/consensus/v2/PoRBFT.ts:500+ (complete lifecycle)
+                </div>
+            </div>
+        </div>
+
+        <!-- Key File References Section -->
+        <div class="diagram-section" style="background: linear-gradient(135deg, #fff9e6 0%, #ffe0b2 100%); border: none;">
+            <h2>📁 Key File References</h2>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                <div class="file-reference">
+                    <h4 style="margin-bottom: 0.5rem; color: #ef6c00;">Block Management Files</h4>
+                    <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                        <li><strong>Block</strong>: <code>src/libs/blockchain/block.ts</code> (73 lines - block structure)</li>
+                        <li><strong>Blocks Entity</strong>: <code>src/model/entities/Blocks.ts</code> (32 lines - database schema)</li>
+                        <li><strong>Chain</strong>: <code>src/libs/blockchain/chain.ts</code> (400+ lines - blockchain operations)</li>
+                    </ul>
+                </div>
+
+                <div class="file-reference">
+                    <h4 style="margin-bottom: 0.5rem; color: #ef6c00;">Block Creation Files</h4>
+                    <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                        <li><strong>Create Block</strong>: <code>src/libs/consensus/v2/routines/createBlock.ts</code> (74 lines - block forging)</li>
+                        <li><strong>Hash GCR</strong>: <code>src/libs/blockchain/gcr/gcr_routines/hashGCR.ts</code> (native tables hashing)</li>
+                        <li><strong>CVSA</strong>: <code>src/libs/consensus/v2/routines/getCommonValidatorSeed.ts</code> (next proposer calculation)</li>
+                    </ul>
+                </div>
+
+                <div class="file-reference">
+                    <h4 style="margin-bottom: 0.5rem; color: #ef6c00;">Consensus Integration</h4>
+                    <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                        <li><strong>PoRBFT</strong>: <code>src/libs/consensus/v2/PoRBFT.ts</code> (Phase 5-7 block operations)</li>
+                        <li><strong>Broadcast Block Hash</strong>: <code>src/libs/consensus/v2/routines/broadcastBlockHash.ts</code> (voting)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Principles Section -->
+        <div class="diagram-section" style="background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); border: none;">
+            <h2>💡 Block Creation & Validation Principles</h2>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                <div class="key-concepts">
+                    <h4>Core Principles</h4>
+                    <ul>
+                        <li><strong>Consensus-Driven</strong>: Blocks only created during consensus Phase 5 by shard members</li>
+                        <li><strong>Content Hash Integrity</strong>: Block hash is SHA256 of stringified content</li>
+                        <li><strong>Previous Hash Linking</strong>: Each block references previous block hash for chain continuity</li>
+                        <li><strong>Native Tables Hashing</strong>: GCR state hashed and included for state verification</li>
+                        <li><strong>Multi-Signature Validation</strong>: 67% of shard must sign block for finalization</li>
+                    </ul>
+                </div>
+
+                <div class="key-concepts">
+                    <h4>Advanced Features</h4>
+                    <ul>
+                        <li><strong>CVSA-Based Proposer</strong>: Deterministic next proposer calculation from block content</li>
+                        <li><strong>Timestamp Consistency</strong>: All shard members use secretary-coordinated timestamp</li>
+                        <li><strong>GCR Rollback Support</strong>: Failed blocks trigger automatic state reversal</li>
+                        <li><strong>Immutable Once Finalized</strong>: Blocks in chain cannot be modified or deleted</li>
+                        <li><strong>Database Persistence</strong>: Blocks, transactions, and GCR hashes stored with indexing</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="btn" onclick="window.print()">🖨️ Print</button>
+        <button class="btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">⬆️ Top</button>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Demos Blockchain - Block Creation & Validation Documentation</p>
+        <p style="margin-top: 0.5rem; opacity: 0.8;">Generated with Mermaid.js | Interactive Diagram Viewer</p>
+    </footer>
+
+    <script>
+        // Initialize Mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            securityLevel: 'loose',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'linear',
+                padding: 20,
+                nodeSpacing: 100,
+                rankSpacing: 100,
+                diagramPadding: 20
+            },
+            graph: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'linear',
+                padding: 20,
+                nodeSpacing: 100,
+                rankSpacing: 100
+            }
+        });
+
+        // Active navigation highlighting
+        function setActive(element) {
+            // Remove active class from all nav links
+            document.querySelectorAll('nav a').forEach(link => {
+                link.classList.remove('active');
+            });
+            // Add active class to clicked link
+            element.classList.add('active');
+        }
+
+        // Highlight active section on scroll
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('[id^="section-"]');
+            const navLinks = document.querySelectorAll('nav a');
+
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.pageYOffset >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('nav a').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

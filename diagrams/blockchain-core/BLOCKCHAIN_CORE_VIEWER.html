@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blockchain Core - Architecture Diagrams</title>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'linear',
+                padding: 20,
+                nodeSpacing: 100,
+                rankSpacing: 100,
+                diagramPadding: 20
+            },
+            graph: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'linear',
+                padding: 20,
+                nodeSpacing: 100,
+                rankSpacing: 100
+            }
+        });
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        nav {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #2a5298;
+            padding: 10px 20px;
+            border-radius: 5px;
+            background: white;
+            border: 2px solid #2a5298;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        nav a:hover {
+            background: #2a5298;
+            color: white;
+        }
+
+        .section {
+            padding: 40px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        .section h2 {
+            color: #2a5298;
+            font-size: 2em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .section p {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .diagram-container {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .mermaid {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .info-box {
+            background: #d1ecf1;
+            border-left: 5px solid #0dcaf0;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .info-box strong {
+            color: #0c5460;
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .key-concepts {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .key-concepts h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .key-concepts ul {
+            list-style-position: inside;
+            color: #856404;
+        }
+
+        .key-concepts li {
+            margin: 5px 0;
+        }
+
+        .print-button {
+            display: inline-block;
+            margin: 20px auto;
+            padding: 15px 30px;
+            background: #2a5298;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .print-button:hover {
+            background: #1e3c72;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+        }
+
+        @media print {
+            .print-button, nav {
+                display: none;
+            }
+
+            .section {
+                page-break-inside: avoid;
+            }
+        }
+
+        footer {
+            background: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            color: #666;
+            border-top: 2px solid #dee2e6;
+        }
+    </style>
+</head>
+<body>
+    <button class="print-button" onclick="window.print()">🖨️ Print All</button>
+
+    <div class="container">
+        <header>
+            <h1>⛓️ Blockchain Core</h1>
+            <p>Complete Architecture Diagrams - Blocks, Transactions, Chain & Mempool</p>
+        </header>
+
+        <nav>
+            <ul>
+                <li><a href="#structure">Block Structure</a></li>
+                <li><a href="#signing">TX Signing</a></li>
+                <li><a href="#validation">TX Validation</a></li>
+                <li><a href="#chain">Chain Operations</a></li>
+                <li><a href="#insertion">Block Insertion</a></li>
+                <li><a href="#mempool">Mempool</a></li>
+                <li><a href="#types">TX Types</a></li>
+                <li><a href="#lifecycle">TX Lifecycle</a></li>
+                <li><a href="#database">Database</a></li>
+                <li><a href="#consensus">Block Proposal</a></li>
+            </ul>
+        </nav>
+
+        <!-- 1. Block Structure -->
+        <div class="section" id="structure">
+            <h2>1. Block Structure & Lifecycle</h2>
+            <p>The Block class represents a single block in the Demos blockchain. Each block contains ordered transactions, metadata, and links to native table states.</p>
+
+            <div class="diagram-container">
+                <div class="mermaid">
+graph TD
+    subgraph BlockStructure["BLOCK STRUCTURE"]
+        B1[Block]
+        B2[Number]
+        B3[Hash]
+        B4[Status: derived/confirmed]
+        B5[Proposer Public Key]
+        B6[Next Proposer]
+        B7[Validation Data]
+
+        B1 --> B2
+        B1 --> B3
+        B1 --> B4
+        B1 --> B5
+        B1 --> B6
+        B1 --> B7
+    end
+
+    subgraph BlockContent["BLOCK CONTENT"]
+        BC1[Ordered Transactions]
+        BC2[Encrypted TX Hashes Map]
+        BC3[Per-Address TX Map]
+        BC4[Web2 Data]
+        BC5[Previous Hash]
+        BC6[Timestamp]
+        BC7[Peerlist]
+        BC8[L2PS Participating Nodes]
+        BC9[L2PS Banned Nodes]
+        BC10[Native Tables Hashes<br/>GCR Hash<br/>Subnets TX Hash]
+    end
+
+    B1 --> BlockContent
+
+    classDef blockClass fill:#667eea,stroke:#764ba2,stroke-width:2px,color:#fff
+    classDef contentClass fill:#11998e,stroke:#38ef7d,stroke-width:2px,color:#fff
+
+    class B1,B2,B3,B4,B5,B6,B7 blockClass
+    class BC1,BC2,BC3,BC4,BC5,BC6,BC7,BC8,BC9,BC10 contentClass
+                </div>
+            </div>
+
+            <div class="key-concepts">
+                <h4>Block Status Types:</h4>
+                <ul>
+                    <li><strong>derived</strong>: Block proposed but not yet confirmed by validators</li>
+                    <li><strong>confirmed</strong>: Block validated by consensus and permanently stored</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 2. Transaction Signing -->
+        <div class="section" id="signing">
+            <h2>2. Transaction Creation & Signing Flow</h2>
+            <p>Transactions must be signed using cryptographic algorithms before submission. Supports ED25519 and post-quantum signatures.</p>
+
+            <div class="diagram-container">
+                <div class="mermaid">
+sequenceDiagram
+    participant Client
+    participant TX as Transaction Class
+    participant Crypto as Cryptography
+    participant Hash as Hashing Module
+
+    Note over Client,Hash: PHASE 1: Transaction Creation
+
+    Client->>TX: Create new Transaction()
+    TX->>TX: Initialize empty content
+    Client->>TX: Set content fields<br/>(type, from, to, amount, data, nonce)
+    Client->>TX: Set transaction_fee
+
+    Note over Client,Hash: PHASE 2: Signing
+
+    Client->>TX: Transaction.sign(tx)
+    TX->>Crypto: ucrypto.sign(algorithm, content)
+
+    alt Signing Algorithms
+        Crypto->>Crypto: ED25519 signature
+        Note over Crypto: OR
+        Crypto->>Crypto: Post-Quantum signature<br/>(ml-dsa, sl-dsa)
+    end
+
+    Crypto-->>TX: Return signature
+    TX-->>Client: Signature object<br/>{type, data}
+
+    Note over Client,Hash: PHASE 3: Hashing
+
+    Client->>TX: Transaction.hash(tx)
+    TX->>Hash: SHA256(JSON.stringify(content))
+    Hash-->>TX: Transaction hash
+    TX->>TX: Set tx.hash
+    TX-->>Client: Hashed transaction
+
+    Note over Client,Hash: Ready for submission
+                </div>
+            </div>
+
+            <div class="key-concepts">
+                <h4>Supported Signature Algorithms:</h4>
+                <ul>
+                    <li><strong>ed25519</strong>: Standard elliptic curve digital signature</li>
+                    <li><strong>ml-dsa</strong>: Post-quantum ML-DSA (Dilithium)</li>
+                    <li><strong>sl-dsa</strong>: Post-quantum SL-DSA (Sphincs+)</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 3. Transaction Validation -->
+        <div class="section" id="validation">
+            <h2>3. Transaction Validation Flow</h2>
+            <p>Comprehensive validation ensures transaction integrity through structure checks, signature verification, and hash validation.</p>
+
+            <div class="diagram-container">
+                <div class="mermaid">
+flowchart TD
+    Start[Receive Transaction]
+
+    Start --> Struct{Structured?}
+    Struct -->|No| E1[Error: Invalid structure]
+    Struct -->|Yes| ValidateSig
+
+    ValidateSig[Validate Signature]
+    ValidateSig --> CheckSender{Sender matches?}
+    CheckSender -->|No| E2[Error: Sender mismatch]
+    CheckSender -->|Yes| CheckSigType
+
+    CheckSigType{Signature Type?}
+    CheckSigType -->|ED25519| VerifyED
+    CheckSigType -->|PQC| CheckGCR
+
+    CheckGCR{PQC in GCR?}
+    CheckGCR -->|No| CheckED25519Sig{Has ED25519<br/>backup sig?}
+    CheckED25519Sig -->|No| E3[Error: PQC not in GCR]
+    CheckED25519Sig -->|Yes| VerifyED
+    CheckGCR -->|Yes| VerifyPQC
+
+    VerifyED[Verify ED25519 Signature]
+    VerifyPQC[Verify PQC Signature]
+
+    VerifyED --> SigValid{Valid?}
+    VerifyPQC --> SigValid
+
+    SigValid -->|No| E4[Error: Invalid signature]
+    SigValid -->|Yes| CheckHash
+
+    CheckHash[Check Hash Coherence]
+    CheckHash --> HashMatch{Hash matches<br/>content?}
+    HashMatch -->|No| E5[Error: Hash mismatch]
+    HashMatch -->|Yes| CreateConfirmation
+
+    CreateConfirmation[Create Confirmation Object]
+    CreateConfirmation --> SignConfirmation[Sign Confirmation]
+    SignConfirmation --> Success[Return Valid Confirmation]
+
+    E1 --> End[Return Error]
+    E2 --> End
+    E3 --> End
+    E4 --> End
+    E5 --> End
+    Success --> End
+
+    classDef errorClass fill:#ff6b6b,stroke:#ee5a6f,stroke-width:2px,color:#fff
+    classDef successClass fill:#51cf66,stroke:#37b24d,stroke-width:2px,color:#fff
+    classDef processClass fill:#4dabf7,stroke:#1c7ed6,stroke-width:2px,color:#fff
+
+    class E1,E2,E3,E4,E5,End errorClass
+    class Success,CreateConfirmation,SignConfirmation successClass
+    class Start,Struct,ValidateSig,CheckSender,CheckSigType,CheckGCR,CheckED25519Sig,VerifyED,VerifyPQC,SigValid,CheckHash,HashMatch processClass
+                </div>
+            </div>
+
+            <div class="info-box">
+                <strong>PQC Identity Validation:</strong>
+                Post-quantum signatures require that the public key be registered in the GCR (Global Consensus Registry) OR provide a backup ED25519 signature proving ownership of the ED25519 address.
+            </div>
+        </div>
+
+        <!-- 4. Chain Operations -->
+        <div class="section" id="chain">
+            <h2>4. Chain Operations Architecture</h2>
+            <p>The Chain class manages blockchain storage, retrieval, and caching through TypeORM repositories.</p>
+
+            <div class="diagram-container">
+                <div class="mermaid">
+graph TB
+    subgraph ChainClass["CHAIN CLASS"]
+        C1[Setup & Init]
+        C2[Database Repositories]
+        C3[Query Methods]
+    end
+
+    subgraph Getters["GETTER OPERATIONS"]
+        G1[getLastBlockNumber]
+        G2[getLastBlockHash]
+        G3[getBlockByNumber]
+        G4[getBlockByHash]
+        G5[getBlocks - range]
+        G6[getGenesisBlock]
+        G7[getTxByHash]
+        G8[getTransactionHistory]
+    end
+
+    subgraph Setters["SETTER OPERATIONS"]
+        S1[insertBlock]
+        S2[insertTransaction]
+        S3[updateBlockStatus]
+        S4[storeValidationData]
+    end
+
+    subgraph Database["DATABASE TABLES"]
+        DB1[(Blocks Table)]
+        DB2[(Transactions Table)]
+        DB3[(GCR Tables)]
+    end
+
+    subgraph Cache["SHARED STATE CACHE"]
+        Cache1[lastBlockNumber]
+        Cache2[lastBlockHash]
+        Cache3[lastBlock]
+    end
+
+    C1 --> C2
+    C2 --> C3
+
+    C3 --> Getters
+    C3 --> Setters
+
+    Getters --> DB1
+    Getters --> DB2
+    Setters --> DB1
+    Setters --> DB2
+    Setters --> DB3
+
+    G1 -.->|Cache hit| Cache1
+    G2 -.->|Cache hit| Cache2
+    S1 -.->|Updates| Cache1
+    S1 -.->|Updates| Cache2
+    S1 -.->|Updates| Cache3
+
+    classDef chainClass fill:#667eea,stroke:#764ba2,stroke-width:2px,color:#fff
+    classDef getterClass fill:#11998e,stroke:#38ef7d,stroke-width:2px,color:#fff
+    classDef setterClass fill:#f093fb,stroke:#f5576c,stroke-width:2px,color:#fff
+    classDef dbClass fill:#4facfe,stroke:#00f2fe,stroke-width:2px,color:#fff
+    classDef cacheClass fill:#feca57,stroke:#ff9ff3,stroke-width:2px,color:#333
+
+    class C1,C2,C3 chainClass
+    class G1,G2,G3,G4,G5,G6,G7,G8 getterClass
+    class S1,S2,S3,S4 setterClass
+    class DB1,DB2,DB3 dbClass
+    class Cache1,Cache2,Cache3 cacheClass
+                </div>
+            </div>
+
+            <div class="info-box">
+                <strong>Performance Optimization:</strong>
+                Frequently accessed data (lastBlockNumber, lastBlockHash) is cached in SharedState to avoid repeated database queries.
+            </div>
+        </div>
+
+        <!-- 5. Block Insertion -->
+        <div class="section" id="insertion">
+            <h2>5. Block Insertion Flow</h2>
+            <p>Block insertion is a multi-phase process involving validation, transaction processing, GCR updates, and mempool cleanup.</p>
+
+            <div class="diagram-container">
+                <div class="mermaid">
+sequenceDiagram
+    participant Validator
+    participant Chain
+    participant Block
+    participant GCR
+    participant Mempool
+    participant Database
+
+    Note over Validator,Database: PHASE 1: Pre-Insertion Validation
+
+    Validator->>Chain: insertBlock(block, txs, gcrSnapshot)
+    Chain->>Chain: Check block number continuity
+    Chain->>Chain: Validate previous hash
+
+    alt Block already exists
+        Chain-->>Validator: Error: Block exists
+    else Continue
+        Chain->>Block: Verify block structure
+        Block-->>Chain: Structure valid
+    end
+
+    Note over Validator,Database: PHASE 2: Transaction Processing
+
+    loop For each transaction
+        Chain->>Chain: Validate transaction
+        Chain->>GCR: Process GCR edits
+        GCR->>GCR: Update balances/identities
+        GCR-->>Chain: GCR updated
+    end
+
+    Note over Validator,Database: PHASE 3: Native Tables Processing
+
+    Chain->>GCR: Process native operations
+    GCR->>GCR: Update native tables
+    GCR->>GCR: Calculate GCR hash
+    GCR-->>Chain: Native hash
+
+    Note over Validator,Database: PHASE 4: Database Commit
+
+    Chain->>Database: Save block
+    Database-->>Chain: Block saved
+
+    Chain->>Database: Save transactions
+    Database-->>Chain: Transactions saved
+
+    Chain->>GCR: Commit GCR state
+    GCR->>Database: Save GCR updates
+    Database-->>GCR: GCR committed
+
+    Note over Validator,Database: PHASE 5: Cleanup
+
+    Chain->>Mempool: Remove processed transactions
+    Mempool->>Database: Delete from mempool
+    Database-->>Mempool: Deleted
+
+    Chain->>Chain: Update shared state cache
+    Chain-->>Validator: Block inserted successfully
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. Mempool -->
+        <div class="section" id="mempool">
+            <h2>6. Mempool Management</h2>
+            <p>The Mempool manages pending transactions waiting for block inclusion with validation and deduplication.</p>
+
+            <div class="diagram-container">
+                <div class="mermaid">
+flowchart TD
+    subgraph MempoolOps["MEMPOOL OPERATIONS"]
+        M1[Add Transaction]
+        M2[Get Mempool]
+        M3[Remove Transactions]
+        M4[Check Transaction Exists]
+    end
+
+    subgraph AddTX["ADD TRANSACTION FLOW"]
+        A1[Receive TX]
+        A2{TX in blockchain?}
+        A3{TX in mempool?}
+        A4[Determine block number]
+        A5{In consensus loop?}
+        A6[Use SecretaryManager.lastBlockRef + 1]
+        A7[Use Chain.getLastBlockNumber + 1]
+        A8[Save to mempool]
+        A9[Return confirmation block]
+    end
+
+    subgraph GetMempool["GET MEMPOOL FLOW"]
+        GM1[Query mempool]
+        GM2{Block number<br/>specified?}
+        GM3[Get all transactions]
+        GM4[Get TXs <= blockNumber]
+        GM5[Order by timestamp, block, hash]
+        GM6[Return transactions]
+    end
+
+    subgraph Validation["TRANSACTION VALIDATION"]
+        V1[Check coherence]
+        V2[Validate signature]
+        V3{Valid?}
+        V4[Add to mempool]
+        V5[Reject TX]
+    end
+
+    M1 --> A1
+    A1 --> A2
+    A2 -->|Yes| E1[Error: TX exists]
+    A2 -->|No| A3
+    A3 -->|Yes| E2[Error: TX in mempool]
+    A3 -->|No| A4
+    A4 --> A5
+    A5 -->|Yes| A6
+    A5 -->|No| A7
+    A6 --> A8
+    A7 --> A8
+    A8 --> A9
+
+    M2 --> GM1
+    GM1 --> GM2
+    GM2 -->|No| GM3
+    GM2 -->|Yes| GM4
+    GM3 --> GM5
+    GM4 --> GM5
+    GM5 --> GM6
+
+    A1 --> V1
+    V1 --> V2
+    V2 --> V3
+    V3 -->|Yes| V4
+    V3 -->|No| V5
+
+    classDef mempoolClass fill:#667eea,stroke:#764ba2,stroke-width:2px,color:#fff
+    classDef addClass fill:#11998e,stroke:#38ef7d,stroke-width:2px,color:#fff
+    classDef getClass fill:#f093fb,stroke:#f5576c,stroke-width:2px,color:#fff
+    classDef validClass fill:#4dabf7,stroke:#1c7ed6,stroke-width:2px,color:#fff
+    classDef errorClass fill:#ff6b6b,stroke:#ee5a6f,stroke-width:2px,color:#fff
+
+    class M1,M2,M3,M4 mempoolClass
+    class A1,A2,A3,A4,A5,A6,A7,A8,A9 addClass
+    class GM1,GM2,GM3,GM4,GM5,GM6 getClass
+    class V1,V2,V3,V4,V5 validClass
+    class E1,E2 errorClass
+                </div>
+            </div>
+
+            <div class="key-concepts">
+                <h4>Mempool Block Assignment:</h4>
+                <ul>
+                    <li>During consensus: Uses <code>SecretaryManager.lastBlockRef + 1</code></li>
+                    <li>Outside consensus: Uses <code>Chain.getLastBlockNumber() + 1</code></li>
+                    <li>This ensures proper transaction ordering and prevents conflicts</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 7. Transaction Types -->
+        <div class="section" id="types">
+            <h2>7. Transaction Types & Structure</h2>
+            <p>Demos supports multiple transaction types for different operations across the network.</p>
+
+            <div class="diagram-container">
+                <div class="mermaid">
+graph TB
+    subgraph TXTypes["TRANSACTION TYPES"]
+        T1[standard - Token transfer]
+        T2[delegated - Delegated execution]
+        T3[subnet - Subnet operation]
+        T4[l2ps - L2PS transaction]
+        T5[l2ps_hash_update - L2PS hash update]
+        T6[web2_request - Web2 API call]
+        T7[contract - Smart contract call]
+    end
+
+    subgraph TXContent["TRANSACTION CONTENT"]
+        TC1[Type]
+        TC2[From address]
+        TC3[From ED25519 address]
+        TC4[To address]
+        TC5[Amount]
+        TC6[Data - array of 2 elements]
+        TC7[GCR Edits]
+        TC8[Nonce]
+        TC9[Timestamp]
+        TC10[Transaction Fees<br/>- network_fee<br/>- rpc_fee<br/>- additional_fee]
+    end
+
+    subgraph TXMeta["TRANSACTION METADATA"]
+        TM1[Signature<br/>- type - algorithm<br/>- data - hex string]
+        TM2[ED25519 Signature - backup]
+        TM3[Hash - SHA256 of content]
+        TM4[Status]
+        TM5[Block Number]
+    end
+
+    TXTypes --> TC1
+    TXContent --> TXMeta
+
+    classDef typeClass fill:#667eea,stroke:#764ba2,stroke-width:2px,color:#fff
+    classDef contentClass fill:#11998e,stroke:#38ef7d,stroke-width:2px,color:#fff
+    classDef metaClass fill:#f093fb,stroke:#f5576c,stroke-width:2px,color:#fff
+
+    class T1,T2,T3,T4,T5,T6,T7 typeClass
+    class TC1,TC2,TC3,TC4,TC5,TC6,TC7,TC8,TC9,TC10 contentClass
+    class TM1,TM2,TM3,TM4,TM5 metaClass
+                </div>
+            </div>
+
+            <div class="key-concepts">
+                <h4>Transaction Fees:</h4>
+                <ul>
+                    <li><strong>network_fee</strong>: Paid to network validators for processing</li>
+                    <li><strong>rpc_fee</strong>: Paid to RPC node that received the transaction</li>
+                    <li><strong>additional_fee</strong>: Optional fees for priority processing</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 8. Transaction Lifecycle -->
+        <div class="section" id="lifecycle">
+            <h2>8. Complete Transaction Lifecycle</h2>
+            <p>State machine showing all states a transaction passes through from creation to execution.</p>
+
+            <div class="diagram-container">
+                <div class="mermaid">
+stateDiagram-v2
+    [*] --> Created: Client creates TX
+
+    Created --> Signed: Sign with private key
+    Signed --> Hashed: Calculate hash
+    Hashed --> Submitted: Submit to RPC
+
+    Submitted --> Validating: RPC validates
+
+    state Validating {
+        [*] --> CheckStructure
+        CheckStructure --> CheckSignature
+        CheckSignature --> CheckHash
+        CheckHash --> [*]
+    }
+
+    Validating --> Rejected: Validation failed
+    Validating --> InMempool: Valid TX
+
+    InMempool --> AwaitingConsensus: Waiting for proposer
+
+    state ConsensusProcessing {
+        [*] --> ProposerSelection
+        ProposerSelection --> BlockCreation
+        BlockCreation --> BlockValidation
+        BlockValidation --> BlockInsertion
+        BlockInsertion --> [*]
+    }
+
+    AwaitingConsensus --> ConsensusProcessing: Block proposed
+
+    ConsensusProcessing --> InBlock: Block confirmed
+
+    InBlock --> Executed: GCR updates applied
+
+    Executed --> [*]: Transaction complete
+
+    Rejected --> [*]: Error returned
+
+    note right of InMempool
+        TX stored in mempool
+        Assigned to block number
+    end note
+
+    note right of InBlock
+        TX permanently stored
+        Removed from mempool
+    end note
+                </div>
+            </div>
+        </div>
+
+        <!-- 9. Database Schema -->
+        <div class="section" id="database">
+            <h2>9. Database Schema</h2>
+            <p>Entity-relationship diagram showing how blocks, transactions, and mempool are stored.</p>
+
+            <div class="diagram-container">
+                <div class="mermaid">
+erDiagram
+    Blocks ||--|{ Transactions : contains
+    Blocks ||--|| GCRHashes : references
+    Blocks {
+        int number PK
+        string hash
+        string status
+        jsonb content
+        string proposer
+        string next_proposer
+        jsonb validation_data
+        timestamp created_at
+    }
+
+    Transactions {
+        string hash PK
+        string type
+        string from
+        string from_ed25519_address
+        string to
+        decimal amount
+        jsonb data
+        jsonb gcr_edits
+        int nonce
+        bigint timestamp
+        jsonb transaction_fee
+        jsonb signature
+        string ed25519_signature
+        int blockNumber FK
+    }
+
+    Mempool ||--o{ MempoolTx : stores
+    MempoolTx {
+        string hash PK
+        string type
+        string from
+        string to
+        decimal amount
+        jsonb content
+        jsonb signature
+        bigint timestamp
+        int nonce
+        int blockNumber
+        int reference_block
+    }
+
+    GCRHashes {
+        int block_number PK
+        string gcr_hash
+        string subnets_hash
+        timestamp updated_at
+    }
+                </div>
+            </div>
+
+            <div class="info-box">
+                <strong>JSONB Usage:</strong>
+                Complex data structures (content, data, gcr_edits, signatures) are stored as JSONB in PostgreSQL for flexibility and efficient querying.
+            </div>
+        </div>
+
+        <!-- 10. Block Proposal & Validation -->
+        <div class="section" id="consensus">
+            <h2>10. Block Proposal & Validation</h2>
+            <p>Complete consensus flow showing how blocks are proposed, validated, and confirmed by the network.</p>
+
+            <div class="diagram-container">
+                <div class="mermaid">
+flowchart TD
+    subgraph Proposer["BLOCK PROPOSER"]
+        P1[Check if validator]
+        P2[Check if turn to propose]
+        P3[Get mempool TXs]
+        P4[Process transactions]
+        P5[Calculate GCR hash]
+        P6[Calculate subnets hash]
+        P7[Create block]
+        P8[Sign block]
+        P9[Broadcast to validators]
+    end
+
+    subgraph Validators["VALIDATORS"]
+        V1[Receive block proposal]
+        V2[Validate block structure]
+        V3[Verify proposer signature]
+        V4[Validate each transaction]
+        V5[Recalculate hashes]
+        V6{Hashes match?}
+        V7[Sign validation]
+        V8[Send validation back]
+        V9[Reject block]
+    end
+
+    subgraph Consensus["CONSENSUS"]
+        CO1[Collect validations]
+        CO2{Enough signatures?}
+        CO3[Block confirmed]
+        CO4[Insert to chain]
+        CO5[Broadcast confirmed block]
+        CO6[Try different proposer]
+    end
+
+    P1 --> P2
+    P2 --> P3
+    P3 --> P4
+    P4 --> P5
+    P5 --> P6
+    P6 --> P7
+    P7 --> P8
+    P8 --> P9
+
+    P9 --> V1
+    V1 --> V2
+    V2 --> V3
+    V3 --> V4
+    V4 --> V5
+    V5 --> V6
+    V6 -->|Yes| V7
+    V6 -->|No| V9
+    V7 --> V8
+
+    V8 --> CO1
+    V9 --> CO6
+    CO1 --> CO2
+    CO2 -->|Yes| CO3
+    CO2 -->|No| CO6
+    CO3 --> CO4
+    CO4 --> CO5
+
+    classDef proposerClass fill:#667eea,stroke:#764ba2,stroke-width:2px,color:#fff
+    classDef validatorClass fill:#11998e,stroke:#38ef7d,stroke-width:2px,color:#fff
+    classDef consensusClass fill:#f093fb,stroke:#f5576c,stroke-width:2px,color:#fff
+
+    class P1,P2,P3,P4,P5,P6,P7,P8,P9 proposerClass
+    class V1,V2,V3,V4,V5,V6,V7,V8,V9 validatorClass
+    class CO1,CO2,CO3,CO4,CO5,CO6 consensusClass
+                </div>
+            </div>
+
+            <div class="info-box">
+                <strong>Consensus Requirements:</strong>
+                A block requires validation signatures from a threshold of validators before being confirmed and inserted into the chain. If consensus fails, the next proposer in rotation is selected.
+            </div>
+        </div>
+
+        <footer>
+            <p><strong>Blockchain Core - Demos Network</strong></p>
+            <p>Blocks, Transactions, Chain Management & Mempool Operations</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">
+                Files: block.ts • transaction.ts • chain.ts • mempool_v2.ts<br>
+                Generated diagrams using Mermaid.js • View source at diagrams/blockchain-core/
+            </p>
+        </footer>
+    </div>
+</body>
+</html>

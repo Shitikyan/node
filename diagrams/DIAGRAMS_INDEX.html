@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demos Blockchain - Complete Diagram Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 1.3em;
+            opacity: 0.95;
+            margin-bottom: 10px;
+        }
+
+        .header .stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            background: rgba(255,255,255,0.2);
+            padding: 15px 30px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section-title {
+            font-size: 2em;
+            color: #333;
+            margin: 40px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .section-subtitle {
+            font-size: 1.1em;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border: 2px solid #f0f0f0;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            border-color: #667eea;
+        }
+
+        .feature-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .feature-icon {
+            font-size: 2.5em;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            color: white;
+        }
+
+        .feature-title {
+            font-size: 1.4em;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .feature-description {
+            color: #666;
+            margin-bottom: 15px;
+            font-size: 0.95em;
+        }
+
+        .feature-topics {
+            margin-bottom: 15px;
+        }
+
+        .topic-title {
+            font-weight: 600;
+            color: #667eea;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .topic-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .topic-list li {
+            color: #666;
+            font-size: 0.85em;
+            padding: 3px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .topic-list li:before {
+            content: "▸";
+            position: absolute;
+            left: 5px;
+            color: #667eea;
+        }
+
+        .feature-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            text-align: center;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .info-box {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-box h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .info-box p {
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .tag {
+            display: inline-block;
+            background: #e8f0fe;
+            color: #1967d2;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 600;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+
+        .tag.security {
+            background: #fce8e6;
+            color: #c5221f;
+        }
+
+        .tag.network {
+            background: #e6f4ea;
+            color: #137333;
+        }
+
+        .tag.crypto {
+            background: #fef7e0;
+            color: #f9ab00;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 40px;
+            text-align: center;
+            color: #666;
+            border-top: 3px solid #667eea;
+        }
+
+        .footer p {
+            margin: 10px 0;
+        }
+
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .header p {
+                font-size: 1em;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .header .stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Demos Blockchain</h1>
+            <p>Complete Diagram Documentation</p>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-number">13</div>
+                    <div class="stat-label">Features</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">130</div>
+                    <div class="stat-label">Diagrams</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">6</div>
+                    <div class="stat-label">Diagram Types</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="info-box">
+                <h3>🎯 About This Documentation</h3>
+                <p>Comprehensive Mermaid diagram documentation for all major features of the Demos blockchain. Each feature includes 10 detailed diagrams covering architecture, flows, state machines, and complete system lifecycles.</p>
+                <p><strong>Diagram Types:</strong> Flowcharts, Sequence Diagrams, State Machines, Class Diagrams, ER Diagrams, Graph Diagrams</p>
+            </div>
+
+            <h2 class="section-title">🔷 Core Blockchain Features</h2>
+            <p class="section-subtitle">Fundamental blockchain components and consensus mechanisms</p>
+
+            <div class="features-grid">
+                <!-- Blockchain Core -->
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon">⛓️</div>
+                        <div class="feature-title">Blockchain Core</div>
+                    </div>
+                    <div class="feature-description">
+                        Complete blockchain fundamentals including block structure, chain management, genesis initialization, and native hashing.
+                    </div>
+                    <div class="feature-topics">
+                        <div class="topic-title">Key Topics:</div>
+                        <ul class="topic-list">
+                            <li>Block Structure & Properties</li>
+                            <li>Chain Management & Validation</li>
+                            <li>Native SHA256 Hashing</li>
+                            <li>Database Operations</li>
+                            <li>Genesis Initialization</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <span class="tag">Core</span>
+                        <span class="tag">Foundation</span>
+                    </div>
+                    <div class="feature-actions">
+                        <a href="./blockchain-core/BLOCKCHAIN_CORE_VIEWER.html" class="btn btn-primary">View Diagrams</a>
+                        <a href="./blockchain-core/BLOCKCHAIN_CORE.md" class="btn btn-secondary">Markdown</a>
+                    </div>
+                </div>
+
+                <!-- GCR -->
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon">🌐</div>
+                        <div class="feature-title">Global Change Registry</div>
+                    </div>
+                    <div class="feature-description">
+                        Global mutable state registry managing balances, identities, nonces, and incentives with cryptographic traceability for all state modifications.
+                    </div>
+                    <div class="feature-topics">
+                        <div class="topic-title">Key Topics:</div>
+                        <ul class="topic-list">
+                            <li>Balance & Nonce Management</li>
+                            <li>Multi-Chain Identity Support</li>
+                            <li>Transaction-Derived Operations</li>
+                            <li>Rollback-Safe State Transitions</li>
+                            <li>Cryptographic Traceability</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <span class="tag">State</span>
+                        <span class="tag">Architecture</span>
+                    </div>
+                    <div class="feature-actions">
+                        <a href="./gcr/GCR_VIEWER.html" class="btn btn-primary">View Diagrams</a>
+                        <a href="./gcr/GCR.md" class="btn btn-secondary">Markdown</a>
+                    </div>
+                </div>
+
+                <!-- PoR-BFT Consensus -->
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon">✅</div>
+                        <div class="feature-title">PoR-BFT Consensus</div>
+                    </div>
+                    <div class="feature-description">
+                        Proof of Representation Byzantine Fault Tolerant consensus with validator voting, BFT, and 2/3+ supermajority finalization.
+                    </div>
+                    <div class="feature-topics">
+                        <div class="topic-title">Key Topics:</div>
+                        <ul class="topic-list">
+                            <li>Validator Voting & Aggregation</li>
+                            <li>Block Finalization (2/3+ threshold)</li>
+                            <li>Byzantine Fault Tolerance</li>
+                            <li>Fork Resolution</li>
+                            <li>Validator Rotation</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <span class="tag security">Consensus</span>
+                        <span class="tag security">BFT</span>
+                    </div>
+                    <div class="feature-actions">
+                        <a href="./consensus-v2/CONSENSUS_V2_VIEWER.html" class="btn btn-primary">View Diagrams</a>
+                        <a href="./consensus-v2/CONSENSUS_V2.md" class="btn btn-secondary">Markdown</a>
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="section-title">🌐 Network & Communication</h2>
+            <p class="section-subtitle">Peer-to-peer networking, discovery, and synchronization</p>
+
+            <div class="features-grid">
+                <!-- Validator Management -->
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon">👥</div>
+                        <div class="feature-title">Validator & Peer Management</div>
+                    </div>
+                    <div class="feature-description">
+                        Complete peer lifecycle management with discovery, authentication, reputation system, and stake-weighted validator selection.
+                    </div>
+                    <div class="feature-topics">
+                        <div class="topic-title">Key Topics:</div>
+                        <ul class="topic-list">
+                            <li>Peer Discovery (Bootstrap, DNS, mDNS, DHT)</li>
+                            <li>Validator Registration & Staking</li>
+                            <li>Reputation System & Scoring</li>
+                            <li>Health Monitoring</li>
+                            <li>Slashing Conditions</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <span class="tag network">P2P</span>
+                        <span class="tag network">Validators</span>
+                    </div>
+                    <div class="feature-actions">
+                        <a href="./validator-management/VALIDATOR_PEER_MANAGEMENT_VIEWER.html" class="btn btn-primary">View Diagrams</a>
+                        <a href="./validator-management/VALIDATOR_PEER_MANAGEMENT.md" class="btn btn-secondary">Markdown</a>
+                    </div>
+                </div>
+
+                <!-- P2P Network -->
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon">🔗</div>
+                        <div class="feature-title">P2P Network & Sync</div>
+                    </div>
+                    <div class="feature-description">
+                        High-performance P2P networking with fast sync, gossip-based block propagation, RPC server, and DDoS protection.
+                    </div>
+                    <div class="feature-topics">
+                        <div class="topic-title">Key Topics:</div>
+                        <ul class="topic-list">
+                            <li>Fast Sync Protocol</li>
+                            <li>Block Propagation (Gossip)</li>
+                            <li>RPC Server & Routing</li>
+                            <li>Mempool Synchronization</li>
+                            <li>Rate Limiting (100 req/min)</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <span class="tag network">Sync</span>
+                        <span class="tag network">RPC</span>
+                    </div>
+                    <div class="feature-actions">
+                        <a href="./p2p-network/P2P_NETWORK_SYNC_VIEWER.html" class="btn btn-primary">View Diagrams</a>
+                        <a href="./p2p-network/P2P_NETWORK_SYNC.md" class="btn btn-secondary">Markdown</a>
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="section-title">💰 Transaction Processing</h2>
+            <p class="section-subtitle">Transaction lifecycle, mempool management, and block creation</p>
+
+            <div class="features-grid">
+                <!-- Transactions & Mempool -->
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon">📝</div>
+                        <div class="feature-title">Transactions & Mempool</div>
+                    </div>
+                    <div class="feature-description">
+                        Complete transaction lifecycle with post-quantum signatures (ML-DSA, SL-DSA), mempool management, and double-spend prevention.
+                    </div>
+                    <div class="feature-topics">
+                        <div class="topic-title">Key Topics:</div>
+                        <ul class="topic-list">
+                            <li>Post-Quantum Signatures (PQC)</li>
+                            <li>Transaction Validation</li>
+                            <li>Mempool Priority Queue</li>
+                            <li>Fee Market & Pricing</li>
+                            <li>Nonce-based Replay Protection</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <span class="tag security">PQC</span>
+                        <span class="tag">Mempool</span>
+                    </div>
+                    <div class="feature-actions">
+                        <a href="./transactions-mempool/TRANSACTIONS_MEMPOOL_VIEWER.html" class="btn btn-primary">View Diagrams</a>
+                        <a href="./transactions-mempool/TRANSACTIONS_MEMPOOL.md" class="btn btn-secondary">Markdown</a>
+                    </div>
+                </div>
+
+                <!-- Block Creation -->
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon">🧱</div>
+                        <div class="feature-title">Block Creation & Validation</div>
+                    </div>
+                    <div class="feature-description">
+                        Block assembly with transaction selection, validator voting (2/3+ approval), finalization, and rollback handling.
+                    </div>
+                    <div class="feature-topics">
+                        <div class="topic-title">Key Topics:</div>
+                        <ul class="topic-list">
+                            <li>Block Assembly & Merkle Root</li>
+                            <li>Validation Voting</li>
+                            <li>Block Finalization</li>
+                            <li>Fork Handling & Rollback</li>
+                            <li>Chain Continuity</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <span class="tag">Blocks</span>
+                        <span class="tag">Validation</span>
+                    </div>
+                    <div class="feature-actions">
+                        <a href="./block-creation/BLOCK_CREATION_VALIDATION_VIEWER.html" class="btn btn-primary">View Diagrams</a>
+                        <a href="./block-creation/BLOCK_CREATION_VALIDATION.md" class="btn btn-secondary">Markdown</a>
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="section-title">🚀 Advanced Features</h2>
+            <p class="section-subtitle">Cross-chain bridges, Web2 integration, and advanced cryptography</p>
+
+            <div class="features-grid">
+                <!-- Bridges & Multichain -->
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon">🌉</div>
+                        <div class="feature-title">Bridges & Multichain</div>
+                    </div>
+                    <div class="feature-description">
+                        Cross-chain interoperability with XM scripts, native bridges (EVM, Solana, Aptos), and Rubic swap integration.
+                    </div>
+                    <div class="feature-topics">
+                        <div class="topic-title">Key Topics:</div>
+                        <ul class="topic-list">
+                            <li>XM Script System</li>
+                            <li>Cross-Chain Operations</li>
+                            <li>Native Bridges (EVM/Solana/Aptos)</li>
+                            <li>Rubic Swap Integration</li>
+                            <li>Multi-Chain Execution</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <span class="tag">Interoperability</span>
+                        <span class="tag">Cross-Chain</span>
+                    </div>
+                    <div class="feature-actions">
+                        <a href="./bridges-multichain/BRIDGES_MULTICHAIN_VIEWER.html" class="btn btn-primary">View Diagrams</a>
+                        <a href="./bridges-multichain/BRIDGES_MULTICHAIN.md" class="btn btn-secondary">Markdown</a>
+                    </div>
+                </div>
+
+                <!-- Web2 Integration -->
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon">🌐</div>
+                        <div class="feature-title">Web2 Integration (DAHR)</div>
+                    </div>
+                    <div class="feature-description">
+                        Data Agnostic HTTPS Relay enabling blockchain-Web2 interaction with cryptographic integrity and session management.
+                    </div>
+                    <div class="feature-topics">
+                        <div class="topic-title">Key Topics:</div>
+                        <ul class="topic-list">
+                            <li>DAHR Factory Pattern</li>
+                            <li>Proxy Server Lifecycle</li>
+                            <li>Request/Response Hashing (SHA256)</li>
+                            <li>Session Management (24h TTL)</li>
+                            <li>URL Validation & Security</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <span class="tag">Web2</span>
+                        <span class="tag">Integration</span>
+                    </div>
+                    <div class="feature-actions">
+                        <a href="./web2-integration/WEB2_DAHR_VIEWER.html" class="btn btn-primary">View Diagrams</a>
+                        <a href="./web2-integration/WEB2_DAHR.md" class="btn btn-secondary">Markdown</a>
+                    </div>
+                </div>
+
+                <!-- Cryptography -->
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon">🔐</div>
+                        <div class="feature-title">Cryptography (FHE, ZK, PQC)</div>
+                    </div>
+                    <div class="feature-description">
+                        Advanced cryptography: Fully Homomorphic Encryption (SEAL), Zero-Knowledge Proofs, and Post-Quantum Cryptography (SuperDilithium).
+                    </div>
+                    <div class="feature-topics">
+                        <div class="topic-title">Key Topics:</div>
+                        <ul class="topic-list">
+                            <li>FHE: BFV Scheme, Homomorphic Ops</li>
+                            <li>ZK: Interactive Proofs (k=20 rounds)</li>
+                            <li>PQC: ML-DSA (Quantum-Safe)</li>
+                            <li>Private Computation</li>
+                            <li>Lattice-Based Security</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <span class="tag crypto">FHE</span>
+                        <span class="tag crypto">ZK</span>
+                        <span class="tag security">PQC</span>
+                    </div>
+                    <div class="feature-actions">
+                        <a href="./cryptography/CRYPTOGRAPHY_SYSTEMS_VIEWER.html" class="btn btn-primary">View Diagrams</a>
+                        <a href="./cryptography/CRYPTOGRAPHY_SYSTEMS.md" class="btn btn-secondary">Markdown</a>
+                    </div>
+                </div>
+
+                <!-- ActivityPub Integration -->
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon">📱</div>
+                        <div class="feature-title">ActivityPub Integration</div>
+                    </div>
+                    <div class="feature-description">
+                        Federated social networking protocol implementation with Express.js server, SQLite storage, and ActivityStreams support.
+                    </div>
+                    <div class="feature-topics">
+                        <div class="topic-title">Key Topics:</div>
+                        <ul class="topic-list">
+                            <li>Express.js REST API with Universal Handlers</li>
+                            <li>SQLite Storage (14 Collections)</li>
+                            <li>Actor Model & Collections</li>
+                            <li>Federation Protocol & HTTP Signatures</li>
+                            <li>Inbox/Outbox Message Flow</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <span class="tag">Federation</span>
+                        <span class="tag">Social</span>
+                    </div>
+                    <div class="feature-actions">
+                        <a href="./activitypub/ACTIVITYPUB_INTEGRATION_VIEWER.html" class="btn btn-primary">View Diagrams</a>
+                        <a href="./activitypub/ACTIVITYPUB_INTEGRATION.md" class="btn btn-secondary">Markdown</a>
+                    </div>
+                </div>
+
+                <!-- Incentive Management -->
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon">🎁</div>
+                        <div class="feature-title">Incentive Management</div>
+                    </div>
+                    <div class="feature-description">
+                        Comprehensive point-based incentive system with referrals, levels, rewards, and gamification for network participation.
+                    </div>
+                    <div class="feature-topics">
+                        <div class="topic-title">Key Topics:</div>
+                        <ul class="topic-list">
+                            <li>Point Earning Mechanisms</li>
+                            <li>Multi-Level Referral System</li>
+                            <li>Level Progression (Bronze → Diamond)</li>
+                            <li>Automatic Reward Distribution</li>
+                            <li>Leaderboard & Rankings</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <span class="tag">Rewards</span>
+                        <span class="tag">Gamification</span>
+                    </div>
+                    <div class="feature-actions">
+                        <a href="./incentive/INCENTIVE_MANAGEMENT_VIEWER.html" class="btn btn-primary">View Diagrams</a>
+                        <a href="./incentive/INCENTIVE_MANAGEMENT.md" class="btn btn-secondary">Markdown</a>
+                    </div>
+                </div>
+
+                <!-- MCP Protocol -->
+                <div class="feature-card">
+                    <div class="feature-header">
+                        <div class="feature-icon">🤖</div>
+                        <div class="feature-title">MCP Protocol</div>
+                    </div>
+                    <div class="feature-description">
+                        Model Context Protocol server enabling AI assistants to interact with blockchain operations via standardized tools.
+                    </div>
+                    <div class="feature-topics">
+                        <div class="topic-title">Key Topics:</div>
+                        <ul class="topic-list">
+                            <li>Dual Transport (stdio + SSE)</li>
+                            <li>Tool Registration & Management</li>
+                            <li>Blockchain Tools Suite</li>
+                            <li>Request/Response Flow</li>
+                            <li>Remote Network Access</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <span class="tag">AI</span>
+                        <span class="tag">Integration</span>
+                    </div>
+                    <div class="feature-actions">
+                        <a href="./mcp/MCP_PROTOCOL_VIEWER.html" class="btn btn-primary">View Diagrams</a>
+                        <a href="./mcp/MCP_PROTOCOL.md" class="btn btn-secondary">Markdown</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-box" style="margin-top: 40px;">
+                <h3>📖 Documentation Standards</h3>
+                <p>Each feature includes:</p>
+                <ul style="margin-left: 20px; color: #666;">
+                    <li><strong>10 Comprehensive Diagrams</strong> covering all aspects</li>
+                    <li><strong>Mermaid Syntax</strong> for interactive rendering</li>
+                    <li><strong>Detailed Descriptions</strong> for each diagram</li>
+                    <li><strong>Interactive HTML Viewer</strong> with navigation</li>
+                    <li><strong>Architecture Overviews</strong>, <strong>Sequence Diagrams</strong>, <strong>State Machines</strong>, and <strong>Flowcharts</strong></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>Demos Blockchain - Complete Diagram Documentation</strong></p>
+            <p>130 Comprehensive Diagrams Across 13 Features</p>
+            <p><a href="./README.md">View Documentation README</a> | <a href="../">Back to Project Root</a></p>
+            <p style="margin-top: 20px;">© 2024 Kynesys Labs - Powered by Mermaid.js</p>
+        </div>
+    </div>
+</body>
+</html>

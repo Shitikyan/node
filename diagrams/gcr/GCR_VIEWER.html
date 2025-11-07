@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GCR (Global Consensus Registry) - Architecture Diagrams</title>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            securityLevel: 'loose',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'linear',
+                padding: 20,
+                nodeSpacing: 100,
+                rankSpacing: 100,
+                diagramPadding: 20
+            },
+            graph: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'linear',
+                padding: 20,
+                nodeSpacing: 100,
+                rankSpacing: 100
+            }
+        });
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .info-box {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 20px 40px;
+            border-radius: 8px;
+        }
+
+        .info-box h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .info-box ul {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+
+        nav {
+            background: #f8f9fa;
+            padding: 20px 40px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        nav h2 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        nav ul {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 10px;
+        }
+
+        nav a {
+            display: block;
+            padding: 12px 20px;
+            background: white;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 8px;
+            border: 2px solid #667eea;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        nav a:hover {
+            background: #667eea;
+            color: white;
+            transform: translateX(5px);
+        }
+
+        main {
+            padding: 40px;
+        }
+
+        section {
+            margin-bottom: 60px;
+            scroll-margin-top: 100px;
+        }
+
+        section h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        section h3 {
+            color: #764ba2;
+            font-size: 1.5em;
+            margin: 30px 0 15px 0;
+        }
+
+        .diagram-container {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 12px;
+            margin: 20px 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .mermaid {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .key-concepts {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .key-concepts h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .key-concepts ul,
+        .key-concepts ol {
+            margin-left: 20px;
+            line-height: 1.8;
+            color: #856404;
+        }
+
+        .key-concepts code {
+            background: #fff;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .file-reference {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .print-button {
+            display: inline-block;
+            margin: 20px auto;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1.1em;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .print-button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(118, 75, 162, 0.4);
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .container {
+                box-shadow: none;
+            }
+
+            nav, .print-button {
+                display: none;
+            }
+
+            section {
+                page-break-inside: avoid;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            nav ul {
+                grid-template-columns: 1fr;
+            }
+
+            main {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔐 Global Consensus Registry (GCR)</h1>
+            <p>Mutable Global State Management with Cryptographic Security</p>
+        </header>
+
+        <div class="info-box">
+            <h3>📚 About GCR</h3>
+            <p>The Global Consensus Registry (GCR) manages mutable global state including balances, identities (XM, Web2, PQC), nonces, and incentives. While not stored directly in blocks, every GCR modification is cryptographically traceable through Operations derived from Transactions.</p>
+            <ul>
+                <li><strong>Balance Management:</strong> Native token balances with atomic operations and rollback support</li>
+                <li><strong>Identity Management:</strong> Cross-chain (XM), Web2 social, and Post-Quantum Cryptography (PQC) identities</li>
+                <li><strong>Nonce Tracking:</strong> Replay attack prevention through transaction ordering</li>
+                <li><strong>Incentive System:</strong> Points awarded for first-time wallet/social account linking</li>
+                <li><strong>State Hashing:</strong> User-level and block-level cryptographic state tracking</li>
+            </ul>
+        </div>
+
+        <nav>
+            <h2>📑 Diagram Navigation</h2>
+            <ul>
+                <li><a href="#diagram1">1. GCR Architecture & Components</a></li>
+                <li><a href="#diagram2">2. GCREdit Processing Flow</a></li>
+                <li><a href="#diagram3">3. Transaction to GCR Operations Lifecycle</a></li>
+                <li><a href="#diagram4">4. Identity Management Architecture</a></li>
+                <li><a href="#diagram5">5. Balance Operations with Rollback</a></li>
+                <li><a href="#diagram6">6. Nonce Management Flow</a></li>
+                <li><a href="#diagram7">7. Native Operations Handling</a></li>
+                <li><a href="#diagram8">8. GCR Database Schema</a></li>
+                <li><a href="#diagram9">9. GCR State Tracking & Hashing</a></li>
+                <li><a href="#diagram10">10. Complete GCR Update Lifecycle</a></li>
+            </ul>
+        </nav>
+
+        <main>
+            <!-- Diagram 1: GCR Architecture -->
+            <section id="diagram1">
+                <h2>1. GCR Architecture & Components</h2>
+                <div class="diagram-container">
+                    <div class="mermaid">
+graph TB
+    subgraph "Transaction Layer"
+        TX[Transaction]
+        GCREDIT[GCR Edits Array]
+        TX -->|contains| GCREDIT
+    end
+
+    subgraph "GCR Core - handleGCR.ts"
+        HANDLER[HandleGCR Class]
+        APPLY[apply method]
+        APPLYTOTX[applyToTx method]
+        ROLLBACK[rollback method]
+
+        HANDLER --> APPLY
+        HANDLER --> APPLYTOTX
+        HANDLER --> ROLLBACK
+    end
+
+    subgraph "GCR Routines"
+        BALANCE[GCRBalanceRoutines<br/>src/libs/blockchain/gcr/gcr_routines/GCRBalanceRoutines.ts]
+        NONCE[GCRNonceRoutines<br/>src/libs/blockchain/gcr/gcr_routines/GCRNonceRoutines.ts]
+        IDENTITY[GCRIdentityRoutines<br/>src/libs/blockchain/gcr/gcr_routines/GCRIdentityRoutines.ts]
+
+        BALANCE -->|add/remove/rollback| BALANCEDB[(GCR_Main)]
+        NONCE -->|increment/decrement| BALANCEDB
+        IDENTITY -->|XM/Web2/PQC| BALANCEDB
+    end
+
+    subgraph "Identity Management"
+        IDMGR[IdentityManager<br/>src/libs/blockchain/gcr/gcr_routines/identityManager.ts]
+        CHAINS[Supported Chains]
+
+        IDMGR --> CHAINS
+
+        CHAINS --> SOLANA[Solana]
+        CHAINS --> EVM[EVM]
+        CHAINS --> EGLD[MultiversX]
+        CHAINS --> TON[TON]
+        CHAINS --> XRPL[XRPL]
+        CHAINS --> IBC[IBC]
+        CHAINS --> NEAR[NEAR]
+        CHAINS --> BTC[Bitcoin]
+    end
+
+    subgraph "Incentive System"
+        INCENTIVE[IncentiveManager<br/>src/libs/blockchain/gcr/gcr_routines/IncentiveManager.ts]
+        POINTS[PointSystem]
+
+        INCENTIVE -->|awards points| POINTS
+        POINTS -->|Web3 Wallets| BALANCEDB
+        POINTS -->|Twitter/GitHub/Telegram/Discord| BALANCEDB
+        POINTS -->|Referral Code| BALANCEDB
+    end
+
+    subgraph "Database Tables"
+        GCRDB[(GCR_Main<br/>pubkey, balance, nonce, identities)]
+        TRACKER[(GCRTracker<br/>publicKey, hash)]
+        HASHES[(GCRHashes<br/>block, hash)]
+        SUBNETS[(GCRSubnetsTxs<br/>tx_hash, subnet_id)]
+    end
+
+    subgraph "State Management"
+        ENSURE[ensureGCRForUser<br/>src/libs/blockchain/gcr/gcr_routines/ensureGCRForUser.ts]
+        STATESAVE[GCRStateSaverHelper<br/>src/libs/blockchain/gcr/gcr_routines/gcrStateSaverHelper.ts]
+        HASH[hashGCR<br/>src/libs/blockchain/gcr/gcr_routines/hashGCR.ts]
+        JSONB[GCRJsonbHandler<br/>src/libs/blockchain/gcr/gcr_routines/gcrJSONBHandler.ts]
+
+        ENSURE -->|create if missing| GCRDB
+        STATESAVE -->|updateGCRTracker| TRACKER
+        HASH -->|hashGCRTables| HASHES
+        JSONB -->|JSONB operations| GCRDB
+    end
+
+    GCREDIT -->|routed by type| APPLY
+    APPLY -->|balance edit| BALANCE
+    APPLY -->|nonce edit| NONCE
+    APPLY -->|identity edit| IDENTITY
+
+    IDENTITY -->|verify signatures| IDMGR
+    IDENTITY -->|award points| INCENTIVE
+
+    BALANCE -.->|persist| GCRDB
+    NONCE -.->|persist| GCRDB
+    IDENTITY -.->|persist| GCRDB
+
+    GCRDB -->|track changes| TRACKER
+    TRACKER -->|hash history| HASHES
+
+    style TX fill:#e1f5ff
+    style HANDLER fill:#fff4e1
+    style BALANCE fill:#e8f5e9
+    style NONCE fill:#e8f5e9
+    style IDENTITY fill:#e8f5e9
+    style GCRDB fill:#f3e5f5
+    style IDMGR fill:#fff3e0
+    style INCENTIVE fill:#fce4ec
+                    </div>
+                </div>
+                <div class="key-concepts">
+                    <h4>🔑 Key Concepts</h4>
+                    <ul>
+                        <li><strong>Cryptographic Security:</strong> While GCR is mutable, every property traces back to Operations derived from Transactions in consensus-validated blocks</li>
+                        <li><strong>GCREdit Types:</strong> balance, nonce, identity, assign, subnetsTx</li>
+                        <li><strong>Identity Types:</strong> XM (8 chains), Web2 (Twitter/GitHub/Telegram/Discord), PQC (ML-DSA, SL-DSA)</li>
+                        <li><strong>Atomic Operations:</strong> All edits in a transaction succeed together or all fail with automatic rollback</li>
+                    </ul>
+                </div>
+                <div class="file-reference">
+                    <strong>Core Files:</strong><br/>
+                    • handleGCR.ts (18,809 bytes) - Main GCR handler<br/>
+                    • gcr.ts (40,673 bytes) - GCR singleton class<br/>
+                    • GCRBalanceRoutines.ts (3,216 bytes)<br/>
+                    • GCRNonceRoutines.ts (2,204 bytes)<br/>
+                    • GCRIdentityRoutines.ts (27,607 bytes)
+                </div>
+            </section>
+
+            <!-- Diagram 2: GCREdit Processing Flow -->
+            <section id="diagram2">
+                <h2>2. GCREdit Processing Flow</h2>
+                <div class="diagram-container">
+                    <div class="mermaid">
+flowchart TD
+    START([Transaction with GCR Edits])
+
+    START --> CHECKTX{Check if<br/>TX exists<br/>in chain?}
+    CHECKTX -->|exists| REJECT[Return: TX already executed]
+    CHECKTX -->|new| LOOP[Loop through GCR Edits]
+
+    LOOP --> EDITTYPE{Edit Type?}
+
+    EDITTYPE -->|balance| BALANCEROUTE[GCRBalanceRoutines.apply]
+    EDITTYPE -->|nonce| NONCEROUTE[GCRNonceRoutines.apply]
+    EDITTYPE -->|identity| IDENTITYROUTE[GCRIdentityRoutines.apply]
+    EDITTYPE -->|assign| ASSIGNROUTE[Not Implemented]
+    EDITTYPE -->|subnetsTx| SUBNETSROUTE[Not Implemented]
+    EDITTYPE -->|unknown| INVALIDTYPE[Return: Invalid GCREdit type]
+
+    subgraph "Balance Processing"
+        BALANCEROUTE --> BALANCEOP{Operation?}
+        BALANCEOP -->|add| BALADD[Add amount to balance]
+        BALANCEOP -->|remove| BALREM{Balance >= Amount?}
+        BALREM -->|yes| BALSUBTRACT[Subtract from balance]
+        BALREM -->|no| BALFAIL[Return: Insufficient balance]
+
+        BALANCEOP -->|isRollback?| BALREVERSE[Reverse operation<br/>add→remove<br/>remove→add]
+        BALREVERSE --> BALANCEOP
+
+        BALADD --> BALSAVE{Simulate?}
+        BALSUBTRACT --> BALSAVE
+        BALSAVE -->|no| BALPERSIST[Save to DB]
+        BALSAVE -->|yes| BALSKIP[Skip save]
+        BALPERSIST --> BALSUCCESS[Return: Success]
+        BALSKIP --> BALSUCCESS
+    end
+
+    subgraph "Nonce Processing"
+        NONCEROUTE --> NONCEOP{Operation?}
+        NONCEOP -->|add| NONCEADD[Increment nonce]
+        NONCEOP -->|remove| NONCEREM{Nonce >= Amount?}
+        NONCEREM -->|yes| NONCESUB[Decrement nonce]
+        NONCEREM -->|no| NONCEFAIL[Return: Insufficient nonce]
+
+        NONCEOP -->|isRollback?| NONCEREVERSE[Reverse operation]
+        NONCEREVERSE --> NONCEOP
+
+        NONCEADD --> NONCESAVE{Simulate?}
+        NONCESUB --> NONCESAVE
+        NONCESAVE -->|no| NONCEPERSIST[Save to DB]
+        NONCESAVE -->|yes| NONCESKIP[Skip save]
+        NONCEPERSIST --> NONCESUCCESS[Return: Success]
+        NONCESKIP --> NONCESUCCESS
+    end
+
+    subgraph "Identity Processing"
+        IDENTITYROUTE --> IDENTITYSUBTYPE{Identity<br/>Subtype?}
+        IDENTITYSUBTYPE -->|xm_add| XMADD[applyXmIdentityAdd]
+        IDENTITYSUBTYPE -->|xm_remove| XMREM[applyXmIdentityRemove]
+        IDENTITYSUBTYPE -->|web2_add| WEB2ADD[applyWeb2IdentityAdd]
+        IDENTITYSUBTYPE -->|web2_remove| WEB2REM[applyWeb2IdentityRemove]
+        IDENTITYSUBTYPE -->|pqc_add| PQCADD[applyPqcIdentityAdd]
+        IDENTITYSUBTYPE -->|pqc_remove| PQCREM[applyPqcIdentityRemove]
+
+        XMADD --> VERIFYSIG[Verify Signature]
+        WEB2ADD --> VERIFYPROOF{Context?}
+        VERIFYPROOF -->|telegram| TELVERIFY[Telegram dual signature]
+        VERIFYPROOF -->|other| SHA256VERIFY[SHA256 proof hash]
+
+        PQCADD --> VERIFYPQC[Verify PQC Signature]
+
+        VERIFYSIG --> CHECKSIG{Valid?}
+        TELVERIFY --> CHECKSIG
+        SHA256VERIFY --> CHECKSIG
+        VERIFYPQC --> CHECKSIG
+
+        CHECKSIG -->|no| IDENTITYFAIL[Return: Signature verification failed]
+        CHECKSIG -->|yes| CHECKFIRST{First time<br/>linking?}
+
+        CHECKFIRST -->|yes| AWARDPOINTS[IncentiveManager awards points]
+        CHECKFIRST -->|no| SKIPPOINTS[Skip incentive]
+
+        AWARDPOINTS --> IDENTITYSAVE[Save identity to GCR]
+        SKIPPOINTS --> IDENTITYSAVE
+
+        XMREM --> REMOVEIDENTITY[Remove from identities]
+        WEB2REM --> REMOVEIDENTITY
+        PQCREM --> REMOVEIDENTITY
+
+        REMOVEIDENTITY --> DEDUCTPOINTS[Deduct incentive points]
+
+        IDENTITYSAVE --> IDENTITYSUCCESS[Return: Success]
+        DEDUCTPOINTS --> IDENTITYSUCCESS
+    end
+
+    BALSUCCESS --> TRACK[Track applied edit]
+    NONCESUCCESS --> TRACK
+    IDENTITYSUCCESS --> TRACK
+    BALFAIL --> ROLLBACKALL[Rollback all applied edits]
+    NONCEFAIL --> ROLLBACKALL
+    IDENTITYFAIL --> ROLLBACKALL
+    INVALIDTYPE --> ROLLBACKALL
+
+    TRACK --> MOREEDIT{More edits<br/>to process?}
+    MOREEDIT -->|yes| LOOP
+    MOREEDIT -->|no| UPDATETRACKER[Update GCRTracker<br/>with new hash]
+
+    ROLLBACKALL --> REVERSE[Reverse all tracked edits<br/>in reverse order]
+    REVERSE --> FAILURE[Return: Failure]
+
+    UPDATETRACKER --> SUCCESS[Return: All edits applied successfully]
+
+    REJECT -.-> END([End])
+    FAILURE -.-> END
+    SUCCESS -.-> END
+
+    style START fill:#e1f5ff
+    style BALANCEROUTE fill:#e8f5e9
+    style NONCEROUTE fill:#e8f5e9
+    style IDENTITYROUTE fill:#e8f5e9
+    style SUCCESS fill:#c8e6c9
+    style FAILURE fill:#ffcdd2
+    style REJECT fill:#ffcdd2
+                    </div>
+                </div>
+                <div class="key-concepts">
+                    <h4>🔑 Key Processing Features</h4>
+                    <ul>
+                        <li><strong>Idempotency:</strong> Checks if TX already exists to prevent duplicate execution</li>
+                        <li><strong>Rollback Support:</strong> isRollback flag reverses operations (add↔remove)</li>
+                        <li><strong>Simulation Mode:</strong> Test edits without persisting to database</li>
+                        <li><strong>Incentive Integration:</strong> First-time linking automatically awards points</li>
+                        <li><strong>Atomic Transactions:</strong> All edits succeed or all fail with automatic rollback</li>
+                    </ul>
+                </div>
+                <div class="file-reference">
+                    <strong>Implementation:</strong> handleGCR.ts:240-420
+                </div>
+            </section>
+
+            <!-- Diagram 3: Transaction to GCR Operations Lifecycle -->
+            <section id="diagram3">
+                <h2>3. Transaction to GCR Operations Lifecycle</h2>
+                <div class="diagram-container">
+                    <div class="mermaid">
+sequenceDiagram
+    participant User
+    participant TX as Transaction
+    participant HandleGCR
+    participant Routines as GCR Routines
+    participant DB as Database
+    participant Tracker as GCRTracker
+    participant Incentive as IncentiveManager
+
+    User->>TX: Create transaction with GCR edits
+    TX->>TX: Sign transaction
+    TX->>HandleGCR: Submit to applyToTx()
+
+    HandleGCR->>DB: Check if TX exists
+    alt TX already exists
+        DB-->>HandleGCR: TX found
+        HandleGCR-->>User: Error: TX already executed
+    else New TX
+        DB-->>HandleGCR: TX not found
+
+        loop For each GCR edit
+            HandleGCR->>HandleGCR: Route by edit type
+
+            alt Balance Edit
+                HandleGCR->>Routines: GCRBalanceRoutines.apply()
+                Routines->>DB: Get current balance
+                DB-->>Routines: Balance: 1000
+
+                alt Add operation
+                    Routines->>Routines: newBalance = 1000 + 500
+                else Remove operation
+                    Routines->>Routines: Check sufficient balance
+                    alt Insufficient
+                        Routines-->>HandleGCR: Error: Insufficient balance
+                        HandleGCR->>HandleGCR: Trigger rollback
+                    else Sufficient
+                        Routines->>Routines: newBalance = 1000 - 500
+                    end
+                end
+
+                Routines->>DB: Save new balance
+                Routines-->>HandleGCR: Success
+
+            else Nonce Edit
+                HandleGCR->>Routines: GCRNonceRoutines.apply()
+                Routines->>DB: Get current nonce
+                DB-->>Routines: Nonce: 42
+                Routines->>Routines: Increment/decrement nonce
+                Routines->>DB: Save new nonce
+                Routines-->>HandleGCR: Success
+
+            else Identity Edit
+                HandleGCR->>Routines: GCRIdentityRoutines.apply()
+
+                alt XM Identity
+                    Routines->>Routines: Verify cross-chain signature
+                    Routines->>Routines: Check first-time linking
+                    alt First time
+                        Routines->>Incentive: walletLinked()
+                        Incentive->>DB: Award points
+                        Incentive-->>Routines: Points awarded
+                    end
+                    Routines->>DB: Save XM identity
+
+                else Web2 Identity
+                    Routines->>Routines: Verify proof/attestation
+                    alt Telegram
+                        Routines->>Routines: Dual signature validation
+                    else Other
+                        Routines->>Routines: SHA256 proof validation
+                    end
+                    Routines->>Routines: Check first-time linking
+                    alt First time
+                        Routines->>Incentive: twitterLinked() / githubLinked() / etc
+                        Incentive->>DB: Award points
+                        Incentive-->>Routines: Points awarded
+                    end
+                    Routines->>DB: Save Web2 identity
+
+                else PQC Identity
+                    Routines->>Routines: Verify PQC signature (ML-DSA/SL-DSA)
+                    Routines->>DB: Save PQC identity
+                end
+
+                Routines-->>HandleGCR: Success
+            end
+
+            HandleGCR->>HandleGCR: Track applied edit
+        end
+
+        HandleGCR->>Tracker: Update GCRTracker hash
+        Tracker->>DB: Calculate hash of GCR state
+        DB-->>Tracker: Hash: 0xabc123...
+        Tracker->>DB: Save hash to gcr_tracker
+
+        HandleGCR-->>User: Success: All edits applied
+    end
+                    </div>
+                </div>
+                <div class="key-concepts">
+                    <h4>🔑 Lifecycle Stages</h4>
+                    <ol>
+                        <li><strong>Transaction Creation:</strong> User creates TX with GCR edits, signs it</li>
+                        <li><strong>Validation:</strong> Check TX existence, validate signature</li>
+                        <li><strong>Edit Processing:</strong> Route each edit by type, apply with validation</li>
+                        <li><strong>Incentive Awards:</strong> First-time linking awards points automatically</li>
+                        <li><strong>State Tracking:</strong> Update GCRTracker hash after successful processing</li>
+                    </ol>
+                </div>
+            </section>
+
+            <!-- Diagram 4: Identity Management -->
+            <section id="diagram4">
+                <h2>4. Identity Management Architecture</h2>
+                <div class="diagram-container">
+                    <div class="mermaid">
+graph TB
+    subgraph "Identity Types"
+        IDTYPES[GCR Identities]
+        XM[XM - Cross-Chain]
+        WEB2[Web2 - Social]
+        PQC[PQC - Post-Quantum]
+
+        IDTYPES --> XM
+        IDTYPES --> WEB2
+        IDTYPES --> PQC
+    end
+
+    subgraph "XM Cross-Chain Identities"
+        XM --> XMVERIFY[Signature Verification]
+
+        XMVERIFY --> SOLANA[Solana<br/>Ed25519 signature]
+        XMVERIFY --> EVM[EVM<br/>ECDSA signature]
+        XMVERIFY --> EGLD[MultiversX<br/>Ed25519 signature]
+        XMVERIFY --> TON[TON<br/>Ed25519 signature]
+        XMVERIFY --> XRPL[XRPL<br/>ECDSA signature]
+        XMVERIFY --> IBC[IBC/Cosmos<br/>signature]
+        XMVERIFY --> NEAR[NEAR<br/>Ed25519 signature]
+        XMVERIFY --> BTC[Bitcoin<br/>ECDSA signature]
+
+        SOLANA --> XMDATA[XM Identity Data]
+        EVM --> XMDATA
+        EGLD --> XMDATA
+        TON --> XMDATA
+        XRPL --> XMDATA
+        IBC --> XMDATA
+        NEAR --> XMDATA
+        BTC --> XMDATA
+
+        XMDATA -->|structure| XMSTRUCT["chain: string<br/>subchain: string<br/>address: string<br/>signature: string<br/>publicKey: optional"]
+    end
+
+    subgraph "Web2 Social Identities"
+        WEB2 --> WEB2TYPES[Web2 Platforms]
+
+        WEB2TYPES --> TWITTER[Twitter<br/>OAuth proof + SHA256]
+        WEB2TYPES --> GITHUB[GitHub<br/>OAuth proof + SHA256]
+        WEB2TYPES --> TELEGRAM[Telegram<br/>Dual signature]
+        WEB2TYPES --> DISCORD[Discord<br/>OAuth proof + SHA256]
+
+        TWITTER --> WEB2VERIFY{Verification Type}
+        GITHUB --> WEB2VERIFY
+        DISCORD --> WEB2VERIFY
+
+        WEB2VERIFY -->|standard| SHA256[SHA256 Hash Verification<br/>sha256 proof match]
+
+        TELEGRAM --> TELVERIFY[Telegram Attestation<br/>User + Bot signature]
+
+        SHA256 --> WEB2DATA[Web2 Identity Data]
+        TELVERIFY --> WEB2DATA
+
+        WEB2DATA -->|structure| WEB2STRUCT["context: string<br/>username: string<br/>userId: string<br/>proof: string<br/>proofHash: string<br/>timestamp: Date"]
+    end
+
+    subgraph "PQC Post-Quantum Identities"
+        PQC --> PQCTYPES[PQC Algorithms]
+
+        PQCTYPES --> MLDSA[ML-DSA<br/>Dilithium<br/>NIST standard]
+        PQCTYPES --> SLDSA[SL-DSA<br/>Sphincs+<br/>NIST standard]
+
+        MLDSA --> PQCVERIFY[PQC Signature Verification<br/>ucrypto.verify]
+        SLDSA --> PQCVERIFY
+
+        PQCVERIFY --> PQCDATA[PQC Identity Data]
+
+        PQCDATA -->|structure| PQCSTRUCT["algorithm: ml-dsa or sl-dsa<br/>address: string<br/>signature: string<br/>timestamp: Date"]
+    end
+
+    subgraph "First-Time Linking Incentives"
+        XMDATA --> FIRSTCHECK{First time<br/>linking?}
+        WEB2DATA --> FIRSTCHECK
+
+        FIRSTCHECK -->|yes| INCENTIVE[IncentiveManager]
+        FIRSTCHECK -->|no| NOINCENTIVE[Skip incentive]
+
+        INCENTIVE --> WALLETLINKED[walletLinked<br/>XM chains]
+        INCENTIVE --> TWITTERLINKED[twitterLinked<br/>Twitter OAuth]
+        INCENTIVE --> GITHUBLINKED[githubLinked<br/>GitHub OAuth]
+        INCENTIVE --> TELEGRAMLINKED[telegramLinked<br/>Telegram attestation]
+        INCENTIVE --> DISCORDLINKED[discordLinked<br/>Discord OAuth]
+
+        WALLETLINKED --> POINTS[PointSystem.awardPoints]
+        TWITTERLINKED --> POINTS
+        GITHUBLINKED --> POINTS
+        TELEGRAMLINKED --> POINTS
+        DISCORDLINKED --> POINTS
+
+        POINTS --> GCRPOINTS[GCR_Main.points field]
+    end
+
+    subgraph "Identity Storage"
+        XMSTRUCT -.->|stored in| GCRID[(GCR_Main.identities)]
+        WEB2STRUCT -.->|stored in| GCRID
+        PQCSTRUCT -.->|stored in| GCRID
+
+        GCRID -->|JSONB structure| IDSTRUCT["xm: by chain and subchain<br/>web2: by context<br/>pqc: by algorithm"]
+    end
+
+    style IDTYPES fill:#e1f5ff
+    style XM fill:#e8f5e9
+    style WEB2 fill:#fff3e0
+    style PQC fill:#f3e5f5
+    style INCENTIVE fill:#fce4ec
+    style GCRID fill:#f3e5f5
+                    </div>
+                </div>
+                <div class="key-concepts">
+                    <h4>🔑 Identity Types</h4>
+                    <ul>
+                        <li><strong>XM (Cross-Chain):</strong> 8 supported chains - Solana, EVM, MultiversX, TON, XRPL, IBC, NEAR, Bitcoin</li>
+                        <li><strong>Web2 (Social):</strong> Twitter, GitHub, Telegram (dual signature), Discord</li>
+                        <li><strong>PQC (Post-Quantum):</strong> ML-DSA (Dilithium), SL-DSA (Sphincs+)</li>
+                        <li><strong>Verification:</strong> Signature verification for XM, SHA256/attestation for Web2, PQC crypto for quantum-resistant</li>
+                        <li><strong>Incentives:</strong> Points awarded only on first-time linking</li>
+                    </ul>
+                </div>
+                <div class="file-reference">
+                    <strong>Files:</strong><br/>
+                    • GCRIdentityRoutines.ts (27,607 bytes) - Identity processing<br/>
+                    • identityManager.ts (10,599 bytes) - Chain verification<br/>
+                    • IncentiveManager.ts (3,729 bytes) - Points system
+                </div>
+            </section>
+
+            <!-- Diagram 5: Balance Operations with Rollback -->
+            <section id="diagram5">
+                <h2>5. Balance Operations with Rollback</h2>
+                <div class="diagram-container">
+                    <div class="mermaid">
+stateDiagram-v2
+    [*] --> CheckEditType: GCREdit received
+
+    CheckEditType --> BalanceEdit: type is balance
+    CheckEditType --> [*]: other types
+
+    state BalanceEdit {
+        [*] --> CheckRollback
+
+        CheckRollback --> ReverseOperation: isRollback is true
+        CheckRollback --> NormalOperation: isRollback is false
+
+        ReverseOperation --> DetermineOp: Swap add and remove
+        NormalOperation --> DetermineOp
+
+        DetermineOp --> AddOperation: operation is add
+        DetermineOp --> RemoveOperation: operation is remove
+
+        state AddOperation {
+            [*] --> GetCurrentBalance_Add
+            GetCurrentBalance_Add --> CalculateNewBalance_Add: balance = 1000
+            CalculateNewBalance_Add --> ValidateNewBalance_Add: newBalance = 1000 + 500
+            ValidateNewBalance_Add --> SaveBalance_Add: valid
+            SaveBalance_Add --> [*]: Success
+        }
+
+        state RemoveOperation {
+            [*] --> GetCurrentBalance_Rem
+            GetCurrentBalance_Rem --> CheckSufficient: balance = 1000
+            CheckSufficient --> CalculateNewBalance_Rem: balance >= amount
+            CheckSufficient --> InsufficientBalance: balance < amount (PROD only)
+            CalculateNewBalance_Rem --> SaveBalance_Rem: newBalance = 1000 - 500
+            SaveBalance_Rem --> [*]: Success
+            InsufficientBalance --> [*]: Error
+        }
+
+        AddOperation --> CheckSimulate
+        RemoveOperation --> CheckSimulate
+
+        CheckSimulate --> SkipPersist: simulate is true
+        CheckSimulate --> PersistToDB: simulate is false
+
+        PersistToDB --> UpdateTracker: gcrMainRepository.save()
+        SkipPersist --> ReturnSuccess
+        UpdateTracker --> ReturnSuccess
+
+        ReturnSuccess --> [*]
+    }
+
+    BalanceEdit --> TransactionRollback: Edit failed
+    BalanceEdit --> [*]: Success
+
+    state TransactionRollback {
+        [*] --> ReverseEdits: Reverse applied edits order
+        ReverseEdits --> ReapplyWithRollback: appliedEdits.reverse()
+
+        ReapplyWithRollback --> ReapplyEdit1: edit.isRollback = true
+        ReapplyEdit1 --> ReapplyEdit2
+        ReapplyEdit2 --> ReapplyEditN
+
+        ReapplyEditN --> [*]: All edits rolled back
+    }
+
+    TransactionRollback --> [*]: Rollback complete
+
+    note right of AddOperation
+        Add operation:
+        - Retrieve current balance
+        - Add amount to balance
+        - Save to GCR_Main
+        - No validation needed
+
+        File: GCRBalanceRoutines.ts:8-60
+    end note
+
+    note right of RemoveOperation
+        Remove operation:
+        - Retrieve current balance
+        - Check sufficient balance (PROD)
+        - Subtract amount from balance
+        - Save to GCR_Main
+
+        File: GCRBalanceRoutines.ts:8-60
+    end note
+
+    note right of TransactionRollback
+        Rollback mechanism:
+        - Reverse array of applied edits
+        - Set isRollback = true
+        - Reapply in reverse order
+        - Operations swap add and remove
+
+        File: handleGCR.ts:383-420
+    end note
+                    </div>
+                </div>
+                <div class="key-concepts">
+                    <h4>🔑 Rollback Safety</h4>
+                    <ul>
+                        <li><strong>Reversibility:</strong> Operations can be undone by setting isRollback = true</li>
+                        <li><strong>Operation Swapping:</strong> Rollback swaps add↔remove operations</li>
+                        <li><strong>Reverse Order:</strong> Edits are rolled back in reverse order of application</li>
+                        <li><strong>Production Safety:</strong> Balance checks prevent overdrafts in production</li>
+                        <li><strong>Simulation Mode:</strong> Test without persisting to database</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Diagram 6: Nonce Management -->
+            <section id="diagram6">
+                <h2>6. Nonce Management Flow</h2>
+                <div class="diagram-container">
+                    <div class="mermaid">
+flowchart TD
+    START([GCR Nonce Edit])
+
+    START --> VALIDATETYPE{Edit type<br/>is nonce?}
+    VALIDATETYPE -->|no| INVALID[Return: Invalid type]
+    VALIDATETYPE -->|yes| CHECKROLLBACK{isRollback?}
+
+    CHECKROLLBACK -->|yes| REVERSE[Reverse operation<br/>swap add and remove]
+    CHECKROLLBACK -->|no| GETACCOUNT
+    REVERSE --> GETACCOUNT
+
+    GETACCOUNT[Get GCR account by pubkey]
+    GETACCOUNT --> ACCOUNTEXISTS{Account<br/>exists?}
+
+    ACCOUNTEXISTS -->|no| CREATE[Create new GCR account<br/>HandleGCR.createAccount]
+    ACCOUNTEXISTS -->|yes| GETCURRENT[Get current nonce]
+    CREATE --> GETCURRENT
+
+    GETCURRENT --> OPERATION{Operation<br/>type?}
+
+    OPERATION -->|add| ADD[Increment nonce<br/>nonce plus amount]
+    OPERATION -->|remove| CHECKSUFFICIENT{nonce greater or equal<br/>to amount?}
+
+    CHECKSUFFICIENT -->|no| INSUFFICENT[Return: Insufficient nonce]
+    CHECKSUFFICIENT -->|yes| REMOVE[Decrement nonce<br/>nonce minus amount]
+
+    ADD --> SIMULATE{Simulate<br/>mode?}
+    REMOVE --> SIMULATE
+
+    SIMULATE -->|yes| SKIPSAVE[Skip database save]
+    SIMULATE -->|no| PERSIST[Save to GCR_Main<br/>gcrMainRepository.save]
+
+    SKIPSAVE --> SUCCESS[Return: Nonce applied successfully]
+    PERSIST --> SUCCESS
+
+    INVALID -.-> END([End])
+    INSUFFICENT -.-> END
+    SUCCESS -.-> END
+
+    style START fill:#e1f5ff
+    style SUCCESS fill:#c8e6c9
+    style INVALID fill:#ffcdd2
+    style INSUFFICENT fill:#ffcdd2
+    style SIMULATE fill:#fff4e1
+                    </div>
+                </div>
+                <div class="key-concepts">
+                    <h4>🔑 Nonce Purpose</h4>
+                    <ul>
+                        <li><strong>Replay Attack Prevention:</strong> Ensures transactions are processed in order</li>
+                        <li><strong>Operations:</strong> add (increment), remove (decrement for rollbacks)</li>
+                        <li><strong>Validation:</strong> Checks sufficient nonce before decrementing</li>
+                        <li><strong>Auto-Creation:</strong> Creates GCR account if it doesn't exist</li>
+                    </ul>
+                </div>
+                <div class="file-reference">
+                    <strong>Implementation:</strong> GCRNonceRoutines.ts (2,204 bytes)
+                </div>
+            </section>
+
+            <!-- Diagram 7: Native Operations -->
+            <section id="diagram7">
+                <h2>7. Native Operations Handling</h2>
+                <div class="diagram-container">
+                    <div class="mermaid">
+flowchart TD
+    START([Transaction with<br/>type: native])
+
+    START --> EXTRACT["Extract native payload<br/>from tx.content.data"]
+    EXTRACT --> PARSE["Parse INativePayload<br/>native and payload"]
+
+    PARSE --> OPERATION{nativeOperation<br/>type?}
+
+    OPERATION -->|send| SEND[Native Token Send]
+    OPERATION -->|other| UNKNOWN[Unknown operation<br/>Log error]
+
+    subgraph "Send Native Tokens"
+        SEND --> EXTRACTARGS["Extract arguments<br/>to address and amount"]
+
+        EXTRACTARGS --> CREATEEDITS[Create 2 GCREdits]
+
+        CREATEEDITS --> EDIT1["Edit 1<br/>Remove from sender"]
+        CREATEEDITS --> EDIT2["Edit 2<br/>Add to receiver"]
+
+        EDIT1 --> EDIT1DETAILS["Edit 1 Details<br/>type: balance<br/>operation: remove<br/>account: sender<br/>amount: value<br/>txhash: hash<br/>isRollback: false"]
+
+        EDIT2 --> EDIT2DETAILS["Edit 2 Details<br/>type: balance<br/>operation: add<br/>account: receiver<br/>amount: value<br/>txhash: hash<br/>isRollback: false"]
+
+        EDIT1DETAILS --> ARRAYEDITS["Array of edits<br/>edit1 and edit2"]
+        EDIT2DETAILS --> ARRAYEDITS
+    end
+
+    ARRAYEDITS --> RETURNEDIT[Return GCREdit array]
+    UNKNOWN --> RETURNEDIT
+
+    RETURNEDIT --> APPLYTOTX[HandleGCR.applyToTx]
+
+    APPLYTOTX --> LOOPEDITS[Loop through edits]
+
+    LOOPEDITS --> APPLYEDIT1["Apply Edit 1<br/>Remove balance"]
+    APPLYEDIT1 --> CHECKEDIT1{Edit 1<br/>success?}
+
+    CHECKEDIT1 -->|no| ROLLBACK[Rollback all edits]
+    CHECKEDIT1 -->|yes| APPLYEDIT2["Apply Edit 2<br/>Add balance"]
+
+    APPLYEDIT2 --> CHECKEDIT2{Edit 2<br/>success?}
+    CHECKEDIT2 -->|no| ROLLBACK
+    CHECKEDIT2 -->|yes| UPDATETRACKER[Update GCRTracker hash]
+
+    ROLLBACK --> FAILURE[Return: Transfer failed]
+    UPDATETRACKER --> SUCCESS[Return: Transfer successful]
+
+    FAILURE -.-> END([End])
+    SUCCESS -.-> END
+
+    style START fill:#e1f5ff
+    style SEND fill:#e8f5e9
+    style SUCCESS fill:#c8e6c9
+    style FAILURE fill:#ffcdd2
+    style ROLLBACK fill:#ffcdd2
+                    </div>
+                </div>
+                <div class="key-concepts">
+                    <h4>🔑 Native Token Transfer</h4>
+                    <ul>
+                        <li><strong>Purpose:</strong> Transfer native DEMOS tokens between accounts</li>
+                        <li><strong>Transaction Type:</strong> type: "native", nativeOperation: "send"</li>
+                        <li><strong>Atomic Transfer:</strong> Remove from sender first, then add to receiver</li>
+                        <li><strong>Rollback Safety:</strong> If any edit fails, entire transfer is rolled back</li>
+                        <li><strong>Payload:</strong> ["native", { nativeOperation: "send", args: [to, amount] }]</li>
+                    </ul>
+                </div>
+                <div class="file-reference">
+                    <strong>Implementation:</strong> handleNativeOperations.ts (2,541 bytes)
+                </div>
+            </section>
+
+            <!-- Diagram 8: Database Schema -->
+            <section id="diagram8">
+                <h2>8. GCR Database Schema</h2>
+                <div class="diagram-container">
+                    <div class="mermaid">
+erDiagram
+    GCR_Main ||--o{ GCRTracker : "tracked by"
+    GCR_Main ||--o{ GCRHashes : "hashed in"
+    GCR_Main {
+        text pubkey PK "Ed25519 public key"
+        jsonb assignedTxs "Array of transaction hashes"
+        integer nonce "Transaction nonce"
+        bigint balance "Native token balance"
+        jsonb identities "XM, Web2, PQC identities"
+        jsonb points "Incentive points breakdown"
+        jsonb referralInfo "Referral code and tracking"
+        boolean flagged "Account flagged for review"
+        text flaggedReason "Reason for flagging"
+        boolean reviewed "Manual review status"
+        timestamp createdAt "Account creation time"
+        timestamp updatedAt "Last update time"
+    }
+
+    GCRTracker {
+        integer id PK "Auto-increment ID"
+        text publicKey "User public key"
+        text hash "SHA256 hash of GCR state"
+    }
+
+    GCRHashes {
+        integer id PK "Auto-increment ID"
+        integer block "Block number"
+        text hash "Combined hash of native tables"
+    }
+
+    GCRSubnetsTxs {
+        text tx_hash PK "Transaction hash"
+        text subnet_id "L2PS subnet identifier"
+        text status "processed, pending, failed"
+        text block_hash "Block hash"
+        integer block_number "Block number"
+        json tx_data "Encrypted transaction data"
+    }
+
+    GlobalChangeRegistry {
+        integer id PK "Legacy table ID"
+        text publicKey "User public key"
+        jsonb details "Legacy GCR status"
+        jsonb extended "Legacy extended data"
+    }
+                    </div>
+                </div>
+                <div class="key-concepts">
+                    <h4>🔑 Table Purposes</h4>
+                    <ul>
+                        <li><strong>GCR_Main:</strong> Primary account state (balances, identities, points)</li>
+                        <li><strong>GCRTracker:</strong> Per-user state hashing for change detection</li>
+                        <li><strong>GCRHashes:</strong> Per-block combined hash of all native tables</li>
+                        <li><strong>GCRSubnetsTxs:</strong> L2PS subnet transaction storage (synced with chain)</li>
+                        <li><strong>GlobalChangeRegistry:</strong> Legacy table (being phased out)</li>
+                    </ul>
+                </div>
+                <div class="file-reference">
+                    <strong>Entities:</strong><br/>
+                    • GCR_Main.ts (75 lines)<br/>
+                    • GCRTracker.ts (23 lines)<br/>
+                    • GCRHashes.ts (17 lines)<br/>
+                    • GCRSubnetsTxs.ts (29 lines)
+                </div>
+            </section>
+
+            <!-- Diagram 9: State Tracking & Hashing -->
+            <section id="diagram9">
+                <h2>9. GCR State Tracking & Hashing</h2>
+                <div class="diagram-container">
+                    <div class="mermaid">
+flowchart TD
+    subgraph "Hash Generation Flow"
+        START([GCR State Change])
+
+        START --> UPDATEUSER[Update GCR_Main record]
+        UPDATEUSER --> TRIGGER[Trigger GCRStateSaverHelper]
+
+        TRIGGER --> HASHUSER[Hash user's GCR state]
+        HASHUSER --> STRINGIFY[JSON.stringify(userData)]
+        STRINGIFY --> SHA256USER[SHA256 hash]
+
+        SHA256USER --> UPSERT[Upsert to GCRTracker<br/>publicKey, hash]
+        UPSERT --> USERTRACKED[User state tracked]
+    end
+
+    subgraph "Block-Level Hashing"
+        BLOCKEND[Block consensus complete]
+
+        BLOCKEND --> HASHTABLES[Hash all native tables]
+
+        HASHTABLES --> HASHGCR[Hash GCRTracker table]
+        HASHTABLES --> HASHSUBNETS[Hash GCRSubnetsTxs table]
+
+        HASHGCR --> ORDERGCR[Order by publicKey ASC]
+        ORDERGCR --> STRINGIFYGCR[JSON.stringify all records]
+        STRINGIFYGCR --> SHA256GCR[SHA256 hash]
+
+        HASHSUBNETS --> ORDERSUBNETS[Order by tx_hash ASC]
+        ORDERSUBNETS --> STRINGIFYSUBNETS[JSON.stringify all records]
+        STRINGIFYSUBNETS --> SHA256SUBNETS[SHA256 hash]
+
+        SHA256GCR --> COMBINE[Combine hashes]
+        SHA256SUBNETS --> COMBINE
+
+        COMBINE --> NATIVEHASH["Combined Hash Object<br/>native_gcr: hash1<br/>native_subnets_txs: hash2"]
+
+        NATIVEHASH --> INSERTGCRHASH[Insert to GCRHashes<br/>block, hash]
+        INSERTGCRHASH --> BLOCKTRACKED[Block state tracked]
+    end
+
+    subgraph "Hash Verification"
+        VERIFY[Node syncing/<br/>Validator checking]
+
+        VERIFY --> FETCHHASH[Fetch GCRHashes for block N]
+        FETCHHASH --> RECALCULATE[Recalculate hashes from tables]
+
+        RECALCULATE --> COMPARE{Hashes<br/>match?}
+
+        COMPARE -->|yes| VALID[State is valid]
+        COMPARE -->|no| INVALID[State mismatch!<br/>Resync needed]
+    end
+
+    USERTRACKED -.->|contributes to| BLOCKEND
+    BLOCKTRACKED --> VERIFY
+
+    VALID --> END([End])
+    INVALID --> RESYNC[Trigger state resync]
+    RESYNC --> END
+
+    style START fill:#e1f5ff
+    style BLOCKEND fill:#fff4e1
+    style VALID fill:#c8e6c9
+    style INVALID fill:#ffcdd2
+    style NATIVEHASH fill:#f3e5f5
+                    </div>
+                </div>
+                <div class="key-concepts">
+                    <h4>🔑 Hashing Levels</h4>
+                    <ul>
+                        <li><strong>User-Level:</strong> SHA256 hash of entire GCR_Main record (GCRTracker)</li>
+                        <li><strong>Block-Level:</strong> Combined hash of GCRTracker + GCRSubnetsTxs tables (GCRHashes)</li>
+                        <li><strong>Deterministic Ordering:</strong> ASC by primary key ensures consistent hashes</li>
+                        <li><strong>Cryptographic Security:</strong> Every GCR property traces back to Operations from Transactions</li>
+                        <li><strong>Use Cases:</strong> Sync validation, consensus verification, rollback detection, state snapshots</li>
+                    </ul>
+                </div>
+                <div class="file-reference">
+                    <strong>Files:</strong><br/>
+                    • gcrStateSaverHelper.ts:25-51 - User-level hashing<br/>
+                    • hashGCR.ts:70-103 - Block-level hashing
+                </div>
+            </section>
+
+            <!-- Diagram 10: Complete Lifecycle -->
+            <section id="diagram10">
+                <h2>10. Complete GCR Update Lifecycle</h2>
+                <div class="diagram-container">
+                    <div class="mermaid">
+stateDiagram-v2
+    [*] --> TxCreated: User creates transaction
+
+    state TxCreated {
+        [*] --> DefineGCREdits
+        DefineGCREdits --> SignTx
+        SignTx --> BroadcastTx
+        BroadcastTx --> [*]
+    }
+
+    TxCreated --> TxReceived: Network receives TX
+
+    state TxReceived {
+        [*] --> ValidateSignature
+        ValidateSignature --> CheckNonce
+        CheckNonce --> AddToMempool
+        AddToMempool --> [*]
+    }
+
+    TxReceived --> TxInBlock: Proposer includes in block
+
+    state TxInBlock {
+        [*] --> BlockProposed
+        BlockProposed --> ValidatorValidation
+        ValidatorValidation --> ConsensusReached
+        ConsensusReached --> [*]
+    }
+
+    TxInBlock --> GCRProcessing: Block confirmed
+
+    state GCRProcessing {
+        [*] --> ExtractGCREdits
+
+        ExtractGCREdits --> CheckTxExists
+        CheckTxExists --> AlreadyExecuted: TX found
+        CheckTxExists --> NewTransaction: TX not found
+
+        AlreadyExecuted --> [*]: Reject
+
+        state NewTransaction {
+            [*] --> ProcessEdits
+
+            state ProcessEdits {
+                [*] --> ProcessEdit
+
+                state ProcessEdit {
+                    [*] --> RouteByType
+                    RouteByType --> BalanceRoutine: type balance
+                    RouteByType --> NonceRoutine: type nonce
+                    RouteByType --> IdentityRoutine: type identity
+
+                    state BalanceRoutine {
+                        [*] --> CheckRollback_B
+                        CheckRollback_B --> ReverseOp_B: isRollback
+                        CheckRollback_B --> NormalOp_B: !isRollback
+                        ReverseOp_B --> ExecuteBalance
+                        NormalOp_B --> ExecuteBalance
+                        ExecuteBalance --> ValidateBalance
+                        ValidateBalance --> Success_B: valid
+                        ValidateBalance --> Failed_B: invalid
+                        Success_B --> [*]
+                        Failed_B --> [*]
+                    }
+
+                    state NonceRoutine {
+                        [*] --> CheckRollback_N
+                        CheckRollback_N --> ReverseOp_N: isRollback
+                        CheckRollback_N --> NormalOp_N: !isRollback
+                        ReverseOp_N --> ExecuteNonce
+                        NormalOp_N --> ExecuteNonce
+                        ExecuteNonce --> Success_N
+                        Success_N --> [*]
+                    }
+
+                    state IdentityRoutine {
+                        [*] --> DetermineSubtype
+                        DetermineSubtype --> XMIdentity: xm add or remove
+                        DetermineSubtype --> Web2Identity: web2 add or remove
+                        DetermineSubtype --> PQCIdentity: pqc add or remove
+
+                        XMIdentity --> VerifyXMSignature
+                        Web2Identity --> VerifyWeb2Proof
+                        PQCIdentity --> VerifyPQCSignature
+
+                        VerifyXMSignature --> CheckFirstLink
+                        VerifyWeb2Proof --> CheckFirstLink
+                        VerifyPQCSignature --> CheckFirstLink
+
+                        CheckFirstLink --> AwardIncentive: first time
+                        CheckFirstLink --> SkipIncentive: already linked
+
+                        AwardIncentive --> SaveIdentity
+                        SkipIncentive --> SaveIdentity
+
+                        SaveIdentity --> Success_I
+                        Success_I --> [*]
+                    }
+
+                    BalanceRoutine --> CheckResult
+                    NonceRoutine --> CheckResult
+                    IdentityRoutine --> CheckResult
+
+                    CheckResult --> TrackApplied: success
+                    CheckResult --> TriggerRollback: failure
+
+                    TrackApplied --> [*]
+                    TriggerRollback --> [*]
+                }
+
+                ProcessEdit --> MoreEdits: edit processed
+
+                MoreEdits --> ProcessEdit: yes
+                MoreEdits --> AllEditsApplied: no
+
+                AllEditsApplied --> [*]
+            }
+
+            ProcessEdits --> EditsFailed: any edit failed
+            ProcessEdits --> EditsSuccess: all succeeded
+
+            state EditsFailed {
+                [*] --> ReverseAppliedEdits
+                ReverseAppliedEdits --> ReapplyWithRollback
+                ReapplyWithRollback --> RollbackComplete
+                RollbackComplete --> [*]
+            }
+
+            EditsFailed --> [*]: TX rejected
+            EditsSuccess --> UpdateState
+        }
+
+        UpdateState --> PersistGCRMain
+        PersistGCRMain --> HashUserState
+        HashUserState --> UpdateGCRTracker
+        UpdateGCRTracker --> [*]
+    }
+
+    GCRProcessing --> StateTracked: GCR updated
+
+    state StateTracked {
+        [*] --> UserHashUpdated
+        UserHashUpdated --> BlockComplete
+        BlockComplete --> [*]
+    }
+
+    StateTracked --> BlockHashing: Block finalized
+
+    state BlockHashing {
+        [*] --> HashAllTables
+        HashAllTables --> CombineHashes
+        CombineHashes --> InsertGCRHash
+        InsertGCRHash --> [*]
+    }
+
+    BlockHashing --> [*]: State finalized
+
+    note right of GCRProcessing
+        Core GCR processing:
+        - Extract GCR edits from TX
+        - Route each edit by type
+        - Apply with rollback support
+        - Track applied edits
+        - Rollback on any failure
+
+        Files:
+        - handleGCR.ts:240-420
+        - GCRBalanceRoutines.ts
+        - GCRNonceRoutines.ts
+        - GCRIdentityRoutines.ts
+    end note
+
+    note right of StateTracked
+        State tracking:
+        - User hash: SHA256 of GCR_Main record
+        - Stored in GCRTracker table
+        - Block hash: Combined native table hashes
+        - Stored in GCRHashes table
+
+        Files:
+        - gcrStateSaverHelper.ts:25-51
+        - hashGCR.ts:70-103
+    end note
+
+    note right of IdentityRoutine
+        Identity incentives:
+        - XM: walletLinked (per chain)
+        - Web2: twitterLinked, githubLinked,
+          telegramLinked, discordLinked
+        - Only awarded on first-time link
+        - Points stored in GCR_Main.points
+
+        File: IncentiveManager.ts
+    end note
+                    </div>
+                </div>
+                <div class="key-concepts">
+                    <h4>🔑 Complete Lifecycle Stages</h4>
+                    <ol>
+                        <li><strong>Creation:</strong> User creates TX with GCR edits, signs, broadcasts</li>
+                        <li><strong>Validation:</strong> Signature check, nonce check, mempool addition</li>
+                        <li><strong>Consensus:</strong> Block proposed, validators validate, consensus reached</li>
+                        <li><strong>Processing:</strong> Extract edits, route by type, apply with validation</li>
+                        <li><strong>Rollback:</strong> If any edit fails, reverse all applied edits</li>
+                        <li><strong>State Tracking:</strong> Hash user state, update GCRTracker</li>
+                        <li><strong>Block Finalization:</strong> Hash all tables, store in GCRHashes</li>
+                    </ol>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <button class="print-button" onclick="window.print()">🖨️ Print Diagrams</button>
+
+    <script>
+        // Smooth scroll for navigation
+        document.querySelectorAll('nav a').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+    </script>
+</body>
+</html>

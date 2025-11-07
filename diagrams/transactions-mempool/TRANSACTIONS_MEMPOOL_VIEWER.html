@@ -1159,15 +1159,31 @@ stateDiagram-v2
     </div>
 
     <script>
+        // Add comprehensive error logging
+        console.log('=== MERMAID DEBUG START ===');
+        console.log('Mermaid version:', mermaid.version);
+
+        // Capture parse errors
+        mermaid.parseError = function(err, hash) {
+            console.error('❌ MERMAID PARSE ERROR:', err);
+            console.error('Error details:', {
+                message: err.message,
+                str: err.str,
+                hash: hash,
+                stack: err.stack
+            });
+        };
+
+        // Initialize with logging
         mermaid.initialize({
             startOnLoad: true,
             theme: 'default',
             securityLevel: 'loose',
+            logLevel: 'debug',  // Enable debug logging
             flowchart: {
                 useMaxWidth: true,
                 htmlLabels: true,
-                curve: 'basis',
-                useMaxWidth: true
+                curve: 'basis'
             },
             sequence: {
                 useMaxWidth: true,
@@ -1179,8 +1195,7 @@ stateDiagram-v2
                 boxMargin: 10,
                 boxTextMargin: 5,
                 noteMargin: 10,
-                messageMargin: 35,
-                useMaxWidth: true
+                messageMargin: 35
             },
             stateDiagram: {
                 useMaxWidth: true
@@ -1191,6 +1206,32 @@ stateDiagram-v2
             deterministicIds: false,
             deterministicIDSeed: undefined
         });
+
+        console.log('Mermaid initialized with config');
+
+        // Log all mermaid blocks found
+        window.addEventListener('DOMContentLoaded', function() {
+            const mermaidDivs = document.querySelectorAll('.mermaid');
+            console.log(`Found ${mermaidDivs.length} mermaid blocks`);
+
+            mermaidDivs.forEach((div, index) => {
+                const content = div.textContent.trim();
+                const firstLine = content.split('\n')[0];
+                console.log(`Mermaid block ${index}: Type="${firstLine}", Length=${content.length} chars`);
+
+                // Log first 200 chars of each diagram
+                if (index >= 2 && index <= 9) {  // Diagrams 3-10 (0-indexed)
+                    console.log(`Block ${index} content preview:`, content.substring(0, 200));
+                }
+            });
+        });
+
+        // Catch rendering errors
+        window.addEventListener('error', function(e) {
+            console.error('❌ Window error:', e.message, e.filename, e.lineno);
+        });
+
+        console.log('=== MERMAID DEBUG SETUP COMPLETE ===');
 
         function showDiagram(index) {
             // Hide all diagrams

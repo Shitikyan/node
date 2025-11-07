@@ -363,38 +363,38 @@ sequenceDiagram
 flowchart TD
     START([validateSignature called])
 
-    START --> CHECKSENDER{Sender<br/>provided?}
-    CHECKSENDER -->|yes| VERIFYSENDER{content.from<br/>matches sender?}
+    START --> CHECKSENDER{Sender<br>provided?}
+    CHECKSENDER -->|yes| VERIFYSENDER{content.from<br>matches sender?}
     CHECKSENDER -->|no| CHECKPQC
 
     VERIFYSENDER -->|no| FAIL1[Return: Signer does not match sender]
     VERIFYSENDER -->|yes| CHECKPQC
 
-    CHECKPQC{Signature type<br/>is PQC?}
+    CHECKPQC{Signature type<br>is PQC?}
     CHECKPQC -->|no ed25519| SETED25519TRUE[ed25519SignatureVerified = true]
-    CHECKPQC -->|yes ml-dsa or sl-dsa| HASBACKUP{Has<br/>ed25519_signature?}
+    CHECKPQC -->|yes ml-dsa or sl-dsa| HASBACKUP{Has<br>ed25519_signature?}
 
     HASBACKUP -->|no| CHECKGCR[Check GCR for PQC identity]
     HASBACKUP -->|yes| VERIFYED25519BACKUP
 
     subgraph "GCR PQC Identity Check"
-        CHECKGCR --> GETIDENTITIES[IdentityManager.getIdentities<br/>from_ed25519_address, pqc]
+        CHECKGCR --> GETIDENTITIES[IdentityManager.getIdentities<br>from_ed25519_address, pqc]
         GETIDENTITIES --> GETPQCTYPE[Get indexed pubkeys for signature.type]
-        GETPQCTYPE --> FINDPUBKEY{Find PQC pubkey<br/>matching content.from?}
+        GETPQCTYPE --> FINDPUBKEY{Find PQC pubkey<br>matching content.from?}
 
-        FINDPUBKEY -->|not found| FAIL2[Return: PQC signer not in GCR<br/>and no ed25519 backup]
+        FINDPUBKEY -->|not found| FAIL2[Return: PQC signer not in GCR<br>and no ed25519 backup]
         FINDPUBKEY -->|found| VERIFYGCRIDENTITY[Verify GCR identity ed25519 signature]
 
-        VERIFYGCRIDENTITY --> IDENTITYVALID{GCR identity<br/>signature valid?}
+        VERIFYGCRIDENTITY --> IDENTITYVALID{GCR identity<br>signature valid?}
         IDENTITYVALID -->|yes| SETED25519TRUEGCR[ed25519SignatureVerified = true]
         IDENTITYVALID -->|no| FAIL3[Return: GCR identity signature invalid]
     end
 
     subgraph "Backup Ed25519 Verification"
         VERIFYED25519BACKUP[Verify ed25519_signature field]
-        VERIFYED25519BACKUP --> VERIFYED25519HASH[ucrypto.verify ed25519<br/>message: tx.hash<br/>publicKey: from_ed25519_address<br/>signature: ed25519_signature]
+        VERIFYED25519BACKUP --> VERIFYED25519HASH[ucrypto.verify ed25519<br>message: tx.hash<br>publicKey: from_ed25519_address<br>signature: ed25519_signature]
 
-        VERIFYED25519HASH --> ED25519VALID{Signature<br/>valid?}
+        VERIFYED25519HASH --> ED25519VALID{Signature<br>valid?}
         ED25519VALID -->|yes| SETED25519TRUEBACKUP[ed25519SignatureVerified = true]
         ED25519VALID -->|no| FAIL4[Return: Ed25519 backup signature invalid]
     end
@@ -404,12 +404,12 @@ flowchart TD
     SETED25519TRUEBACKUP --> VERIFYMAIN
 
     VERIFYMAIN[Verify main signature]
-    VERIFYMAIN --> VERIFYMAINDETAILS[ucrypto.verify<br/>algorithm: signature.type<br/>message: tx.hash<br/>publicKey: content.from<br/>signature: signature.data]
+    VERIFYMAIN --> VERIFYMAINDETAILS[ucrypto.verify<br>algorithm: signature.type<br>message: tx.hash<br>publicKey: content.from<br>signature: signature.data]
 
-    VERIFYMAINDETAILS --> MAINVALID{Main signature<br/>valid?}
+    VERIFYMAINDETAILS --> MAINVALID{Main signature<br>valid?}
 
-    MAINVALID -->|yes| SUCCESS[Return: success true<br/>Transaction signature verified]
-    MAINVALID -->|no| FAIL5[Return: success false<br/>Main signature verification failed]
+    MAINVALID -->|yes| SUCCESS[Return: success true<br>Transaction signature verified]
+    MAINVALID -->|no| FAIL5[Return: success false<br>Main signature verification failed]
 
     style START fill:#e1f5ff
     style SUCCESS fill:#c8e6c9
@@ -547,7 +547,7 @@ flowchart TD
         STRINGIFY --> CALCSHA256[Calculate SHA256 hash]
         CALCSHA256 --> DERIVEHASH[derivedHash result]
 
-        DERIVEHASH --> COMPARE{derivedHash<br/>equals tx.hash?}
+        DERIVEHASH --> COMPARE{derivedHash<br>equals tx.hash?}
         COMPARE -->|yes| COHERENT[Transaction is coherent]
         COMPARE -->|no| INCOHERENT[Transaction is NOT coherent]
     end
@@ -555,16 +555,16 @@ flowchart TD
     COHERENT --> STRUCTURED[structured validation]
 
     subgraph "Structure Validation"
-        STRUCTURED --> CHECKFIELDS{All required<br/>fields present?}
+        STRUCTURED --> CHECKFIELDS{All required<br>fields present?}
 
-        CHECKFIELDS --> HASTYPE{content.type<br/>exists?}
-        CHECKFIELDS --> HASFROM{content.from<br/>exists?}
-        CHECKFIELDS --> HASTO{content.to<br/>exists?}
-        CHECKFIELDS --> HASAMOUNT{content.amount<br/>exists?}
-        CHECKFIELDS --> HASNONCE{content.nonce<br/>exists?}
-        CHECKFIELDS --> HASTIMESTAMP{content.timestamp<br/>exists?}
-        CHECKFIELDS --> HASHASH{hash<br/>exists?}
-        CHECKFIELDS --> HASSIG{signature<br/>exists?}
+        CHECKFIELDS --> HASTYPE{content.type<br>exists?}
+        CHECKFIELDS --> HASFROM{content.from<br>exists?}
+        CHECKFIELDS --> HASTO{content.to<br>exists?}
+        CHECKFIELDS --> HASAMOUNT{content.amount<br>exists?}
+        CHECKFIELDS --> HASNONCE{content.nonce<br>exists?}
+        CHECKFIELDS --> HASTIMESTAMP{content.timestamp<br>exists?}
+        CHECKFIELDS --> HASHASH{hash<br>exists?}
+        CHECKFIELDS --> HASSIG{signature<br>exists?}
 
         HASTYPE -->|no| INVALID
         HASFROM -->|no| INVALID
@@ -589,11 +589,11 @@ flowchart TD
     end
 
     subgraph "TO Field Validation"
-        VALIDATETO --> TOEXISTS{TO field<br/>exists?}
+        VALIDATETO --> TOEXISTS{TO field<br>exists?}
         TOEXISTS -->|no| INVALID[Return: invalid]
         TOEXISTS -->|yes| CONVERTBUFFER[convertToBuffer TO]
 
-        CONVERTBUFFER --> BUFFERTYPE{Buffer<br/>type?}
+        CONVERTBUFFER --> BUFFERTYPE{Buffer<br>type?}
         BUFFERTYPE -->|hex string| PARSEHEX[Parse hex to buffer]
         BUFFERTYPE -->|Buffer object| USEDIRECT[Use directly]
         BUFFERTYPE -->|JSON Buffer| PARSEJSON[Parse from JSON]
@@ -602,7 +602,7 @@ flowchart TD
         USEDIRECT --> CHECKLEN
         PARSEJSON --> CHECKLEN[Check buffer length]
 
-        CHECKLEN --> IS32BYTES{Length<br/>equals 32?}
+        CHECKLEN --> IS32BYTES{Length<br>equals 32?}
         IS32BYTES -->|no| INVALID
         IS32BYTES -->|yes| VALIDED25519[Valid Ed25519 public key format]
     end
@@ -740,7 +740,7 @@ flowchart TD
     START --> GETACCOUNT[Get sender account from GCR]
     GETACCOUNT --> READNONCE[Read current nonce from GCR_Main]
 
-    READNONCE --> ACCOUNTEXISTS{Account<br/>exists?}
+    READNONCE --> ACCOUNTEXISTS{Account<br>exists?}
     ACCOUNTEXISTS -->|no| NONCE0[Current nonce = 0]
     ACCOUNTEXISTS -->|yes| CURRENTNONCE[Current nonce from GCR]
 
@@ -759,7 +759,7 @@ flowchart TD
         PHASE4 --> GCRCHECK[HandleGCR.apply nonce edit]
         GCRCHECK --> GETEXPECTED[Get expected nonce from GCR]
 
-        GETEXPECTED --> COMPARENONCE{tx.nonce equals<br/>expected plus 1?}
+        GETEXPECTED --> COMPARENONCE{tx.nonce equals<br>expected plus 1?}
 
         COMPARENONCE -->|yes| VALIDNONCE[Valid nonce]
         COMPARENONCE -->|no| INVALIDNONCE[Invalid nonce]

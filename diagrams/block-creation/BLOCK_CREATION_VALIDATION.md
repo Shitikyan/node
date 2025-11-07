@@ -588,21 +588,12 @@ erDiagram
     BLOCKS ||--o{ MEMPOOL_V2 : references
     TRANSACTIONS }o--|| GCR_MAIN : modifies
     BLOCKS }|--|| BLOCKS : previousHash_links_to
+```
 
-    BLOCKS }|--|| INDEXES_BLOCKS : indexed_by
-    TRANSACTIONS }|--|| INDEXES_TXS : indexed_by
+**Database Indexes:**
+- **BLOCKS table indexes:** idx_blocks_number, idx_blocks_hash
+- **TRANSACTIONS table indexes:** idx_transactions_hash, idx_transactions_blockNumber, idx_transactions_from_ed25519_address, idx_transactions_to
 
-    INDEXES_BLOCKS {
-        index idx_blocks_number
-        index idx_blocks_hash
-    }
-
-    INDEXES_TXS {
-        index idx_transactions_hash
-        index idx_transactions_blockNumber
-        index idx_transactions_from_ed25519_address
-        index idx_transactions_to
-    }
 ```
 
 ## 9. Block Sync & Propagation

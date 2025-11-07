@@ -34,40 +34,40 @@ Complete blockchain fundamentals including block structure, chain management, ge
 
 ---
 
-#### 2. [Global Cluster Registry (GCR)](./gcr/GCR.md)
+#### 2. [Global Change Registry (GCR)](./gcr/GCR.md)
 **Location:** `diagrams/gcr/`
 **Viewer:** [GCR_VIEWER.html](./gcr/GCR_VIEWER.html)
 
-Cluster-based blockchain organization enabling horizontal scaling and inter-cluster communication.
+Global mutable state registry managing balances, identities, nonces, and incentives with cryptographic traceability.
 
 **Key Topics:**
-- Multi-Cluster Architecture (Local, Regional, Global levels)
-- Cluster Formation & Joining Process
-- Cluster State Management (Active, Syncing, Degraded, Failed)
-- Inter-Cluster Communication & RPC
-- Cross-Cluster Transaction Routing
-- Cluster Health Monitoring & Heartbeats
-- Cluster Synchronization Mechanisms
-- Cluster Rebalancing & Migration
+- GCR Architecture (HandleGCR core, routines, operations)
+- Balance Management (add, remove, rollback operations)
+- Nonce Management (increment, decrement, tracking)
+- Identity Management (XM, Web2, PQC identities across chains)
+- GCR Edit Operations (Transaction → Operation flow)
+- Cross-Chain Identity Support (Solana, EVM, MultiversX, TON, etc.)
+- Rollback Mechanisms
 - GCR Database Schema
-- Complete Cluster Lifecycle
+- State Change Traceability
+- Complete GCR Lifecycle
 
 **Innovations:**
-- 3-tier hierarchical clustering
-- Dynamic cluster rebalancing
-- Cross-cluster consensus
-- Fault-tolerant cluster health monitoring
+- Cryptographically traceable state modifications
+- Multi-chain identity management
+- Transaction-derived operations model
+- Rollback-safe state transitions
 
 ---
 
-#### 3. [Consensus V2](./consensus-v2/CONSENSUS_V2.md)
+#### 3. [PoR-BFT Consensus](./consensus-v2/CONSENSUS_V2.md)
 **Location:** `diagrams/consensus-v2/`
 **Viewer:** [CONSENSUS_V2_VIEWER.html](./consensus-v2/CONSENSUS_V2_VIEWER.html)
 
-Advanced consensus mechanism with validator voting, finalization, and Byzantine fault tolerance.
+Advanced Proof of Representation Byzantine Fault Tolerant consensus mechanism with validator voting, finalization, and supermajority requirements.
 
 **Key Topics:**
-- Consensus Architecture (Proposer, Validators, Voters)
+- PoR-BFT Architecture (Proposer, Validators, Voters)
 - Block Proposal & Validation Flow
 - Vote Collection & Aggregation (2/3+ threshold)
 - Block Finalization Process
@@ -606,8 +606,8 @@ This documentation is part of the Demos blockchain project.
 | Feature | Markdown | HTML Viewer |
 |---------|----------|-------------|
 | Blockchain Core | [BLOCKCHAIN_CORE.md](./blockchain-core/BLOCKCHAIN_CORE.md) | [View](./blockchain-core/BLOCKCHAIN_CORE_VIEWER.html) |
-| Global Cluster Registry | [GCR.md](./gcr/GCR.md) | [View](./gcr/GCR_VIEWER.html) |
-| Consensus V2 | [CONSENSUS_V2.md](./consensus-v2/CONSENSUS_V2.md) | [View](./consensus-v2/CONSENSUS_V2_VIEWER.html) |
+| Global Change Registry | [GCR.md](./gcr/GCR.md) | [View](./gcr/GCR_VIEWER.html) |
+| PoR-BFT Consensus | [CONSENSUS_V2.md](./consensus-v2/CONSENSUS_V2.md) | [View](./consensus-v2/CONSENSUS_V2_VIEWER.html) |
 | Validator Management | [VALIDATOR_PEER_MANAGEMENT.md](./validator-management/VALIDATOR_PEER_MANAGEMENT.md) | [View](./validator-management/VALIDATOR_PEER_MANAGEMENT_VIEWER.html) |
 | Transactions & Mempool | [TRANSACTIONS_MEMPOOL.md](./transactions-mempool/TRANSACTIONS_MEMPOOL.md) | [View](./transactions-mempool/TRANSACTIONS_MEMPOOL_VIEWER.html) |
 | Block Creation | [BLOCK_CREATION_VALIDATION.md](./block-creation/BLOCK_CREATION_VALIDATION.md) | [View](./block-creation/BLOCK_CREATION_VALIDATION_VIEWER.html) |

@@ -992,22 +992,13 @@ erDiagram
     BLOCKS ||--o{ MEMPOOL_V2 : references
     TRANSACTIONS }o--|| GCR_MAIN : modifies
     BLOCKS }|--|| BLOCKS : previousHash_links_to
-
-    BLOCKS }|--|| INDEXES_BLOCKS : indexed_by
-    TRANSACTIONS }|--|| INDEXES_TXS : indexed_by
-
-    INDEXES_BLOCKS {
-        index idx_blocks_number
-        index idx_blocks_hash
-    }
-
-    INDEXES_TXS {
-        index idx_transactions_hash
-        index idx_transactions_blockNumber
-        index idx_transactions_from_ed25519_address
-        index idx_transactions_to
-    }
                 </div>
+
+                <p><strong>Database Indexes:</strong></p>
+                <ul>
+                    <li><strong>BLOCKS table indexes:</strong> idx_blocks_number, idx_blocks_hash</li>
+                    <li><strong>TRANSACTIONS table indexes:</strong> idx_transactions_hash, idx_transactions_blockNumber, idx_transactions_from_ed25519_address, idx_transactions_to</li>
+                </ul>
 
                 <div class="file-reference">
                     <strong>📁 File Reference:</strong> src/model/entities/Blocks.ts:32

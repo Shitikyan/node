@@ -732,22 +732,12 @@ erDiagram
     MEMPOOL_V2 ||--o{ BLOCKS : "waiting_for"
     TRANSACTIONS ||--o| GCR_MAIN : "modifies_state"
     MEMPOOL_V2 ||--o| GCR_MAIN : "will_modify"
+```
 
-    TRANSACTIONS }|--|| INDEXES_TX : "indexed_by"
-    MEMPOOL_V2 }|--|| INDEXES_MEMPOOL : "indexed_by"
+**Database Indexes:**
+- **TRANSACTIONS table indexes:** idx_transactions_hash, idx_transactions_blockNumber, idx_transactions_from_ed25519_address, idx_transactions_to
+- **MEMPOOL_V2 table indexes:** idx_mempool_hash, idx_mempool_blockNumber, idx_mempool_timestamp
 
-    INDEXES_TX {
-        index idx_transactions_hash
-        index idx_transactions_blockNumber
-        index idx_transactions_from_ed25519_address
-        index idx_transactions_to
-    }
-
-    INDEXES_MEMPOOL {
-        index idx_mempool_hash
-        index idx_mempool_blockNumber
-        index idx_mempool_timestamp
-    }
 ```
 
 ## 10. Complete Transaction Flow with Error Handling

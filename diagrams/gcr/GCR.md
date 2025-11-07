@@ -1,8 +1,8 @@
-# Global Consensus Registry (GCR) - Mermaid Diagrams
+# Global Change Registry (GCR) - Mermaid Diagrams
 
 ## Overview
 
-The Global Consensus Registry (GCR) is a critical component of the Demos blockchain that manages mutable global state including balances, identities, nonces, and incentives. While not stored directly in blocks, every GCR modification is cryptographically traceable through Operations derived from Transactions.
+The Global Change Registry (GCR) is a critical component of the Demos blockchain that manages mutable global state including balances, identities, nonces, and incentives. While not stored directly in blocks, every GCR modification is cryptographically traceable through Operations derived from Transactions.
 
 ## 1. GCR Architecture & Components
 

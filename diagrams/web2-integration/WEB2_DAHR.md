@@ -128,11 +128,6 @@ sequenceDiagram
     Note over Client: Store sessionId<br/>for future requests
 
     deactivate DAHR
-
-    style Factory fill:#e1f5ff
-    style Store fill:#fff4e1
-    style DAHR fill:#e8f5e9
-    style Proxy fill:#f3e5f5
 ```
 
 **Description**: Detailed sequence showing DAHR instance creation through the factory pattern, including session management, cleanup of expired sessions, and proxy server initialization.

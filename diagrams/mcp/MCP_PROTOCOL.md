@@ -229,7 +229,7 @@ stateDiagram-v2
     state RegisterTools {
         [*] --> CheckRunning: registerTool(tool)
         CheckRunning --> Running: Server running?
-        Running --> [*]: Error: Cannot register
+        Running --> [*]: Error - Cannot register
         CheckRunning --> AddToMap: Server not running
         AddToMap --> LogRegistration: tools.set(name, tool)
         LogRegistration --> [*]: Tool registered
@@ -785,7 +785,7 @@ stateDiagram-v2
         RequestType --> HandleCall: CallToolRequest
 
         HandleList --> BuildToolList: Iterate tools Map
-        BuildToolList --> ReturnTools: Return {tools: Tool[]}
+        BuildToolList --> ReturnTools: Return tools array
         ReturnTools --> WaitForClient
 
         HandleCall --> LookupTool: tools.get(name)
@@ -805,7 +805,7 @@ stateDiagram-v2
         QueryChain --> ReturnData
         QueryPeers --> ReturnData
 
-        ReturnData --> FormatResult: Format as {content: [...]}
+        ReturnData --> FormatResult: Format as content array
         FormatResult --> LogSuccess: Log success
         LogSuccess --> WaitForClient
 

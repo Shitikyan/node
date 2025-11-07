@@ -827,7 +827,7 @@ flowchart TD
         UPDATEUSER --> TRIGGER[Trigger GCRStateSaverHelper]
 
         TRIGGER --> HASHUSER[Hash user's GCR state]
-        HASHUSER --> STRINGIFY[JSON.stringify(userData)]
+        HASHUSER --> STRINGIFY[JSON.stringify userData]
         STRINGIFY --> SHA256USER[SHA256 hash]
 
         SHA256USER --> UPSERT[Upsert to GCRTracker<br/>publicKey, hash]

@@ -184,7 +184,7 @@ flowchart TD
 
     subgraph "PQC Identity Bootstrapping"
         CheckEd25519Sig -->|No - First time PQC use| LookupGCR[Query GCR PQC Identities<br/>IdentityManager.getIdentities]
-        LookupGCR --> FilterType[Filter by signature type<br/> falcon | ml-dsa | sl-dsa]
+        LookupGCR --> FilterType[Filter by signature type<br/>falcon, ml-dsa, or sl-dsa]
         FilterType --> FindPubKey{PQC pubkey<br/>found in GCR?}
 
         FindPubKey -->|No| RejectNotRegistered[❌ REJECT<br/>PQC pubkey not registered<br/>Must provide ed25519_signature]

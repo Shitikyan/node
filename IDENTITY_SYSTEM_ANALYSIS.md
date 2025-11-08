@@ -1,8 +1,12 @@
 # Demos Network Current Identity Verification System Analysis
 
+> **Note**: This document analyzes the **existing public identity system**. For the ZK-SNARK privacy identity implementation plan, see [ZK_PRIVACY_IDENTITY_IMPLEMENTATION_PLAN.md](./ZK_PRIVACY_IDENTITY_IMPLEMENTATION_PLAN.md).
+
 ## Executive Summary
 
 The Demos Network implements a **public multi-identity verification system** that allows users to link and verify multiple blockchain addresses (Web3), Web2 social accounts, and post-quantum cryptographic identities. All identity data is stored publicly in the **Global Change Registry (GCR)** - a JSONB-based state storage system.
+
+This document serves as a **reference for understanding the current system architecture** to inform the design of the privacy-preserving ZK-SNARK identity system that will run alongside it.
 
 ---
 

@@ -1,1180 +1,807 @@
-# Cryptography Systems: FHE, ZK, and PQC
+# Post-Quantum Cryptography in Demos Blockchain
 
-## ⚠️ IMPLEMENTATION STATUS: PROOF-OF-CONCEPT
+## ✅ PRODUCTION SYSTEM
 
-**IMPORTANT**: This documentation describes **demonstration and proof-of-concept code** that is NOT currently integrated into the main blockchain operations. These are standalone cryptographic experiments showcasing advanced cryptography capabilities.
+This document describes the **production post-quantum cryptography** system actively used in Demos blockchain for all transaction signatures, block validation, and consensus operations.
 
-### Status Overview:
-- **FHE (Fully Homomorphic Encryption)**: 🧪 **PROOF-OF-CONCEPT** - Demo code, not used in production
-- **ZK (Zero-Knowledge Proofs)**: 🧪 **PROOF-OF-CONCEPT** - Demo code, not used in production
-- **PQC Enigma Wrapper**: 🧪 **PROOF-OF-CONCEPT** - Demo code, not used in production
-- **Production PQC**: ✅ **PRODUCTION** - Blockchain uses SDK's ML-DSA and SL-DSA signatures (not Enigma)
+### Production Status:
+- **ucrypto SDK Integration**: ✅ **PRODUCTION** - All signatures use `@demoslabs/mlkp-sdk`
+- **ML-DSA (Dilithium)**: ✅ **PRODUCTION** - NIST FIPS 204 lattice-based signatures
+- **SL-DSA (Sphincs+)**: ✅ **PRODUCTION** - NIST FIPS 205 hash-based signatures
+- **Falcon**: ✅ **PRODUCTION** - Compact lattice-based signatures
+- **ED25519**: ✅ **PRODUCTION** - Classical elliptic curve (default, PQC optional)
 
-### What's Actually in Production:
-The Demos blockchain uses **post-quantum signatures via the SDK** (`@demoslabs/mlkp-sdk`):
-- **ML-DSA (Module-Lattice Digital Signature Algorithm)** - NIST FIPS 204
-- **SL-DSA (Stateless Hash-Based Digital Signature Algorithm)** - NIST FIPS 205
-- Used for all transaction signatures in `src/core/transaction.ts`
-- Integrated into block validation and consensus
-
-The FHE, ZK, and Enigma implementations below are **research demonstrations** for future exploration.
+### Source Files (Production):
+- **Transaction Signing**: `src/libs/blockchain/transaction.ts:75-95` (ucrypto.sign)
+- **Signature Verification**: `src/libs/blockchain/transaction.ts:164-260` (ucrypto.verify)
+- **PQC Identity Management**: `src/libs/blockchain/gcr/gcr_routines/identityManager.ts`
+- **ucrypto SDK**: `@kynesyslabs/demosdk/encryption` (sign, verify, key generation)
+- **Supported Algorithms**: `src/libs/network/server_rpc.ts:98` (ed25519, falcon, ml-dsa)
 
 ---
 
 ## Overview
 
-This document describes three proof-of-concept cryptography systems demonstrating advanced privacy and security techniques:
+The Demos blockchain uses **NIST-approved post-quantum cryptography** via the ucrypto SDK to protect against quantum computing attacks. All transactions can be signed with quantum-resistant algorithms including ML-DSA (Dilithium), SL-DSA (Sphincs+), and Falcon, in addition to classical ED25519.
 
-1. **FHE (Fully Homomorphic Encryption)**: Enables computation on encrypted data using Microsoft SEAL with BFV scheme
-2. **ZK (Zero-Knowledge Proofs)**: Interactive proof system allowing verification without revealing secrets
-3. **PQC Enigma Wrapper**: Quantum-resistant signatures using SuperDilithium (ML-DSA) wrapper
-
----
-
-## Source Files
-
-All cryptography demonstration code is located in:
-- **FHE**: `src/crypto/fhe.ts` - Microsoft SEAL singleton wrapper
-- **ZK Proofs**: `src/crypto/zkProof.ts` - Interactive proof system (Prover/Verifier classes)
-- **PQC Enigma**: `src/crypto/enigma.ts` - SuperDilithium wrapper class
-- **Tests Only**: These files are only imported by test files (`*.test.ts`), not by production blockchain code
+### Key Features:
+- **Algorithm Flexibility**: Support for multiple signature algorithms (ED25519, Falcon, ML-DSA, SL-DSA)
+- **PQC Identity Bootstrapping**: Link PQC public keys to ED25519 addresses via GCR
+- **Dual Signature System**: Optional ED25519 + PQC signatures for identity verification
+- **SDK Integration**: All cryptography via `@demoslabs/mlkp-sdk` ucrypto interface
+- **Seamless Migration**: Classical ED25519 (default) with opt-in PQC
 
 ---
 
-## Diagram 1: Cryptography Systems Architecture Overview
+## Diagram 1: Production ucrypto PQC Architecture
 
 ```mermaid
 graph TB
     subgraph "Application Layer"
-        App[Blockchain Application]
-        Tx[Transactions]
-        Privacy[Privacy Features]
+        TxCreate[Transaction Creation]
+        BlockVal[Block Validation]
+        Consensus[Consensus Operations]
     end
 
-    subgraph "Cryptography Layer"
-        CryptoCore[Cryptography Core]
-
-        subgraph "FHE System"
-            FHEInstance[FHE Singleton]
-            SEALLib[Microsoft SEAL<br/>node-seal]
-            BFVScheme[BFV Scheme<br/>Poly Degree: 4096]
-            Context[Encryption Context]
-            KeyGen[Key Generator]
-            Encryptor[Encryptor]
-            Decryptor[Decryptor]
-            Evaluator[Evaluator<br/>Homomorphic Ops]
-            BatchEncoder[Batch Encoder<br/>Int32 Arrays]
-        end
-
-        subgraph "ZK System"
-            Prover[Prover Class<br/>Secret Holder]
-            Verifier[Verifier Class<br/>Validator]
-            Commitment[Commitment<br/>Generation]
-            Challenge[Challenge<br/>Random Bit]
-            Response[Response<br/>Computation]
-            Verification[Verification<br/>Logic]
-        end
-
-        subgraph "PQC System"
-            Enigma[Enigma Class<br/>PQC Wrapper]
-            SuperDilithium[SuperDilithium<br/>ML-DSA Library]
-            KeyPairGen[Key Pair<br/>Generator]
-            Signer[Digital Signature<br/>Sign/Verify]
-            KeyExport[Key Export<br/>with Passphrase]
-        end
+    subgraph "ucrypto SDK Interface"
+        direction TB
+        UCryptoSign[ucrypto.sign<br/>algorithm, message]
+        UCryptoVerify[ucrypto.verify<br/>algorithm, message, pubkey, sig]
+        UCryptoKeyGen[ucrypto.generateKeyPair<br/>algorithm]
     end
 
-    subgraph "Use Cases"
-        PrivateTx[Private Transactions<br/>FHE encrypted amounts]
-        ProofAuth[Proof-based Auth<br/>ZK identity proofs]
-        QuantumSafe[Quantum-Safe Signatures<br/>PQC signing]
+    subgraph "Supported Algorithms"
+        direction LR
+        ED25519[ED25519<br/>✅ Default<br/>Classical ECDSA]
+        Falcon[Falcon<br/>✅ PQC<br/>Lattice-based<br/>Compact signatures]
+        MLDSA[ML-DSA Dilithium<br/>✅ PQC<br/>NIST FIPS 204<br/>Lattice-based]
+        SLDSA[SL-DSA Sphincs+<br/>✅ PQC<br/>NIST FIPS 205<br/>Hash-based]
     end
 
-    App --> CryptoCore
-    Tx --> CryptoCore
-    Privacy --> CryptoCore
+    subgraph "PQC Identity Management"
+        GCRIdentities[GCR PQC Identities Table]
+        IdentityManager[IdentityManager.ts]
+        LinkPQC[Link PQC pubkey → ED25519 address]
+    end
 
-    CryptoCore --> FHEInstance
-    CryptoCore --> Prover
-    CryptoCore --> Enigma
+    subgraph "Transaction Structure"
+        TxContent[Transaction Content<br/>type, from, to, amount, etc.]
+        MainSig[signature: ISignature<br/> type: algorithm<br/> data: hex]
+        Ed25519Sig[ed25519_signature: string<br/>Optional bootstrapping sig]
+    end
 
-    FHEInstance --> SEALLib
-    SEALLib --> BFVScheme
-    BFVScheme --> Context
-    Context --> KeyGen
-    Context --> Encryptor
-    Context --> Decryptor
-    Context --> Evaluator
-    Context --> BatchEncoder
+    TxCreate --> UCryptoSign
+    BlockVal --> UCryptoVerify
+    Consensus --> UCryptoSign
+    Consensus --> UCryptoVerify
 
-    Prover --> Commitment
-    Verifier --> Challenge
-    Prover --> Response
-    Verifier --> Verification
+    UCryptoSign --> ED25519
+    UCryptoSign --> Falcon
+    UCryptoSign --> MLDSA
+    UCryptoSign --> SLDSA
 
-    Enigma --> SuperDilithium
-    SuperDilithium --> KeyPairGen
-    SuperDilithium --> Signer
-    SuperDilithium --> KeyExport
+    UCryptoVerify --> ED25519
+    UCryptoVerify --> Falcon
+    UCryptoVerify --> MLDSA
+    UCryptoVerify --> SLDSA
 
-    FHEInstance -.->|Enables| PrivateTx
-    Prover -.->|Enables| ProofAuth
-    Enigma -.->|Enables| QuantumSafe
+    UCryptoSign --> MainSig
+    MainSig --> TxContent
+    Ed25519Sig --> TxContent
 
+    IdentityManager --> GCRIdentities
+    GCRIdentities --> LinkPQC
+    LinkPQC --> Ed25519Sig
+
+    style ED25519 fill:#e8f5e9
+    style Falcon fill:#e1f5ff
+    style MLDSA fill:#e1f5ff
+    style SLDSA fill:#e1f5ff
+    style GCRIdentities fill:#fff4e1
 ```
 
-**Description**: Complete cryptography systems architecture showing FHE (Microsoft SEAL with BFV), ZK (interactive proof system), and PQC (SuperDilithium) components and their integration into the blockchain application layer.
+**Description**: Complete production PQC architecture showing ucrypto SDK integration with support for ED25519 (classical), Falcon, ML-DSA (Dilithium), and SL-DSA (Sphincs+). All transaction signatures use this system via `@demoslabs/mlkp-sdk`.
 
 ---
 
-## Diagram 2: FHE Architecture & Components
-
-```mermaid
-graph TD
-    subgraph "FHE Singleton Pattern"
-        GetInstance[FHE.getInstance<br/>Lazy Initialization]
-        Instance[FHE Instance<br/>Singleton]
-        InitFlag{Initialized?}
-    end
-
-    subgraph "SEAL Library Initialization"
-        LoadSEAL[Load SEAL Library<br/>await SEAL]
-        SetScheme[Set Scheme Type<br/>SchemeType.bfv]
-        SetSecurity[Set Security Level<br/>SecurityLevel.tc128]
-        SetPolyDegree[Set Polynomial Degree<br/>polyModulusDegree: 4096]
-        SetCoeffModulus[Set Coefficient Modulus<br/>bitSizes: 36, 36, 37]
-        SetPlainModulus[Set Plain Modulus<br/>PlainModulusDegree: 1032193]
-    end
-
-    subgraph "Encryption Parameters"
-        EncParams[EncryptionParameters<br/>BFV Scheme]
-        PolyMod[Polynomial Modulus<br/>Degree 4096]
-        CoeffMod[Coefficient Modulus<br/>3 primes]
-        PlainMod[Plain Modulus<br/>1032193]
-    end
-
-    subgraph "Context Creation"
-        CreateContext[Create SEALContext<br/>from parameters]
-        ValidateContext{Context<br/>Valid?}
-        ContextReady[Context Ready<br/>Security: tc128]
-    end
-
-    subgraph "Component Initialization"
-        InitKeyGen[Initialize KeyGenerator<br/>from context]
-        GenSecretKey[Generate Secret Key]
-        GenPublicKey[Generate Public Key]
-        GenRelinKeys[Generate Relin Keys<br/>for multiplication]
-
-        InitEncryptor[Initialize Encryptor<br/>context + publicKey]
-        InitDecryptor[Initialize Decryptor<br/>context + secretKey]
-        InitEvaluator[Initialize Evaluator<br/>context only]
-        InitEncoder[Initialize BatchEncoder<br/>context for Int32]
-    end
-
-    subgraph "Ready State"
-        FHEReady[FHE System Ready]
-        EncryptAPI[Encryption API<br/>encryptNumber]
-        DecryptAPI[Decryption API<br/>decryptNumber]
-        MathAPI[Math API<br/>add, multiply, negate]
-    end
-
-    GetInstance --> InitFlag
-    InitFlag -->|No| Instance
-    Instance --> LoadSEAL
-
-    LoadSEAL --> SetScheme
-    SetScheme --> SetSecurity
-    SetSecurity --> SetPolyDegree
-    SetPolyDegree --> SetCoeffModulus
-    SetCoeffModulus --> SetPlainModulus
-
-    SetPlainModulus --> EncParams
-    EncParams --> PolyMod
-    EncParams --> CoeffMod
-    EncParams --> PlainMod
-
-    PolyMod --> CreateContext
-    CoeffMod --> CreateContext
-    PlainMod --> CreateContext
-
-    CreateContext --> ValidateContext
-    ValidateContext -->|Valid| ContextReady
-    ValidateContext -->|Invalid| Error[Error: Invalid params]
-
-    ContextReady --> InitKeyGen
-    InitKeyGen --> GenSecretKey
-    GenSecretKey --> GenPublicKey
-    GenPublicKey --> GenRelinKeys
-
-    GenRelinKeys --> InitEncryptor
-    InitEncryptor --> InitDecryptor
-    InitDecryptor --> InitEvaluator
-    InitEvaluator --> InitEncoder
-
-    InitEncoder --> FHEReady
-
-    FHEReady --> EncryptAPI
-    FHEReady --> DecryptAPI
-    FHEReady --> MathAPI
-
-    InitFlag -->|Yes| FHEReady
-
-```
-
-**Description**: Detailed FHE architecture showing singleton pattern, Microsoft SEAL library initialization with BFV scheme parameters (4096 poly degree, tc128 security), component setup (KeyGenerator, Encryptor, Decryptor, Evaluator, BatchEncoder), and API exposure.
-
----
-
-## Diagram 3: FHE Encryption & Decryption Flow
+## Diagram 2: Transaction Signing with ucrypto PQC
 
 ```mermaid
 sequenceDiagram
-    participant App as Application
-    participant FHE as FHE Instance
-    participant Encoder as BatchEncoder
-    participant Encryptor as Encryptor
-    participant Decryptor as Decryptor
-    participant Storage as Encrypted Storage
+    participant User as User/Wallet
+    participant Tx as Transaction Class
+    participant SharedState as Shared State
+    participant UCrypto as ucrypto SDK
+    participant Algo as Algorithm Implementation<br/>(ML-DSA/SL-DSA/Falcon/ED25519)
 
-    rect rgb(230, 245, 255)
-        Note over App,Storage: Encryption Flow
-        App->>FHE: encryptNumber(42)
-        activate FHE
+    Note over User,Algo: Transaction Signing Flow (transaction.ts:75-95)
 
-        FHE->>FHE: Check initialized
-        alt Not Initialized
-            FHE->>FHE: await getInstance()
-            Note over FHE: Lazy initialization<br/>Load SEAL, setup context
-        end
+    User->>Tx: Create transaction
+    Tx->>Tx: Set content (from, to, amount, nonce, etc.)
 
-        FHE->>Encoder: encode(Int32Array.from([42]))
-        activate Encoder
-        Note over Encoder: Convert integer to<br/>polynomial representation
-        Encoder-->>FHE: PlainText object
-        deactivate Encoder
+    User->>Tx: Transaction.sign(tx)
+    activate Tx
 
-        alt Encoding Failed
-            FHE-->>App: Error: Encoding failed
-        else Encoding Success
-            FHE->>Encryptor: encrypt(plainText)
-            activate Encryptor
-            Note over Encryptor: Encrypt using<br/>public key + BFV scheme
-            Encryptor->>Encryptor: Apply noise budget
-            Encryptor->>Encryptor: Polynomial multiplication
-            Encryptor-->>FHE: CipherText object
-            deactivate Encryptor
+    Tx->>SharedState: Get signingAlgorithm
+    SharedState-->>Tx: "ml-dsa" | "sl-dsa" | "falcon" | "ed25519"
 
-            FHE-->>App: CipherText (encrypted 42)
-            deactivate FHE
+    Tx->>Tx: Serialize content to JSON
+    Tx->>Tx: Encode to Uint8Array
 
-            App->>Storage: Store CipherText
-            Note over Storage: Encrypted data at rest<br/>No one can read value
-        end
+    Tx->>UCrypto: ucrypto.sign(algorithm, message)
+    activate UCrypto
+
+    alt ML-DSA (Dilithium - NIST FIPS 204)
+        UCrypto->>Algo: ML-DSA sign with private key
+        Note over Algo: Lattice-based signature<br/>Quantum-resistant<br/>~2400 byte signature
+        Algo-->>UCrypto: ML-DSA signature
+
+    else SL-DSA (Sphincs+ - NIST FIPS 205)
+        UCrypto->>Algo: SL-DSA sign with private key
+        Note over Algo: Hash-based signature<br/>Quantum-resistant<br/>~8000 byte signature
+        Algo-->>UCrypto: SL-DSA signature
+
+    else Falcon
+        UCrypto->>Algo: Falcon sign with private key
+        Note over Algo: Lattice-based signature<br/>Quantum-resistant<br/>~660 byte signature
+        Algo-->>UCrypto: Falcon signature
+
+    else ED25519 (Default)
+        UCrypto->>Algo: ED25519 sign with private key
+        Note over Algo: Classical ECDSA<br/>64 byte signature
+        Algo-->>UCrypto: ED25519 signature
     end
 
-    rect rgb(255, 245, 230)
-        Note over App,Storage: Decryption Flow
-        App->>Storage: Retrieve CipherText
-        Storage-->>App: CipherText object
+    UCrypto-->>Tx: { signature: Uint8Array, publicKey: Uint8Array }
+    deactivate UCrypto
 
-        App->>FHE: decryptNumber(cipherText)
-        activate FHE
+    Tx->>Tx: Convert signature to hex
+    Tx->>Tx: Create ISignature object<br/> type: algorithm<br/> data: hex
 
-        FHE->>Decryptor: decrypt(cipherText)
-        activate Decryptor
-        Note over Decryptor: Decrypt using<br/>secret key
-        Decryptor->>Decryptor: Polynomial operations
-        Decryptor->>Decryptor: Remove noise
-        Decryptor-->>FHE: PlainText object
-        deactivate Decryptor
+    Tx-->>User: [true, signature]
+    deactivate Tx
 
-        alt Decryption Failed
-            FHE-->>App: Error: Decryption failed
-        else Decryption Success
-            FHE->>Encoder: decode(plainText)
-            activate Encoder
-            Note over Encoder: Convert polynomial<br/>back to integer
-            Encoder-->>FHE: Int32Array([42])
-            deactivate Encoder
-
-            FHE->>FHE: Extract first element
-            FHE-->>App: 42 (original value)
-            deactivate FHE
-
-            Note over App: Application can now<br/>use the decrypted value
-        end
-    end
-
+    User->>Tx: Set tx.signature
+    User->>Tx: Transaction.hash(tx)
+    Tx->>Tx: SHA256(JSON.stringify(content))
+    Tx-->>User: Signed and hashed transaction ready
 ```
 
-**Description**: Complete encryption and decryption flow showing how integers are encoded to polynomials, encrypted with BFV scheme using public key, stored securely, and later decrypted with secret key and decoded back to integers.
+**Description**: Complete transaction signing flow showing how ucrypto SDK handles multiple PQC algorithms (ML-DSA, SL-DSA, Falcon) and classical ED25519. Used in `transaction.ts:75-95`.
 
 ---
 
-## Diagram 4: FHE Homomorphic Operations
+## Diagram 3: Signature Verification with Dual Signature System
 
 ```mermaid
 flowchart TD
-    Start([Application Needs<br/>Compute on Encrypted Data]) --> LoadCiphers[Load CipherText Objects<br/>cipherA = encrypt 5<br/>cipherB = encrypt 3]
+    Start([Receive Transaction]) --> ExtractSig[Extract signature and hash<br/>from transaction]
 
-    LoadCiphers --> ChooseOp{Choose<br/>Operation}
+    ExtractSig --> CheckType{Signature<br/>type?}
 
-    ChooseOp -->|Addition| AddOp[Add Operation<br/>addNumbers cipherA, cipherB]
-    ChooseOp -->|Multiplication| MulOp[Multiply Operation<br/>multiplyNumbers cipherA, cipherB]
-    ChooseOp -->|Negation| NegOp[Negate Operation<br/>negate cipherA]
+    CheckType -->|ED25519| SkipBootstrap[Skip PQC identity check<br/>Use ED25519 directly]
+    CheckType -->|PQC: falcon, ml-dsa, sl-dsa| CheckEd25519Sig{Has<br/>ed25519_signature<br/>field?}
 
-    AddOp --> EvalAdd[Evaluator.add<br/>cipherA, cipherB, cipherDest]
-    EvalAdd --> AddResult[Result: cipherDest<br/>decrypt → 8<br/>5 + 3 = 8]
+    subgraph "PQC Identity Bootstrapping"
+        CheckEd25519Sig -->|No - First time PQC use| LookupGCR[Query GCR PQC Identities<br/>IdentityManager.getIdentities]
+        LookupGCR --> FilterType[Filter by signature type<br/> falcon | ml-dsa | sl-dsa]
+        FilterType --> FindPubKey{PQC pubkey<br/>found in GCR?}
 
-    MulOp --> CheckRelinKeys{Relin Keys<br/>Available?}
-    CheckRelinKeys -->|No| ErrorRelin[Error: Relinearization<br/>keys required]
-    ErrorRelin --> End([End with Error])
+        FindPubKey -->|No| RejectNotRegistered[❌ REJECT<br/>PQC pubkey not registered<br/>Must provide ed25519_signature]
+        FindPubKey -->|Yes| VerifyIdentityLink[Verify identity link signature<br/>ucrypto.verify ed25519 on PQC address]
+        VerifyIdentityLink --> IdentityValid{Valid?}
+        IdentityValid -->|No| RejectIdentity[❌ REJECT<br/>Invalid identity link]
+        IdentityValid -->|Yes| Ed25519Verified1[✅ ED25519 verified via identity]
 
-    CheckRelinKeys -->|Yes| EvalMul[Evaluator.multiply<br/>cipherA, cipherB, cipherDest]
-    EvalMul --> Relinearize[Relinearize cipherDest<br/>Reduce ciphertext size]
-    Relinearize --> MulResult[Result: cipherDest<br/>decrypt → 15<br/>5 × 3 = 15]
-
-    NegOp --> EvalNeg[Evaluator.negate<br/>cipherA, cipherDest]
-    EvalNeg --> NegResult[Result: cipherDest<br/>decrypt → -5<br/>negate 5 = -5]
-
-    AddResult --> CheckNoise{Noise Budget<br/>Remaining?}
-    MulResult --> CheckNoise
-    NegResult --> CheckNoise
-
-    CheckNoise -->|Low < 10 bits| WarningNoise[Warning: Noise budget low<br/>Limited operations remaining]
-    CheckNoise -->|Good >= 10 bits| NoiseOK[Noise Budget OK<br/>Can continue operations]
-
-    WarningNoise --> ChainOps{More<br/>Operations?}
-    NoiseOK --> ChainOps
-
-    ChainOps -->|Yes| ChooseOp
-    ChainOps -->|No| FinalDecrypt[Decrypt Final Result<br/>Get plain value]
-
-    FinalDecrypt --> Success([Success<br/>Computed on Encrypted Data])
-
-    subgraph "Example: Complex Computation"
-        direction TB
-        Ex1[encrypt 10 → A]
-        Ex2[encrypt 5 → B]
-        Ex3[encrypt 2 → C]
-        Ex4[A + B → D  10+5=15]
-        Ex5[D × C → E  15×2=30]
-        Ex6[E negate → F  -30]
-        Ex7[decrypt F → -30]
-
-        Ex1 --> Ex4
-        Ex2 --> Ex4
-        Ex3 --> Ex5
-        Ex4 --> Ex5
-        Ex5 --> Ex6
-        Ex6 --> Ex7
+        CheckEd25519Sig -->|Yes - Bootstrapping PQC| VerifyEd25519Sig[Verify ed25519_signature<br/>ucrypto.verify ed25519 on tx.hash]
+        VerifyEd25519Sig --> Ed25519Valid{Valid?}
+        Ed25519Valid -->|No| RejectEd25519[❌ REJECT<br/>Invalid ed25519_signature]
+        Ed25519Valid -->|Yes| Ed25519Verified2[✅ ED25519 verified<br/>via signature field]
     end
 
+    SkipBootstrap --> Ed25519Verified3[✅ ED25519 primary signature]
+    Ed25519Verified1 --> VerifyMainSig
+    Ed25519Verified2 --> VerifyMainSig
+    Ed25519Verified3 --> VerifyMainSig
+
+    subgraph "Main Signature Verification"
+        VerifyMainSig[Verify main signature<br/>ucrypto.verify algorithm, message, pubkey, sig]
+        VerifyMainSig --> AlgoVerify{ucrypto.verify<br/>result?}
+
+        AlgoVerify -->|ML-DSA| VerifyMLDSA[Verify ML-DSA signature<br/>NIST FIPS 204 verification]
+        AlgoVerify -->|SL-DSA| VerifySLDSA[Verify SL-DSA signature<br/>NIST FIPS 205 verification]
+        AlgoVerify -->|Falcon| VerifyFalcon[Verify Falcon signature<br/>Lattice-based verification]
+        AlgoVerify -->|ED25519| VerifyED25519[Verify ED25519 signature<br/>Classical ECDSA verification]
+
+        VerifyMLDSA --> MainSigValid{Valid?}
+        VerifySLDSA --> MainSigValid
+        VerifyFalcon --> MainSigValid
+        VerifyED25519 --> MainSigValid
+    end
+
+    MainSigValid -->|No| RejectMainSig[❌ REJECT<br/>Main signature verification failed]
+    MainSigValid -->|Yes| Success[✅ ACCEPT<br/>Transaction signature verified]
+
+    RejectNotRegistered --> End([End: Rejected])
+    RejectIdentity --> End
+    RejectEd25519 --> End
+    RejectMainSig --> End
+    Success --> End2([End: Verified])
+
+    style Success fill:#c8e6c9
+    style Ed25519Verified1 fill:#c8e6c9
+    style Ed25519Verified2 fill:#c8e6c9
+    style Ed25519Verified3 fill:#c8e6c9
+    style RejectNotRegistered fill:#ffcdd2
+    style RejectIdentity fill:#ffcdd2
+    style RejectEd25519 fill:#ffcdd2
+    style RejectMainSig fill:#ffcdd2
 ```
 
-**Description**: Complete homomorphic operations flowchart showing how to perform addition, multiplication, and negation on encrypted data without decryption, including noise budget management, relinearization for multiplication, and operation chaining.
+**Description**: Complete signature verification flow showing the dual signature system for PQC identity bootstrapping. PQC signatures require either a registered identity in GCR or an ED25519 signature to link the PQC key to an ED25519 address. Implemented in `transaction.ts:164-260`.
 
 ---
 
-## Diagram 5: ZK Proof System Architecture
+## Diagram 4: PQC Identity Management in GCR
 
 ```mermaid
 graph TB
-    subgraph "ZK System Components"
-        direction TB
-
-        subgraph "Prover Side"
-            ProverClass[Prover Class]
-            Secret[Secret Value<br/>Private Knowledge]
-            Modulus[Modulus N<br/>prime1 × prime2]
-            RandomValue[Random Value r<br/>2 < r < N-2]
-            CommitGen[Commitment Generator<br/>r² mod N]
-            ResponseCalc[Response Calculator<br/>Based on challenge]
-        end
-
-        subgraph "Verifier Side"
-            VerifierClass[Verifier Class]
-            PublicInfo[Public Information<br/>Modulus N]
-            CommitStore[Commitment Storage]
-            ChallengeGen[Challenge Generator<br/>Random bit 0 or 1]
-            VerifyLogic[Verification Logic<br/>Check response²]
-        end
-
-        subgraph "Protocol Flow"
-            direction LR
-            Step1[1. Setup Phase<br/>Generate primes<br/>Calculate modulus]
-            Step2[2. Commitment<br/>Prover generates r<br/>Sends r² mod N]
-            Step3[3. Challenge<br/>Verifier sends<br/>random bit b]
-            Step4[4. Response<br/>Prover sends:<br/>r if b=0<br/>r×s mod N if b=1]
-            Step5[5. Verification<br/>Check response²<br/>against commitment]
-
-            Step1 --> Step2
-            Step2 --> Step3
-            Step3 --> Step4
-            Step4 --> Step5
-        end
+    subgraph "User Workflow"
+        User[User with ED25519 wallet]
+        GenPQC[Generate PQC keypair<br/>via ucrypto SDK]
+        LinkIdentity[Link PQC pubkey to ED25519 address]
+        UsePQC[Use PQC for transactions]
     end
 
-    subgraph "Security Properties"
-        Completeness[Completeness<br/>Honest prover always convinces]
-        Soundness[Soundness<br/>Cheating prover caught<br/>with probability ≥ 1/2]
-        ZeroKnowledge[Zero-Knowledge<br/>Verifier learns nothing<br/>about secret]
+    subgraph "GCR PQC Identities Storage"
+        GCRMain[(GCR Main Table)]
+        IdentitiesField[identities: jsonb<br/> pqc: object<br/>  falcon: []<br/>  ml-dsa: []<br/>  sl-dsa: []]
+
+        SavedIdentity[SavedPqcIdentity<br/> address: PQC pubkey<br/> signature: ED25519 sig<br/> timestamp: added date]
     end
 
-    subgraph "Mathematical Foundation"
-        BigInt[BigInteger Library<br/>bigint.js]
-        ModularArith[Modular Arithmetic<br/>a mod N operations]
-        PrimeGen[Prime Generation<br/>Large primes p, q]
-        RandomGen[Cryptographic Random<br/>randBetween 2, N-2]
+    subgraph "IdentityManager Operations"
+        GetIdentities[getIdentities<br/>pubkey, type]
+        AddIdentity[addIdentity<br/>ED25519 address, PQC pubkey, signature]
+        VerifyLink[verifyIdentityLink<br/>Check ED25519 signature on PQC address]
     end
 
-    ProverClass --> Secret
-    ProverClass --> Modulus
-    ProverClass --> RandomValue
-    Secret --> ResponseCalc
-    RandomValue --> CommitGen
-    Modulus --> CommitGen
+    subgraph "Identity Link Verification"
+        Step1[1. Sign PQC pubkey with ED25519 private key]
+        Step2[2. Store: address, PQC pubkey, ED25519 signature]
+        Step3[3. Verify: ucrypto.verify ed25519 signature]
+        Step4[4. If valid: PQC pubkey trusted for this ED25519 address]
+    end
 
-    VerifierClass --> PublicInfo
-    VerifierClass --> CommitStore
-    VerifierClass --> ChallengeGen
-    CommitStore --> VerifyLogic
-    ChallengeGen --> VerifyLogic
+    User --> GenPQC
+    GenPQC --> LinkIdentity
+    LinkIdentity --> Step1
+    Step1 --> Step2
+    Step2 --> AddIdentity
+    AddIdentity --> GCRMain
+    GCRMain --> IdentitiesField
+    IdentitiesField --> SavedIdentity
 
-    CommitGen -.->|Sends| CommitStore
-    ChallengeGen -.->|Sends| ResponseCalc
-    ResponseCalc -.->|Sends| VerifyLogic
+    UsePQC --> GetIdentities
+    GetIdentities --> IdentitiesField
+    IdentitiesField --> VerifyLink
+    VerifyLink --> Step3
+    Step3 --> Step4
 
-    Step5 --> Completeness
-    Step5 --> Soundness
-    Step5 --> ZeroKnowledge
-
-    BigInt --> ModularArith
-    BigInt --> PrimeGen
-    BigInt --> RandomGen
-
-    ModularArith --> CommitGen
-    PrimeGen --> Modulus
-    RandomGen --> RandomValue
-
+    style GCRMain fill:#fff4e1
+    style SavedIdentity fill:#e1f5ff
+    style Step4 fill:#c8e6c9
 ```
 
-**Description**: Complete ZK proof system architecture showing Prover and Verifier components, protocol flow (setup, commitment, challenge, response, verification), security properties (completeness, soundness, zero-knowledge), and mathematical foundation using modular arithmetic.
+**Description**: PQC identity management system in GCR showing how PQC public keys are linked to ED25519 addresses. Users sign their PQC pubkey with their ED25519 private key, storing the link in GCR for future verification. Implemented in `identityManager.ts`.
 
 ---
 
-## Diagram 6: ZK Prover/Verifier Interactive Protocol
-
-```mermaid
-sequenceDiagram
-    participant App as Application
-    participant Prover as Prover<br/>(Has Secret)
-    participant Verifier as Verifier<br/>(Validates)
-    participant Random as Random Generator
-    participant Math as Modular Arithmetic
-
-    Note over App,Math: Setup Phase
-
-    App->>Random: Generate prime1, prime2
-    Random-->>App: Large primes (e.g., 2048-bit)
-
-    App->>Prover: new Prover(prime1, prime2, secret)
-    activate Prover
-    Prover->>Math: Calculate N = prime1 × prime2
-    Math-->>Prover: Modulus N
-    Note over Prover: Secret s is stored privately
-    deactivate Prover
-
-    App->>Verifier: new Verifier(prime1, prime2)
-    activate Verifier
-    Verifier->>Math: Calculate N = prime1 × prime2
-    Math-->>Verifier: Modulus N (public)
-    deactivate Verifier
-
-    Note over App,Math: Proof Iteration (Repeat k times for security)
-
-    loop Each Proof Round (k=20 for 2^-20 error)
-        rect rgb(230, 245, 255)
-            Note over Prover,Math: Phase 1: Commitment
-            App->>Prover: generateCommitment()
-            activate Prover
-            Prover->>Random: randBetween(2, N-2)
-            Random-->>Prover: Random value r
-            Prover->>Math: Calculate r² mod N
-            Math-->>Prover: commitment
-            Prover-->>App: commitment
-            deactivate Prover
-
-            App->>Verifier: Send commitment
-            Verifier->>Verifier: Store commitment
-        end
-
-        rect rgb(255, 245, 230)
-            Note over Verifier,Random: Phase 2: Challenge
-            App->>Verifier: generateChallenge(commitment)
-            activate Verifier
-            Verifier->>Random: Math.random()
-            Random-->>Verifier: Random float [0,1)
-            Verifier->>Verifier: Round to bit (0 or 1)
-            Note over Verifier: Challenge b ∈ {0, 1}
-            Verifier-->>App: challenge (0 or 1)
-            deactivate Verifier
-
-            App->>Prover: Send challenge
-        end
-
-        rect rgb(230, 255, 230)
-            Note over Prover,Math: Phase 3: Response
-            App->>Prover: respondToChallenge(challenge)
-            activate Prover
-
-            alt Challenge = 0
-                Note over Prover: Response = r<br/>(reveal random value)
-                Prover-->>App: response = r
-            else Challenge = 1
-                Prover->>Math: Calculate r × s mod N
-                Math-->>Prover: response
-                Note over Prover: Response = r × s mod N<br/>(random × secret)
-                Prover-->>App: response = r × s mod N
-            end
-            deactivate Prover
-
-            App->>Verifier: Send response
-        end
-
-        rect rgb(245, 230, 255)
-            Note over Verifier,Math: Phase 4: Verification
-            App->>Verifier: verifyResponse(response, challenge)
-            activate Verifier
-
-            Verifier->>Math: Calculate response² mod N
-            Math-->>Verifier: responseSquared
-
-            alt Challenge = 0
-                Verifier->>Verifier: Check: response² == commitment
-                Note over Verifier: If r² == commitment<br/>Proof valid for this round
-            else Challenge = 1
-                Verifier->>Verifier: Check: response² != commitment
-                Note over Verifier: If (r×s)² != r²<br/>Proof valid for this round
-            end
-
-            alt Verification Passed
-                Verifier-->>App: true (round passed)
-            else Verification Failed
-                Verifier-->>App: false (proof rejected)
-                Note over App: Abort: Prover is lying<br/>or incorrect secret
-            end
-            deactivate Verifier
-        end
-    end
-
-    Note over App,Math: All Rounds Complete
-
-    App->>App: Accumulate results
-    alt All k rounds passed
-        App->>App: Accept proof<br/>Prover knows secret<br/>Confidence: 1 - 2^-k
-    else Any round failed
-        App->>App: Reject proof<br/>Prover does not know secret
-    end
-
-```
-
-**Description**: Detailed interactive protocol sequence showing setup with large primes, repeated proof rounds (commitment, challenge, response, verification), and how soundness probability increases exponentially with iterations (k=20 rounds → 2^-20 error rate).
-
----
-
-## Diagram 7: ZK Challenge-Response Flow & Security
-
-```mermaid
-flowchart TD
-    Start([ZK Proof Request]) --> Setup[Setup Phase<br/>Generate primes p, q<br/>N = p × q]
-
-    Setup --> InitProver[Initialize Prover<br/>with secret s]
-    Setup --> InitVerifier[Initialize Verifier<br/>with modulus N]
-
-    InitProver --> SetRounds[Set Security Parameter<br/>k = 20 rounds<br/>Error probability = 2^-20]
-    InitVerifier --> SetRounds
-
-    SetRounds --> Round{Round Counter<br/>i < k?}
-
-    Round -->|Yes, i++| GenRandom[Prover: Generate Random r<br/>2 < r < N-2]
-
-    GenRandom --> CalcCommitment[Calculate Commitment<br/>C = r² mod N]
-
-    CalcCommitment --> SendCommitment[Prover → Verifier<br/>Send commitment C]
-
-    SendCommitment --> GenChallenge[Verifier: Generate Challenge<br/>b = random bit ∈ 0, 1]
-
-    GenChallenge --> SendChallenge[Verifier → Prover<br/>Send challenge b]
-
-    SendChallenge --> CheckChallenge{Challenge<br/>b = ?}
-
-    CheckChallenge -->|b = 0| ResponseZero[Response = r<br/>Reveal random value]
-    CheckChallenge -->|b = 1| ResponseOne[Response = r × s mod N<br/>Random times secret]
-
-    ResponseZero --> SendResponse[Prover → Verifier<br/>Send response]
-    ResponseOne --> SendResponse
-
-    SendResponse --> VerifyCalc[Verifier: Calculate<br/>response² mod N]
-
-    VerifyCalc --> VerifyCheck{Verify Based<br/>on Challenge}
-
-    VerifyCheck -->|b = 0| Check0[Check: response² ?= C<br/>Should equal commitment]
-    VerifyCheck -->|b = 1| Check1[Check: response² ?≠ C<br/>Should not equal commitment]
-
-    Check0 --> IsValid0{Valid?}
-    Check1 --> IsValid1{Valid?}
-
-    IsValid0 -->|No| Reject[Reject Proof<br/>Prover is cheating]
-    IsValid1 -->|No| Reject
-
-    IsValid0 -->|Yes| RoundPass[Round i Passed]
-    IsValid1 -->|Yes| RoundPass
-
-    Reject --> End([Proof Failed])
-
-    RoundPass --> Round
-
-    Round -->|No, i >= k| AllPassed[All k Rounds Passed]
-
-    AllPassed --> AcceptProof[Accept Proof<br/>Prover knows secret s<br/>Confidence: 1 - 2^-k]
-
-    AcceptProof --> Success([Proof Verified Successfully])
-
-    subgraph "Security Analysis"
-        direction TB
-        Honest[Honest Prover:<br/>Knows secret s<br/>Always passes all rounds]
-        Cheating[Cheating Prover:<br/>Does not know s<br/>Guesses response]
-        Probability[Guess Probability:<br/>1/2 per round<br/>1/2^k for k rounds]
-        Security[Security Level:<br/>k=20 → 2^-20 ≈ 0.000001%<br/>Virtually impossible to cheat]
-
-        Cheating --> Probability
-        Probability --> Security
-    end
-
-```
-
-**Description**: Complete challenge-response flow showing how security is achieved through repeated rounds, with detailed verification logic for both challenge cases (b=0 and b=1), and security analysis showing exponential decrease in cheating probability.
-
----
-
-## Diagram 8: PQC Enigma Architecture & SuperDilithium
+## Diagram 5: Algorithm Comparison & Key Sizes
 
 ```mermaid
 graph TB
-    subgraph "Enigma PQC Wrapper"
-        EnigmaClass[Enigma Class<br/>PQC Interface]
-        KeyPairField[Private Field:<br/>keyPair Object]
-        InitMethod[init Method<br/>Generate or Import]
-        SignMethod[sign Method<br/>Create Signature]
-        VerifyMethod[verify Method<br/>Validate Signature]
-        ExportMethod[exportKeys Method<br/>Export with Passphrase]
+    subgraph "ED25519 - Classical (Default)"
+        ED1[Algorithm: Elliptic Curve DSA]
+        ED2[Security: 128-bit classical]
+        ED3[Public Key: 32 bytes]
+        ED4[Signature: 64 bytes]
+        ED5[Speed: Very Fast]
+        ED6[Quantum Resistance: ❌ None]
+        ED7[Use Case: Default, fast transactions]
     end
 
-    subgraph "SuperDilithium Library"
-        SuperDil[SuperDilithium<br/>ML-DSA Implementation]
-        KeyPairGen[keyPair Function<br/>Generate quantum-safe keys]
-        ImportKeys[importKeys Function<br/>Load existing keys]
-        SignFunc[sign Function<br/>Lattice-based signing]
-        VerifyFunc[verifyDetached Function<br/>Signature verification]
-        ExportFunc[exportKeys Function<br/>Secure key export]
+    subgraph "Falcon - PQC"
+        F1[Algorithm: Lattice-based NTRU]
+        F2[Security: 128-bit post-quantum]
+        F3[Public Key: 897 bytes]
+        F4[Signature: ~660 bytes]
+        F5[Speed: Fast]
+        F6[Quantum Resistance: ✅ Strong]
+        F7[Use Case: Compact PQC signatures]
     end
 
-    subgraph "Key Pair Structure"
-        KeyPair{KeyPair Object}
-        PrivateKey[privateKey: Uint8Array<br/>Secret signing key]
-        PublicKey[publicKey: Uint8Array<br/>Verification key]
+    subgraph "ML-DSA Dilithium - PQC"
+        ML1[Algorithm: Module Lattice DSA]
+        ML2[Security: 128-bit post-quantum]
+        ML3[Public Key: 1312 bytes]
+        ML4[Signature: ~2420 bytes]
+        ML5[Speed: Medium]
+        ML6[Quantum Resistance: ✅ Strong]
+        ML7[Use Case: NIST standard FIPS 204]
+        ML8[Standard: NIST approved]
     end
 
-    subgraph "Cryptographic Operations"
-        direction TB
-
-        subgraph "Key Generation"
-            NewKeys[Generate New Keys]
-            RandomGen[Quantum Random<br/>Entropy Source]
-            LatticeGen[Lattice-based<br/>Key Generation]
-            KeysReady[Keys Ready<br/>Private + Public]
-        end
-
-        subgraph "Signing"
-            Message[Message Input<br/>string or Uint8Array]
-            HashMsg[Hash Message]
-            LatticeSig[Lattice-based<br/>Signature Algorithm]
-            Signature[Signature Output<br/>Uint8Array]
-        end
-
-        subgraph "Verification"
-            SigInput[Signature Input]
-            MsgInput[Message Input]
-            PubKeyInput[Public Key Input]
-            VerifyAlgo[Verification Algorithm<br/>Lattice operations]
-            VerifyResult{Valid?}
-        end
+    subgraph "SL-DSA Sphincs+ - PQC"
+        SL1[Algorithm: Hash-based signatures]
+        SL2[Security: 128-bit post-quantum]
+        SL3[Public Key: 32 bytes]
+        SL4[Signature: ~8000 bytes]
+        SL5[Speed: Slow]
+        SL6[Quantum Resistance: ✅ Very Strong]
+        SL7[Use Case: Conservative PQC choice]
+        SL8[Standard: NIST approved FIPS 205]
+        SL9[Note: Minimal assumptions]
     end
 
-    subgraph "Security Properties"
-        QuantumSafe[Quantum-Safe<br/>Resistant to Shor's algorithm]
-        MLDSA[ML-DSA Standard<br/>NIST Post-Quantum]
-        LatticeSecurity[Lattice-based<br/>Hard mathematical problems]
+    subgraph "Selection Criteria"
+        Default[Default: ED25519<br/>Fast, small, but no PQC]
+        Compact[Compact PQC: Falcon<br/>Best size/performance for PQC]
+        Standard[NIST Standard: ML-DSA<br/>Government/enterprise use]
+        Conservative[Maximum Security: SL-DSA<br/>Minimal crypto assumptions]
     end
 
-    EnigmaClass --> KeyPairField
-    EnigmaClass --> InitMethod
-    EnigmaClass --> SignMethod
-    EnigmaClass --> VerifyMethod
-    EnigmaClass --> ExportMethod
-
-    InitMethod -->|New Keys| KeyPairGen
-    InitMethod -->|Import Existing| ImportKeys
-
-    KeyPairGen --> SuperDil
-    ImportKeys --> SuperDil
-    SignFunc --> SuperDil
-    VerifyFunc --> SuperDil
-    ExportFunc --> SuperDil
-
-    KeyPairGen --> KeyPair
-    ImportKeys --> KeyPair
-    KeyPair --> PrivateKey
-    KeyPair --> PublicKey
-
-    SignMethod --> SignFunc
-    VerifyMethod --> VerifyFunc
-    ExportMethod --> ExportFunc
-
-    NewKeys --> RandomGen
-    RandomGen --> LatticeGen
-    LatticeGen --> KeysReady
-
-    Message --> HashMsg
-    HashMsg --> LatticeSig
-    LatticeSig --> Signature
-
-    SigInput --> VerifyAlgo
-    MsgInput --> VerifyAlgo
-    PubKeyInput --> VerifyAlgo
-    VerifyAlgo --> VerifyResult
-
-    VerifyResult -->|True| Accept[Signature Valid]
-    VerifyResult -->|False| Reject[Signature Invalid]
-
-    SuperDil -.->|Implements| QuantumSafe
-    SuperDil -.->|Follows| MLDSA
-    SuperDil -.->|Based on| LatticeSecurity
-
+    style ED1 fill:#e8f5e9
+    style F1 fill:#e1f5ff
+    style ML1 fill:#e1f5ff
+    style SL1 fill:#e1f5ff
+    style ML8 fill:#c8e6c9
+    style SL8 fill:#c8e6c9
 ```
 
-**Description**: Complete PQC Enigma architecture showing the wrapper class around SuperDilithium library, key pair structure with Uint8Arrays, cryptographic operations (key generation, signing, verification), and quantum-safe security properties based on lattice problems.
+**Description**: Comparison of all supported signature algorithms showing key sizes, signature sizes, performance characteristics, and quantum resistance. Users choose based on security requirements vs transaction size/speed tradeoffs.
 
 ---
 
-## Diagram 9: PQC Key Generation, Signing & Verification
+## Diagram 6: Block Validation with PQC Signatures
 
 ```mermaid
 sequenceDiagram
-    participant App as Application
-    participant Enigma as Enigma Instance
-    participant SuperDil as SuperDilithium
-    participant Random as Quantum Random
-    participant Lattice as Lattice Operations
+    participant Validator as Validator Node
+    participant Block as Received Block
+    participant TxValidator as Transaction Validator
+    participant UCrypto as ucrypto SDK
+    participant GCR as GCR Identity Store
 
-    rect rgb(230, 245, 255)
-        Note over App,Lattice: Key Generation Phase
-        App->>Enigma: new Enigma()
-        activate Enigma
-        Note over Enigma: Create instance<br/>No keys yet
+    Note over Validator,GCR: Block Validation Flow
 
-        App->>Enigma: init() - no privateKey arg
-        Enigma->>SuperDil: keyPair()
-        activate SuperDil
+    Validator->>Block: Receive proposed block
+    Block->>Validator: Extract transactions[]
 
-        SuperDil->>Random: Generate entropy
-        Random-->>SuperDil: Quantum random bytes
+    loop For each transaction in block
+        Validator->>TxValidator: validateSignature(tx)
+        activate TxValidator
 
-        SuperDil->>Lattice: Generate lattice keys
-        activate Lattice
-        Note over Lattice: ML-DSA algorithm<br/>Lattice-based crypto<br/>Quantum-resistant
-        Lattice-->>SuperDil: Private key (secret)
-        Lattice-->>SuperDil: Public key (verification)
-        deactivate Lattice
+        TxValidator->>TxValidator: Check signature type<br/> falcon | ml-dsa | sl-dsa | ed25519
 
-        SuperDil-->>Enigma: {privateKey: Uint8Array, publicKey: Uint8Array}
-        deactivate SuperDil
+        alt PQC Signature (falcon, ml-dsa, sl-dsa)
+            TxValidator->>GCR: Query PQC identity for tx.content.from
+            GCR-->>TxValidator: SavedPqcIdentity or null
 
-        Enigma->>Enigma: Store keyPair internally
-        Enigma-->>App: Initialization complete
-        deactivate Enigma
-    end
+            alt Identity found in GCR
+                TxValidator->>UCrypto: verify(ed25519, identity.signature, ...)
+                UCrypto-->>TxValidator: ED25519 link verified ✅
+            else No identity, but has ed25519_signature field
+                TxValidator->>UCrypto: verify(ed25519, tx.ed25519_signature, ...)
+                UCrypto-->>TxValidator: ED25519 signature verified ✅
+            else No identity and no ed25519_signature
+                TxValidator-->>Validator: ❌ REJECT: PQC pubkey not registered
+            end
 
-    rect rgb(255, 245, 230)
-        Note over App,Lattice: Alternative: Import Existing Keys
-        App->>Enigma: init(existingPrivateKey)
-        activate Enigma
-        Enigma->>SuperDil: importKeys({private: {combined: privateKey}})
-        activate SuperDil
-        SuperDil->>SuperDil: Parse private key
-        SuperDil->>SuperDil: Derive public key from private
-        SuperDil-->>Enigma: {privateKey, publicKey}
-        deactivate SuperDil
-        Enigma-->>App: Keys imported
-        deactivate Enigma
-    end
+            TxValidator->>UCrypto: verify(algorithm, tx.signature.data, tx.hash, tx.content.from)
+            activate UCrypto
 
-    rect rgb(230, 255, 230)
-        Note over App,Lattice: Signing Phase
-        App->>Enigma: sign("Hello, quantum world!")
-        activate Enigma
+            alt ML-DSA
+                UCrypto->>UCrypto: Verify ML-DSA signature<br/>Lattice-based verification
+            else SL-DSA
+                UCrypto->>UCrypto: Verify SL-DSA signature<br/>Hash-based verification
+            else Falcon
+                UCrypto->>UCrypto: Verify Falcon signature<br/>NTRU lattice verification
+            end
 
-        Enigma->>Enigma: Retrieve privateKey
-        Enigma->>SuperDil: sign(message, privateKey)
-        activate SuperDil
+            UCrypto-->>TxValidator: Signature valid ✅ or invalid ❌
+            deactivate UCrypto
 
-        SuperDil->>Lattice: Apply ML-DSA signing
-        activate Lattice
-        Note over Lattice: 1. Hash message<br/>2. Lattice operations<br/>3. Generate signature
-        Lattice-->>SuperDil: Signature (Uint8Array)
-        deactivate Lattice
-
-        SuperDil-->>Enigma: signature
-        deactivate SuperDil
-
-        Enigma-->>App: signature (Uint8Array)
-        deactivate Enigma
-
-        Note over App: Store signature<br/>for later verification
-    end
-
-    rect rgb(245, 230, 255)
-        Note over App,Lattice: Verification Phase
-        App->>Enigma: verify(signature, message, publicKey)
-        activate Enigma
-
-        Enigma->>Enigma: Convert publicKey if string
-        Note over Enigma: Handle format:<br/>string → Uint8Array
-
-        Enigma->>SuperDil: verifyDetached(signature, message, publicKey)
-        activate SuperDil
-
-        SuperDil->>Lattice: Apply ML-DSA verification
-        activate Lattice
-        Note over Lattice: 1. Hash message<br/>2. Lattice verification<br/>3. Check signature validity
-        Lattice-->>SuperDil: Boolean result
-        deactivate Lattice
-
-        alt Signature Valid
-            SuperDil-->>Enigma: true
-            Enigma-->>App: true (signature valid)
-            Note over App: Message authenticated<br/>Sender verified
-        else Signature Invalid
-            SuperDil-->>Enigma: false
-            Enigma-->>App: false (signature invalid)
-            Note over App: Message tampered<br/>or wrong key
+        else ED25519 Signature
+            TxValidator->>UCrypto: verify(ed25519, tx.signature.data, tx.hash, tx.content.from)
+            UCrypto-->>TxValidator: Signature valid ✅ or invalid ❌
         end
 
-        deactivate SuperDil
-        deactivate Enigma
+        alt Signature valid
+            TxValidator-->>Validator: ✅ Transaction verified
+        else Signature invalid
+            TxValidator-->>Validator: ❌ REJECT: Invalid signature
+            Validator->>Validator: Mark block as invalid
+        end
+
+        deactivate TxValidator
     end
 
-    rect rgb(255, 245, 245)
-        Note over App,SuperDil: Key Export (Optional)
-        App->>Enigma: exportKeys("my-passphrase")
-        activate Enigma
-        Enigma->>SuperDil: exportKeys(keyPair, passphrase)
-        activate SuperDil
-        Note over SuperDil: Encrypt keys with<br/>passphrase for storage
-        SuperDil-->>Enigma: Encrypted key bundle
-        deactivate SuperDil
-        Enigma-->>App: Encrypted keys (secure storage)
-        deactivate Enigma
-    end
+    Validator->>Validator: All transactions verified?
 
+    alt All valid
+        Validator->>Validator: ✅ Vote to accept block
+    else Any invalid
+        Validator->>Validator: ❌ Reject block
+    end
 ```
 
-**Description**: Complete sequence showing PQC key lifecycle including quantum-random key generation with lattice operations, signing messages with ML-DSA algorithm, verifying signatures with public keys, and optional secure key export with passphrase encryption.
+**Description**: Block validation flow showing how validators verify all transaction signatures in a block using ucrypto SDK, including PQC signature verification and identity link checks via GCR.
 
 ---
 
-## Diagram 10: Complete Cryptography Lifecycle State Machine
+## Diagram 7: Complete Signature Lifecycle State Machine
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Uninitialized: System Start
+    [*] --> KeyGeneration: User creates wallet
 
-    state "Cryptography Systems" as CryptoSystems {
-        Uninitialized --> Initializing: Application requests crypto
+    state KeyGeneration {
+        [*] --> ChooseAlgorithm
+        ChooseAlgorithm --> ED25519Gen: Default
+        ChooseAlgorithm --> FalconGen: Compact PQC
+        ChooseAlgorithm --> MLDSAGen: NIST Standard
+        ChooseAlgorithm --> SLDSAGen: Conservative
 
-        state Initializing {
-            [*] --> LoadingLibraries
-            LoadingLibraries --> InitializingFHE: FHE requested
-            LoadingLibraries --> InitializingZK: ZK requested
-            LoadingLibraries --> InitializingPQC: PQC requested
-
-            state InitializingFHE {
-                [*] --> LoadSEAL
-                LoadSEAL --> SetupContext: SEAL loaded
-                SetupContext --> GenerateKeys: Context valid
-                GenerateKeys --> FHEReady: Keys generated
-                SetupContext --> FHEFailed: Invalid params
-            }
-
-            state InitializingZK {
-                [*] --> GeneratePrimes
-                GeneratePrimes --> CalculateModulus: Primes generated
-                CalculateModulus --> ZKReady: Modulus ready
-                GeneratePrimes --> ZKFailed: Prime gen failed
-            }
-
-            state InitializingPQC {
-                [*] --> LoadSuperDilithium
-                LoadSuperDilithium --> GenerateLatticeKeys: Library loaded
-                GenerateLatticeKeys --> PQCReady: Keys ready
-                LoadSuperDilithium --> PQCFailed: Load failed
-            }
-
-            InitializingFHE --> [*]
-            InitializingZK --> [*]
-            InitializingPQC --> [*]
-        }
-
-        Initializing --> Ready: All requested systems ready
-
-        state Ready {
-            [*] --> Idle
-
-            Idle --> FHEOperations: FHE request
-            Idle --> ZKOperations: ZK request
-            Idle --> PQCOperations: PQC request
-
-            state FHEOperations {
-                [*] --> EncryptData: Encrypt request
-
-                state EncryptData {
-                    [*] --> Encoding
-                    Encoding --> Encrypting: Data encoded
-                    Encrypting --> EncryptComplete: Encrypted
-                }
-
-                EncryptData --> HomomorphicCompute: Compute on encrypted
-
-                state HomomorphicCompute {
-                    [*] --> SelectOperation
-                    SelectOperation --> Addition: Add
-                    SelectOperation --> Multiplication: Multiply
-                    SelectOperation --> Negation: Negate
-                    Addition --> CheckNoise: Result ready
-                    Multiplication --> Relinearize: Result ready
-                    Negation --> CheckNoise: Result ready
-                    Relinearize --> CheckNoise: Relinearized
-
-                    state CheckNoise {
-                        [*] --> MeasureNoise
-                        MeasureNoise --> NoiseLow: < 10 bits
-                        MeasureNoise --> NoiseOK: >= 10 bits
-                    }
-
-                    CheckNoise --> [*]
-                }
-
-                HomomorphicCompute --> DecryptData: Decrypt request
-
-                state DecryptData {
-                    [*] --> Decrypting
-                    Decrypting --> Decoding: Decrypted
-                    Decoding --> DecryptComplete: Decoded
-                }
-
-                DecryptData --> [*]
-            }
-
-            state ZKOperations {
-                [*] --> GenerateCommitment: Prover starts
-
-                GenerateCommitment --> ReceiveChallenge: Commitment sent
-
-                ReceiveChallenge --> ComputeResponse: Challenge received
-
-                state ComputeResponse {
-                    [*] --> CheckChallengeBit
-                    CheckChallengeBit --> ResponseR: Challenge = 0
-                    CheckChallengeBit --> ResponseRS: Challenge = 1
-                    ResponseR --> [*]
-                    ResponseRS --> [*]
-                }
-
-                ComputeResponse --> Verify: Response sent
-
-                state Verify {
-                    [*] --> CalculateResponseSquared
-                    CalculateResponseSquared --> CompareCommitment: Calculated
-                    CompareCommitment --> RoundPassed: Valid
-                    CompareCommitment --> RoundFailed: Invalid
-                }
-
-                Verify --> CheckRounds: Round complete
-
-                state CheckRounds {
-                    [*] --> CountRounds
-                    CountRounds --> MoreRounds: i < k
-                    CountRounds --> AllRoundsComplete: i >= k
-                }
-
-                CheckRounds --> GenerateCommitment: More rounds
-                CheckRounds --> ProofComplete: All complete
-                Verify --> ProofRejected: Round failed
-
-                ProofComplete --> [*]
-                ProofRejected --> [*]
-            }
-
-            state PQCOperations {
-                [*] --> SignMessage: Sign request
-
-                state SignMessage {
-                    [*] --> HashingMessage
-                    HashingMessage --> ApplyingLattice: Hashed
-                    ApplyingLattice --> SignatureGenerated: Signed
-                }
-
-                SignMessage --> VerifySignature: Verify request
-
-                state VerifySignature {
-                    [*] --> HashingForVerify
-                    HashingForVerify --> LatticeVerification: Hashed
-                    LatticeVerification --> SignatureValid: Verified
-                    LatticeVerification --> SignatureInvalid: Failed
-                }
-
-                VerifySignature --> [*]
-            }
-
-            FHEOperations --> Idle: Operation complete
-            ZKOperations --> Idle: Proof complete/rejected
-            PQCOperations --> Idle: Sign/verify complete
-        }
-
-        Ready --> Shutdown: System shutdown
-
-        state Shutdown {
-            [*] --> CleaningFHE
-            CleaningFHE --> CleaningZK: FHE cleaned
-            CleaningZK --> CleaningPQC: ZK cleaned
-            CleaningPQC --> ResourcesReleased: PQC cleaned
-        }
+        ED25519Gen --> KeysReady: ucrypto.generateKeyPair(ed25519)
+        FalconGen --> KeysReady: ucrypto.generateKeyPair(falcon)
+        MLDSAGen --> KeysReady: ucrypto.generateKeyPair(ml-dsa)
+        SLDSAGen --> KeysReady: ucrypto.generateKeyPair(sl-dsa)
     }
 
-    Shutdown --> [*]: Shutdown complete
+    KeyGeneration --> IdentityRegistration: PQC keys need registration
 
-    note right of InitializingFHE
-        FHE: Microsoft SEAL
-        - BFV scheme
-        - 4096 poly degree
-        - tc128 security
-        - BatchEncoder
+    state IdentityRegistration {
+        [*] --> CheckIfPQC
+        CheckIfPQC --> SkipRegistration: ED25519 selected
+        CheckIfPQC --> RequireRegistration: PQC selected
+
+        RequireRegistration --> SignPQCPubkey: Sign PQC pubkey with ED25519
+        SignPQCPubkey --> StoreInGCR: IdentityManager.addIdentity
+        StoreInGCR --> RegistrationComplete
+    }
+
+    IdentityRegistration --> Ready: Keys and identity ready
+
+    state Ready {
+        [*] --> Idle
+        Idle --> CreateTransaction: User initiates tx
+    }
+
+    Ready --> Signing: Transaction created
+
+    state Signing {
+        [*] --> SerializeContent
+        SerializeContent --> CallUCryptoSign: ucrypto.sign(algorithm, content)
+        CallUCryptoSign --> AlgorithmExecution
+
+        state AlgorithmExecution {
+            [*] --> SelectAlgo
+            SelectAlgo --> RunED25519: ED25519
+            SelectAlgo --> RunFalcon: Falcon
+            SelectAlgo --> RunMLDSA: ML-DSA
+            SelectAlgo --> RunSLDSA: SL-DSA
+
+            RunED25519 --> [*]
+            RunFalcon --> [*]
+            RunMLDSA --> [*]
+            RunSLDSA --> [*]
+        }
+
+        AlgorithmExecution --> SignatureGenerated
+        SignatureGenerated --> AddED25519Sig: PQC first use?
+        AddED25519Sig --> Signed: Optional
+        SignatureGenerated --> Signed: ED25519 or registered PQC
+    }
+
+    Signing --> Broadcasting: Transaction signed
+
+    state Broadcasting {
+        [*] --> HashContent
+        HashContent --> AttachSignature
+        AttachSignature --> SendToMempool
+        SendToMempool --> [*]
+    }
+
+    Broadcasting --> Verification: Validators receive tx
+
+    state Verification {
+        [*] --> ExtractSignature
+        ExtractSignature --> CheckSignatureType
+
+        CheckSignatureType --> VerifyED25519Direct: ED25519 tx
+        CheckSignatureType --> CheckPQCIdentity: PQC tx
+
+        CheckPQCIdentity --> QueryGCR: Check identity registration
+        QueryGCR --> VerifyIdentityLink: Found in GCR
+        QueryGCR --> VerifyED25519Field: Not in GCR, check ed25519_signature
+        VerifyED25519Field --> PQCBootstrapOK: Valid
+        VerifyED25519Field --> RejectUnregistered: Invalid or missing
+
+        VerifyIdentityLink --> CallUCryptoVerify
+        VerifyED25519Direct --> CallUCryptoVerify
+        PQCBootstrapOK --> CallUCryptoVerify
+
+        CallUCryptoVerify --> AlgorithmVerification
+
+        state AlgorithmVerification {
+            [*] --> VerifyAlgo
+            VerifyAlgo --> VerifyED25519Algo: ED25519
+            VerifyAlgo --> VerifyFalconAlgo: Falcon
+            VerifyAlgo --> VerifyMLDSAAlgo: ML-DSA
+            VerifyAlgo --> VerifySLDSAAlgo: SL-DSA
+
+            VerifyED25519Algo --> [*]
+            VerifyFalconAlgo --> [*]
+            VerifyMLDSAAlgo --> [*]
+            VerifySLDSAAlgo --> [*]
+        }
+
+        AlgorithmVerification --> VerificationResult
+        VerificationResult --> AcceptTx: Valid
+        VerificationResult --> RejectInvalidSig: Invalid
+        RejectUnregistered --> RejectTx: Rejected
+        RejectInvalidSig --> RejectTx: Rejected
+    }
+
+    Verification --> BlockInclusion: Accepted
+    Verification --> [*]: Rejected
+
+    state BlockInclusion {
+        [*] --> AddToMempool
+        AddToMempool --> WaitForBlock
+        WaitForBlock --> IncludedInBlock
+        IncludedInBlock --> BlockValidation
+        BlockValidation --> Confirmed
+    }
+
+    BlockInclusion --> [*]: Transaction confirmed
+
+    note right of KeyGeneration
+        Multiple algorithms supported:
+        - ED25519: Default, classical
+        - Falcon: Compact PQC
+        - ML-DSA: NIST FIPS 204
+        - SL-DSA: NIST FIPS 205
     end note
 
-    note right of InitializingZK
-        ZK: Interactive Proofs
-        - Large prime modulus
-        - Challenge-response
-        - k=20 rounds
-        - 2^-20 error rate
+    note right of IdentityRegistration
+        PQC Bootstrapping:
+        - Sign PQC pubkey with ED25519
+        - Store in GCR identities table
+        - Enables PQC without ed25519_signature field
     end note
 
-    note right of InitializingPQC
-        PQC: SuperDilithium
-        - ML-DSA standard
-        - Lattice-based
-        - Quantum-safe
-        - Uint8Array keys
-    end note
-
-    note right of HomomorphicCompute
-        Homomorphic Operations:
-        - Add: O(1) noise
-        - Multiply: O(n) noise + relin
-        - Negate: O(1) noise
-        - Chain operations
-        - Track noise budget
-    end note
-
-    note right of ZKOperations
-        ZK Protocol:
-        - Commitment (r² mod N)
-        - Challenge (0 or 1)
-        - Response (r or r×s)
-        - Verify (check response²)
-        - Repeat k times
+    note right of Verification
+        Dual Signature System:
+        - PQC + ED25519 signature (first use)
+        - OR PQC + GCR identity (registered)
+        - ED25519 only (classical)
     end note
 ```
 
-**Description**: Complete state machine covering the entire cryptography lifecycle for all three systems (FHE, ZK, PQC) from initialization through operational states (encrypt/decrypt, proof generation/verification, sign/verify) to shutdown, with detailed substates for each operation type and error handling.
+**Description**: Complete state machine showing the entire signature lifecycle from key generation through identity registration, transaction signing, verification, and block inclusion, covering all supported algorithms and PQC identity bootstrapping.
+
+---
+
+## Diagram 8: POC Systems - FHE Architecture (Research Only)
+
+### 🧪 PROOF-OF-CONCEPT - NOT IN PRODUCTION
+
+**Note**: The following diagrams (8-10) show **research proof-of-concept** systems that are NOT integrated into production blockchain operations. These are standalone demonstrations in `src/crypto/` for future exploration.
+
+```mermaid
+graph TD
+    subgraph "FHE Singleton Pattern (POC)"
+        GetInstance[FHE.getInstance<br/>Lazy Initialization]
+        Instance[FHE Instance]
+        LoadSEAL[Load Microsoft SEAL Library]
+        SetupContext[Setup BFV Context<br/>4096 poly degree, tc128 security]
+        InitComponents[Initialize Components<br/>KeyGen, Encryptor, Decryptor, Evaluator]
+    end
+
+    subgraph "Homomorphic Operations (POC)"
+        EncryptNum[encryptNumber: int → CipherText]
+        DecryptNum[decryptNumber: CipherText → int]
+        Add[addNumbers: CipherText + CipherText]
+        Multiply[multiplyNumbers: CipherText × CipherText]
+        Negate[negate: -CipherText]
+    end
+
+    GetInstance --> Instance
+    Instance --> LoadSEAL
+    LoadSEAL --> SetupContext
+    SetupContext --> InitComponents
+    InitComponents --> EncryptNum
+    InitComponents --> DecryptNum
+    InitComponents --> Add
+    InitComponents --> Multiply
+    InitComponents --> Negate
+
+    style GetInstance fill:#ffe0b2
+    style EncryptNum fill:#ffe0b2
+```
+
+**Description**: FHE proof-of-concept using Microsoft SEAL with BFV scheme. Enables computation on encrypted data. Located in `src/crypto/fhe.ts`. **Status**: Demo only, not used in production transactions.
+
+---
+
+## Diagram 9: POC Systems - ZK Proofs (Research Only)
+
+### 🧪 PROOF-OF-CONCEPT - NOT IN PRODUCTION
+
+```mermaid
+graph TB
+    subgraph "ZK Prover (POC)"
+        ProverClass[Prover Class]
+        Secret[Secret Value s]
+        GenerateCommitment[generateCommitment<br/>C = r² mod N]
+        RespondToChallenge[respondToChallenge<br/>if b=0: r<br/>if b=1: r×s mod N]
+    end
+
+    subgraph "ZK Verifier (POC)"
+        VerifierClass[Verifier Class]
+        GenerateChallenge[generateChallenge<br/>b ∈ {0,1}]
+        VerifyResponse[verifyResponse<br/>Check response² matches]
+    end
+
+    subgraph "Protocol Flow (POC)"
+        Setup[Setup: Generate primes p, q<br/>N = p × q]
+        Commitment[Prover → Verifier: C]
+        Challenge[Verifier → Prover: b]
+        Response[Prover → Verifier: response]
+        Verify[Verifier: Check validity]
+    end
+
+    ProverClass --> Secret
+    ProverClass --> GenerateCommitment
+    ProverClass --> RespondToChallenge
+    VerifierClass --> GenerateChallenge
+    VerifierClass --> VerifyResponse
+
+    Setup --> Commitment
+    Commitment --> Challenge
+    Challenge --> Response
+    Response --> Verify
+
+    style ProverClass fill:#ffe0b2
+    style VerifierClass fill:#ffe0b2
+```
+
+**Description**: ZK proof-of-concept showing interactive proof system. Demonstrates zero-knowledge authentication. Located in `src/crypto/zkProof.ts`. **Status**: Demo only, not used in production transactions.
+
+---
+
+## Diagram 10: Production vs POC Comparison
+
+```mermaid
+graph TB
+    subgraph "✅ PRODUCTION - In Active Use"
+        ProdUCrypto[ucrypto SDK<br/>@demoslabs/mlkp-sdk]
+        ProdED25519[ED25519 Signatures<br/>Default, 64 bytes]
+        ProdFalcon[Falcon Signatures<br/>PQC, ~660 bytes]
+        ProdMLDSA[ML-DSA Dilithium<br/>NIST FIPS 204, ~2420 bytes]
+        ProdSLDSA[SL-DSA Sphincs+<br/>NIST FIPS 205, ~8000 bytes]
+        ProdIdentity[GCR Identity Management<br/>PQC pubkey linking]
+        ProdTx[All Transaction Signatures]
+        ProdBlock[Block Validation]
+        ProdConsensus[Consensus Operations]
+    end
+
+    subgraph "🧪 POC - Research Demonstrations"
+        POCEnigma[Enigma Wrapper<br/>SuperDilithium wrapper]
+        POCFHE[FHE System<br/>Microsoft SEAL BFV]
+        POCZK[ZK Proofs<br/>Interactive proof system]
+        POCTests[Test Files Only<br/>*.test.ts]
+        POCNotIntegrated[NOT integrated into<br/>blockchain operations]
+    end
+
+    subgraph "Files & Integration"
+        FileTx[src/libs/blockchain/transaction.ts]
+        FileIdentity[src/libs/blockchain/gcr/gcr_routines/identityManager.ts]
+        FileSDK[@kynesyslabs/demosdk/encryption]
+
+        FilePOCFHE[src/crypto/fhe.ts]
+        FilePOCZK[src/crypto/zkProof.ts]
+        FilePOCEnigma[src/crypto/enigma.ts]
+    end
+
+    ProdUCrypto --> ProdED25519
+    ProdUCrypto --> ProdFalcon
+    ProdUCrypto --> ProdMLDSA
+    ProdUCrypto --> ProdSLDSA
+    ProdIdentity --> ProdUCrypto
+
+    ProdED25519 --> ProdTx
+    ProdFalcon --> ProdTx
+    ProdMLDSA --> ProdTx
+    ProdSLDSA --> ProdTx
+    ProdTx --> ProdBlock
+    ProdBlock --> ProdConsensus
+
+    FileTx --> ProdUCrypto
+    FileIdentity --> ProdIdentity
+    FileSDK --> ProdUCrypto
+
+    POCEnigma --> POCTests
+    POCFHE --> POCTests
+    POCZK --> POCTests
+    POCTests --> POCNotIntegrated
+
+    FilePOCFHE --> POCFHE
+    FilePOCZK --> POCZK
+    FilePOCEnigma --> POCEnigma
+
+    style ProdUCrypto fill:#c8e6c9
+    style ProdTx fill:#c8e6c9
+    style ProdBlock fill:#c8e6c9
+    style ProdConsensus fill:#c8e6c9
+    style POCEnigma fill:#ffe0b2
+    style POCFHE fill:#ffe0b2
+    style POCZK fill:#ffe0b2
+    style POCNotIntegrated fill:#ffcdd2
+```
+
+**Description**: Comparison showing production ucrypto PQC system (actively used in all transactions) vs POC systems (FHE, ZK, Enigma wrapper for research). Production system uses SDK integration for ML-DSA, SL-DSA, Falcon, and ED25519.
 
 ---
 
 ## Summary
 
-### 🧪 Proof-of-Concept Demonstrations (Not in Production)
-
-The following systems are **standalone demonstrations** showcasing advanced cryptography techniques:
-
-#### FHE (Fully Homomorphic Encryption) - POC Only
-- **Status**: 🧪 Proof-of-concept in `src/crypto/fhe.ts`
-- **Library**: Microsoft SEAL with BFV scheme
-- **Security**: tc128 (128-bit security level)
-- **Parameters**: 4096 polynomial modulus degree, coefficient modulus with 3 primes
-- **Operations**: Homomorphic addition, multiplication, negation on encrypted data
-- **Potential Use Cases**: Private transactions, confidential computations, encrypted data analysis
-- **Components**: Context, KeyGenerator, Encryptor, Decryptor, Evaluator, BatchEncoder
-- **Integration**: NOT currently integrated into blockchain operations
-
-#### ZK (Zero-Knowledge Proofs) - POC Only
-- **Status**: 🧪 Proof-of-concept in `src/crypto/zkProof.ts`
-- **Type**: Interactive proof system with Fiat-Shamir heuristic
-- **Protocol**: Commitment → Challenge → Response → Verification
-- **Security**: k=20 rounds → 2^-20 cheating probability (~0.0001%)
-- **Properties**: Completeness, soundness, zero-knowledge
-- **Potential Use Cases**: Authentication without revealing secrets, proof of knowledge, privacy-preserving verification
-- **Foundation**: Modular arithmetic with large prime modulus, BigInteger operations
-- **Integration**: NOT currently integrated into blockchain operations
-
-#### PQC Enigma Wrapper - POC Only
-- **Status**: 🧪 Proof-of-concept in `src/crypto/enigma.ts`
-- **Library**: SuperDilithium (ML-DSA) wrapper
-- **Standard**: NIST post-quantum cryptography
-- **Foundation**: Lattice-based cryptography (hard mathematical problems)
-- **Security**: Resistant to quantum attacks (Shor's algorithm)
-- **Operations**: Key generation, digital signatures (sign/verify), secure key export
-- **Integration**: NOT currently integrated into blockchain operations
-
----
-
 ### ✅ Production Post-Quantum Cryptography
 
-The Demos blockchain uses **production-grade PQC via the SDK** (`@demoslabs/mlkp-sdk`):
+The Demos blockchain uses **production-grade NIST-approved PQC** via the ucrypto SDK:
 
-#### ML-DSA and SL-DSA Signatures (PRODUCTION)
-- **Status**: ✅ Actively used in production
-- **Location**: Integrated via SDK, used in `src/core/transaction.ts`
-- **Standards**:
-  - ML-DSA (Module-Lattice Digital Signature Algorithm) - NIST FIPS 204
-  - SL-DSA (Stateless Hash-Based Digital Signature Algorithm) - NIST FIPS 205
-- **Use Cases**:
-  - All transaction signatures
-  - Block validation
-  - Consensus operations
-- **Security**: Quantum-resistant, NIST-approved algorithms
-- **Integration**: Fully integrated into blockchain core operations
+#### Supported Algorithms (All Production-Ready):
+- **ED25519**: ✅ Default classical ECDSA (32-byte pubkey, 64-byte signature)
+- **Falcon**: ✅ Compact lattice-based PQC (897-byte pubkey, ~660-byte signature)
+- **ML-DSA (Dilithium)**: ✅ NIST FIPS 204 lattice-based PQC (1312-byte pubkey, ~2420-byte signature)
+- **SL-DSA (Sphincs+)**: ✅ NIST FIPS 205 hash-based PQC (32-byte pubkey, ~8000-byte signature)
 
----
+#### Key Features:
+- **ucrypto SDK Integration**: All cryptography via `@demoslabs/mlkp-sdk` with unified sign/verify interface
+- **Algorithm Flexibility**: Users choose signing algorithm based on security/performance needs
+- **PQC Identity Bootstrapping**: Link PQC public keys to ED25519 addresses via GCR for seamless migration
+- **Dual Signature System**: First-time PQC users include ED25519 signature; registered users rely on GCR identity
+- **Zero-Trust Verification**: All signatures verified using ucrypto.verify with algorithm-specific validation
+- **NIST Compliance**: ML-DSA and SL-DSA follow NIST FIPS 204 and 205 standards
 
-### Future Integration Plans
+#### Implementation Locations:
+- **Transaction Signing**: `src/libs/blockchain/transaction.ts:75-95` (ucrypto.sign)
+- **Signature Verification**: `src/libs/blockchain/transaction.ts:164-260` (ucrypto.verify + identity checks)
+- **PQC Identity Management**: `src/libs/blockchain/gcr/gcr_routines/identityManager.ts`
+- **ucrypto SDK**: `@kynesyslabs/demosdk/encryption` (sign, verify, generateKeyPair)
+- **Supported Algorithms**: `src/libs/network/server_rpc.ts:98` (ed25519, falcon, ml-dsa)
 
-The POC systems (FHE, ZK, Enigma) are research demonstrations that may be integrated in future versions:
-- FHE could enable private transactions with encrypted amounts
-- ZK could provide proof-based authentication without revealing credentials
-- Enigma wrapper shows alternative PQC implementation approach
+### 🧪 Proof-of-Concept Systems (Research Only)
+
+The following are **standalone research demonstrations** NOT integrated into production:
+
+- **FHE (Fully Homomorphic Encryption)**: `src/crypto/fhe.ts` - Microsoft SEAL with BFV scheme for computing on encrypted data
+- **ZK (Zero-Knowledge Proofs)**: `src/crypto/zkProof.ts` - Interactive proof system for zero-knowledge authentication
+- **Enigma Wrapper**: `src/crypto/enigma.ts` - SuperDilithium wrapper (superseded by ucrypto SDK)
+
+**Status**: These POC systems are only imported by test files and serve as research demonstrations for future cryptographic features.
+
+### Migration Path
+
+1. **Default**: All transactions use ED25519 (fast, small, quantum-vulnerable)
+2. **Opt-in PQC**: Users generate PQC keypair via ucrypto SDK
+3. **Identity Registration**: Link PQC pubkey to ED25519 address in GCR
+4. **PQC Transactions**: Use PQC signatures with automatic identity verification
+5. **Quantum Safety**: Network transitions to PQC as quantum threats increase
 
 ### Related Documentation
-- **Transaction Processing**: See TRANSACTIONS_MEMPOOL.md for ML-DSA/SL-DSA signature usage
-- **Blockchain Core**: See BLOCKCHAIN_CORE.md for block structure and validation
-- **Web2 Integration**: See WEB2_DAHR.md for DAHR with cryptographic integrity
+- **Transaction Processing**: See `diagrams/transactions-mempool/TRANSACTIONS_MEMPOOL.md` for transaction lifecycle
+- **GCR System**: See `diagrams/gcr/GCR.md` for identity management details
+- **Blockchain Core**: See `diagrams/blockchain-core/BLOCKCHAIN_CORE.md` for block structure

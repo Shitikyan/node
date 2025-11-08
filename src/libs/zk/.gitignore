@@ -1,0 +1,15 @@
+# Compiled circuits
+build/*.wasm
+build/*.r1cs
+build/*.sym
+build/*.json
+
+# Proving keys (too large for git)
+keys/proving_keys/*.zkey
+
+# Powers of Tau files
+*.ptau
+
+# Test artifacts
+tests/**/*.proof
+tests/**/*.public

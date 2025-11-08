@@ -626,3 +626,69 @@ Transactions can carry GCR (Global Consensus Registry) edits that modify:
 Transactions are assigned to specific block numbers:
 - During consensus: Uses `SecretaryManager.lastBlockRef + 1`
 - Outside consensus: Uses `Chain.getLastBlockNumber() + 1`
+
+---
+
+## Source Files
+
+### Core Components (✅ PRODUCTION)
+
+All blockchain core components are actively used in production:
+
+#### Block Management
+- **Block Class**: `src/libs/blockchain/block.ts` (~200 lines)
+  - Block structure and lifecycle management
+  - Block status handling (derived/confirmed)
+  - Validation data management
+  - Used by: consensus, chain, block creation
+
+- **Blocks Entity**: `src/model/entities/Blocks.ts`
+  - Database schema for blocks table
+  - PostgreSQL storage with indexes
+  - Stores: number, hash, content, validation_data
+
+#### Transaction Processing
+- **Transaction Class**: `src/libs/blockchain/transaction.ts` (~400 lines)
+  - Transaction creation and signing
+  - Signature validation (ED25519, ML-DSA, SL-DSA)
+  - Hash calculation and verification
+  - Fee calculation (network_fee, rpc_fee, additional_fee)
+  - Used by: RPC handlers, mempool, consensus
+
+- **Transactions Entity**: `src/model/entities/Transactions.ts` (61 lines)
+  - Database schema for transactions table
+  - Indexes: hash, blockNumber, from_ed25519_address, to
+  - Stores: signature, content, type, amount, nonce, timestamp, fees
+
+#### Chain Storage
+- **Chain Class**: `src/libs/blockchain/chain.ts` (~300 lines)
+  - Blockchain storage and retrieval
+  - Block insertion and queries
+  - Last block number tracking
+  - Chain integrity validation
+  - Used by: consensus, block creation, synchronization
+
+#### Mempool Management
+- **Mempool v2**: `src/libs/blockchain/mempool_v2.ts` (209 lines)
+  - Pending transaction pool
+  - Block number assignment logic
+  - Transaction deduplication
+  - Used by: RPC handlers, consensus
+
+- **Mempool Entity**: `src/model/entities/Mempool.ts`
+  - Database schema for mempooltx table
+  - Indexes: hash, blockNumber, timestamp
+  - Stores pending transactions before inclusion in blocks
+
+#### GCR Integration
+- **GCR Handler**: `src/libs/blockchain/gcr/handleGCR.ts`
+  - Processes GCR edits from transactions
+  - Applies balance changes
+  - Manages identity updates
+  - Used by: transaction processing, block validation
+
+### Related Documentation
+- **GCR System**: See `diagrams/gcr/GCR.md` for complete GCR architecture
+- **Consensus**: See `diagrams/consensus-v2/CONSENSUS_V2.md` for block proposal/validation flow
+- **Transactions & Mempool**: See `diagrams/transactions-mempool/TRANSACTIONS_MEMPOOL.md` for detailed transaction lifecycle
+- **Block Creation**: See `diagrams/block-creation/BLOCK_CREATION_VALIDATION.md` for block formation process

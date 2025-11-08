@@ -786,6 +786,89 @@ stateDiagram-v2
 
 ---
 
+## Source Files
+
+### Core DAHR Components (✅ PRODUCTION)
+
+All core components are actively used in production:
+
+#### Factory & Manager
+- **DAHRFactory**: `src/libs/dahr/DAHRFactory.ts` (~200 lines)
+  - Singleton factory managing DAHR instances
+  - Session management with UUID tracking
+  - 24-hour TTL and lazy cleanup
+  - Used by: RPC handlers for Web2 integration transactions
+
+#### DAHR Instance
+- **DAHR Class**: `src/libs/dahr/DAHR.ts` (~300 lines)
+  - Individual DAHR session management
+  - Action execution (CREATE, START_PROXY)
+  - Request/response hashing (SHA256)
+  - Proxy server coordination
+  - Used by: DAHRFactory
+
+#### Proxy System
+- **Proxy Class**: `src/libs/dahr/Proxy.ts` (~250 lines)
+  - Local proxy server implementation
+  - HTTP request forwarding
+  - SSL/TLS configuration
+  - Connection pooling
+  - Used by: DAHR instances for external requests
+
+- **ProxyFactory**: `src/libs/dahr/ProxyFactory.ts` (~150 lines)
+  - Manages proxy instances per session
+  - Port assignment
+  - Proxy lifecycle management
+  - Used by: DAHR instances
+
+#### Validation
+- **Validator**: `src/libs/dahr/validator.ts` (~100 lines)
+  - URL validation and normalization
+  - Action type validation
+  - HTTP method validation
+  - Security checks
+  - Used by: DAHR instances before request execution
+
+### Missing Components (📋 PLANNED)
+
+The following components are referenced in architecture but not yet implemented:
+
+#### Request Sanitization (Not Implemented)
+- **sanitizeWeb2Request** - Input sanitization layer
+  - Purpose: Prevent injection attacks, validate payloads
+  - Status: Not found in codebase
+  - Impact: Current implementation relies on validator.ts only
+
+#### Platform Abstraction Layer (Not Implemented)
+- **Discord Integration** - Discord API wrapper
+  - Purpose: Standardized Discord operations
+  - Status: Not implemented
+  - Current: Applications use generic Proxy + DAHR
+
+- **Twitter/X Integration** - Twitter API wrapper
+  - Purpose: Standardized Twitter operations
+  - Status: Not implemented
+  - Current: Applications use generic Proxy + DAHR
+
+- **GitHub Integration** - GitHub API wrapper
+  - Purpose: Standardized GitHub operations
+  - Status: Not implemented
+  - Current: Applications use generic Proxy + DAHR
+
+**Note**: The platform abstraction layer is planned for future versions. Currently, applications interact with external APIs directly through the generic Proxy system, which provides sufficient functionality for most use cases.
+
+### Implementation Status Summary
+
+- ✅ **Core DAHR System**: Fully implemented and production-ready
+- ✅ **Proxy Architecture**: Complete with SSL, port management, connection pooling
+- ✅ **Session Management**: UUID tracking, TTL, cleanup working
+- ✅ **Cryptographic Integrity**: SHA256 hashing implemented
+- ✅ **URL Validation**: Comprehensive validation in place
+- 📋 **Request Sanitization**: Planned enhancement (not critical)
+- 📋 **Platform Abstraction**: Planned for convenience (not required)
+
+---
+
 ## Summary
 
 The Web2 Integration system provides a robust, secure gateway for Demos blockchain applications to interact with traditional web services. Key features include:

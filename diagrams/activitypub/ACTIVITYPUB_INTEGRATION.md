@@ -1,6 +1,39 @@
 # ActivityPub Integration - Comprehensive Diagrams
 
-This document provides comprehensive Mermaid diagrams for the ActivityPub Integration implementation in Demos blockchain.
+## ⚠️ IMPLEMENTATION STATUS: EXPERIMENTAL / LEGACY CODE
+
+**CRITICAL**: This documentation describes **experimental code that is NOT actively used** in the blockchain. The ActivityPub integration code exists but has **0 imports** in production code and approximately **70% of documented features are unimplemented**.
+
+### Implementation Status:
+- **Data Types & Interfaces**: ✅ **IMPLEMENTED** - TypeScript interfaces in `feditypes.ts`
+- **SQLite Storage Class**: ✅ **IMPLEMENTED** - Basic FediStore class in `fedistore.ts`
+- **Express Server Skeleton**: ✅ **IMPLEMENTED** - Basic server setup in `fediverse.ts`
+- **REST API**: ❌ **NOT IMPLEMENTED** - GET/PUT endpoints documented but not coded
+- **Federation Protocol**: ❌ **NOT IMPLEMENTED** - WebFinger, HTTP signatures missing
+- **Actor Discovery**: ❌ **NOT IMPLEMENTED** - WebFinger lookup not implemented
+- **Inbox/Outbox Delivery**: ❌ **NOT IMPLEMENTED** - Message federation missing
+- **HTTP Signatures**: ❌ **NOT IMPLEMENTED** - Request signing/verification missing
+- **Collection Management**: ⚠️ **PARTIAL** - Some basic operations, getAllItems() missing
+- **Follow Workflow**: ❌ **NOT IMPLEMENTED** - Accept/Reject flow missing
+- **Social Interactions**: ❌ **NOT IMPLEMENTED** - Like, Announce, Reply missing
+
+### What's Actually Implemented:
+Located in `src/features/activitypub/`:
+- ✅ `feditypes.ts` - TypeScript interfaces for ActivityPub objects (Actor, Activity, Object, Collection types)
+- ✅ `fedistore.ts` - SQLite storage class with table creation and basic CRUD operations
+- ✅ `fediverse.ts` - Express.js server skeleton with port 3000 listener
+- ❌ Missing: getAllItems() method
+- ❌ Missing: Federation protocol implementation
+- ❌ Missing: HTTP signature verification
+- ❌ Missing: WebFinger actor discovery
+- ❌ Missing: Inbox/Outbox delivery logic
+
+### Integration Status:
+**NOT INTEGRATED**: These files are **not imported or used** by any production blockchain code. This is standalone experimental code for future ActivityPub federation exploration.
+
+---
+
+This document provides comprehensive Mermaid diagrams for the ActivityPub Integration **planned features** in Demos blockchain.
 
 ## Table of Contents
 1. [ActivityPub Architecture Overview](#1-activitypub-architecture-overview)
@@ -824,31 +857,101 @@ stateDiagram-v2
 
 ## Summary
 
-These diagrams provide comprehensive coverage of the ActivityPub Integration implementation:
+These diagrams provide comprehensive coverage of the ActivityPub Integration **planned architecture**. Note that approximately **70% of these features are NOT YET IMPLEMENTED**.
 
-1. **Architecture Overview** - Complete system architecture with Express.js, SQLite, and 14 collections
-2. **Actor Model** - TypeScript class hierarchy for ActivityPub objects
-3. **Storage Schema** - Complete SQLite database schema with all 14 tables and relationships
-4. **REST API** - GET/PUT endpoints for item and collection operations
-5. **Object Model** - ActivityStreams vocabulary and object types
-6. **Message Flow** - Inbox/Outbox message delivery sequences
-7. **Federation Protocol** - State machine for federated actor discovery and activity delivery
-8. **Collection Management** - Flowchart for all 8 collection types (followers, following, liked, inbox, outbox, blocked, shares, likes)
-9. **Data Persistence** - Complete CRUD operations with SQLite
-10. **Complete Lifecycle** - End-to-end state machine from initialization to shutdown
+1. **Architecture Overview** - 📋 **PLANNED** - Complete system architecture with Express.js, SQLite, and 14 collections
+2. **Actor Model** - ✅ **IMPLEMENTED** - TypeScript class hierarchy for ActivityPub objects (interfaces defined)
+3. **Storage Schema** - ✅ **IMPLEMENTED** - Complete SQLite database schema with all 14 tables (table creation code exists)
+4. **REST API** - ❌ **NOT IMPLEMENTED** - GET/PUT endpoints documented but not coded
+5. **Object Model** - ✅ **IMPLEMENTED** - ActivityStreams vocabulary and object types (TypeScript interfaces)
+6. **Message Flow** - ❌ **NOT IMPLEMENTED** - Inbox/Outbox message delivery sequences
+7. **Federation Protocol** - ❌ **NOT IMPLEMENTED** - State machine for federated actor discovery and activity delivery
+8. **Collection Management** - ⚠️ **PARTIAL** - Flowchart for all 8 collection types, getAllItems() missing
+9. **Data Persistence** - ⚠️ **PARTIAL** - Basic CRUD operations with SQLite, getAllItems() missing
+10. **Complete Lifecycle** - ❌ **NOT IMPLEMENTED** - End-to-end state machine from initialization to shutdown
 
-### Key Features Documented:
-- **Express.js REST API**: GET/PUT endpoints for universal collection access
-- **SQLite Storage**: 14 normalized tables with proper relationships
-- **ActivityStreams Protocol**: Full @context support with standard vocabulary
-- **Federation**: Actor discovery, HTTP signatures, inbox/outbox delivery
-- **Collections**: Actors, Objects, Activities, Inboxes, Outboxes, Followers, Following, Liked, Collections, Blocked, Rejections, Rejecteds, Shares, Likes (14 total)
-- **Social Interactions**: Follow/Accept workflow, Like, Announce/Share, Reply
-- **Data Integrity**: Primary keys, foreign key relationships, indexes
+---
 
-### Files Referenced:
-- `src/features/activitypub/feditypes.ts` - TypeScript interfaces
-- `src/features/activitypub/fediverse.ts` - Express.js server (port 3000)
-- `src/features/activitypub/fedistore.ts` - SQLite storage class
+### 🧪 Experimental Features Status
 
-This documentation enables developers to understand the complete ActivityPub integration architecture, from low-level database operations to high-level federation protocols.
+#### ✅ Currently Implemented (30%):
+- **TypeScript Interfaces** (`feditypes.ts`):
+  - Actor, Activity, Object, Collection type definitions
+  - ActivityStreams vocabulary types
+  - Full type safety for ActivityPub objects
+
+- **SQLite Storage** (`fedistore.ts`):
+  - FediStore class with database initialization
+  - Table creation for all 14 collections
+  - Basic CRUD operations: getItem(), saveItem(), deleteItem()
+  - Database schema with proper relationships
+
+- **Express Server Skeleton** (`fediverse.ts`):
+  - Basic Express.js server setup
+  - Port 3000 listener
+  - Server initialization code
+
+#### ❌ Not Yet Implemented (70%):
+- **REST API Endpoints**:
+  - GET /:collection/:id (documented but not coded)
+  - PUT /:collection/:id (documented but not coded)
+  - GET /:collection - getAllItems() method missing
+
+- **Federation Protocol**:
+  - WebFinger actor discovery
+  - HTTP signature generation and verification
+  - Remote inbox delivery
+  - Remote outbox fetching
+
+- **ActivityPub Core Features**:
+  - Inbox/Outbox message handling
+  - Follow/Accept/Reject workflow
+  - Actor profile discovery
+  - Remote activity federation
+
+- **Social Interactions**:
+  - Like activity handling
+  - Announce/Share functionality
+  - Reply threading
+  - Collection updates (followers, following, etc.)
+
+---
+
+### Files Reference
+
+**Actual Source Files** (experimental, not integrated):
+- ✅ `src/features/activitypub/feditypes.ts` - TypeScript interfaces (~400 lines)
+- ✅ `src/features/activitypub/fedistore.ts` - SQLite storage class (~300 lines, missing getAllItems())
+- ✅ `src/features/activitypub/fediverse.ts` - Express.js server skeleton (~100 lines)
+
+**Integration Status**: ⚠️ **ZERO IMPORTS** - These files are not used by any production blockchain code.
+
+---
+
+### Future Development Path
+
+To complete this implementation, the following work is required:
+
+1. **Priority 1 - API Completion**:
+   - Implement getAllItems() method in FediStore
+   - Add REST API endpoint handlers in fediverse.ts
+   - Connect Express routes to FediStore operations
+
+2. **Priority 2 - Federation Protocol**:
+   - Implement WebFinger discovery
+   - Add HTTP signature signing/verification
+   - Build remote inbox delivery mechanism
+
+3. **Priority 3 - Integration**:
+   - Connect ActivityPub to blockchain events
+   - Add actor management to validator nodes
+   - Implement blockchain-to-ActivityPub bridges
+
+4. **Priority 4 - Social Features**:
+   - Complete Follow/Accept/Reject workflow
+   - Implement Like, Announce, Reply activities
+   - Build notification system
+
+---
+
+This documentation describes the **planned architecture** for full ActivityPub federation support. Current implementation is experimental foundation code representing approximately 30% of the documented features.

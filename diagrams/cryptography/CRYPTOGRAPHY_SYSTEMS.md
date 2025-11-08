@@ -1,12 +1,43 @@
 # Cryptography Systems: FHE, ZK, and PQC
 
+## ⚠️ IMPLEMENTATION STATUS: PROOF-OF-CONCEPT
+
+**IMPORTANT**: This documentation describes **demonstration and proof-of-concept code** that is NOT currently integrated into the main blockchain operations. These are standalone cryptographic experiments showcasing advanced cryptography capabilities.
+
+### Status Overview:
+- **FHE (Fully Homomorphic Encryption)**: 🧪 **PROOF-OF-CONCEPT** - Demo code, not used in production
+- **ZK (Zero-Knowledge Proofs)**: 🧪 **PROOF-OF-CONCEPT** - Demo code, not used in production
+- **PQC Enigma Wrapper**: 🧪 **PROOF-OF-CONCEPT** - Demo code, not used in production
+- **Production PQC**: ✅ **PRODUCTION** - Blockchain uses SDK's ML-DSA and SL-DSA signatures (not Enigma)
+
+### What's Actually in Production:
+The Demos blockchain uses **post-quantum signatures via the SDK** (`@demoslabs/mlkp-sdk`):
+- **ML-DSA (Module-Lattice Digital Signature Algorithm)** - NIST FIPS 204
+- **SL-DSA (Stateless Hash-Based Digital Signature Algorithm)** - NIST FIPS 205
+- Used for all transaction signatures in `src/core/transaction.ts`
+- Integrated into block validation and consensus
+
+The FHE, ZK, and Enigma implementations below are **research demonstrations** for future exploration.
+
+---
+
 ## Overview
 
-The Demos blockchain implements three advanced cryptography systems providing privacy, integrity, and post-quantum security:
+This document describes three proof-of-concept cryptography systems demonstrating advanced privacy and security techniques:
 
 1. **FHE (Fully Homomorphic Encryption)**: Enables computation on encrypted data using Microsoft SEAL with BFV scheme
 2. **ZK (Zero-Knowledge Proofs)**: Interactive proof system allowing verification without revealing secrets
-3. **PQC (Post-Quantum Cryptography)**: Quantum-resistant signatures using SuperDilithium (ML-DSA)
+3. **PQC Enigma Wrapper**: Quantum-resistant signatures using SuperDilithium (ML-DSA) wrapper
+
+---
+
+## Source Files
+
+All cryptography demonstration code is located in:
+- **FHE**: `src/crypto/fhe.ts` - Microsoft SEAL singleton wrapper
+- **ZK Proofs**: `src/crypto/zkProof.ts` - Interactive proof system (Prover/Verifier classes)
+- **PQC Enigma**: `src/crypto/enigma.ts` - SuperDilithium wrapper class
+- **Tests Only**: These files are only imported by test files (`*.test.ts`), not by production blockchain code
 
 ---
 
@@ -1082,39 +1113,68 @@ stateDiagram-v2
 
 ## Summary
 
-The Demos blockchain cryptography systems provide comprehensive privacy, verification, and post-quantum security:
+### 🧪 Proof-of-Concept Demonstrations (Not in Production)
 
-### FHE (Fully Homomorphic Encryption)
+The following systems are **standalone demonstrations** showcasing advanced cryptography techniques:
+
+#### FHE (Fully Homomorphic Encryption) - POC Only
+- **Status**: 🧪 Proof-of-concept in `src/crypto/fhe.ts`
 - **Library**: Microsoft SEAL with BFV scheme
 - **Security**: tc128 (128-bit security level)
 - **Parameters**: 4096 polynomial modulus degree, coefficient modulus with 3 primes
 - **Operations**: Homomorphic addition, multiplication, negation on encrypted data
-- **Use Cases**: Private transactions, confidential computations, encrypted data analysis
+- **Potential Use Cases**: Private transactions, confidential computations, encrypted data analysis
 - **Components**: Context, KeyGenerator, Encryptor, Decryptor, Evaluator, BatchEncoder
+- **Integration**: NOT currently integrated into blockchain operations
 
-### ZK (Zero-Knowledge Proofs)
+#### ZK (Zero-Knowledge Proofs) - POC Only
+- **Status**: 🧪 Proof-of-concept in `src/crypto/zkProof.ts`
 - **Type**: Interactive proof system with Fiat-Shamir heuristic
 - **Protocol**: Commitment → Challenge → Response → Verification
 - **Security**: k=20 rounds → 2^-20 cheating probability (~0.0001%)
 - **Properties**: Completeness, soundness, zero-knowledge
-- **Use Cases**: Authentication without revealing secrets, proof of knowledge, privacy-preserving verification
+- **Potential Use Cases**: Authentication without revealing secrets, proof of knowledge, privacy-preserving verification
 - **Foundation**: Modular arithmetic with large prime modulus, BigInteger operations
+- **Integration**: NOT currently integrated into blockchain operations
 
-### PQC (Post-Quantum Cryptography)
-- **Library**: SuperDilithium (ML-DSA)
+#### PQC Enigma Wrapper - POC Only
+- **Status**: 🧪 Proof-of-concept in `src/crypto/enigma.ts`
+- **Library**: SuperDilithium (ML-DSA) wrapper
 - **Standard**: NIST post-quantum cryptography
 - **Foundation**: Lattice-based cryptography (hard mathematical problems)
 - **Security**: Resistant to quantum attacks (Shor's algorithm)
 - **Operations**: Key generation, digital signatures (sign/verify), secure key export
-- **Use Cases**: Quantum-safe transaction signing, future-proof authentication, long-term security
+- **Integration**: NOT currently integrated into blockchain operations
 
-### Integration
-All three systems integrate seamlessly into the blockchain:
-- FHE enables private transactions with encrypted amounts
-- ZK provides proof-based authentication without revealing credentials
-- PQC ensures long-term security against quantum computing threats
+---
+
+### ✅ Production Post-Quantum Cryptography
+
+The Demos blockchain uses **production-grade PQC via the SDK** (`@demoslabs/mlkp-sdk`):
+
+#### ML-DSA and SL-DSA Signatures (PRODUCTION)
+- **Status**: ✅ Actively used in production
+- **Location**: Integrated via SDK, used in `src/core/transaction.ts`
+- **Standards**:
+  - ML-DSA (Module-Lattice Digital Signature Algorithm) - NIST FIPS 204
+  - SL-DSA (Stateless Hash-Based Digital Signature Algorithm) - NIST FIPS 205
+- **Use Cases**:
+  - All transaction signatures
+  - Block validation
+  - Consensus operations
+- **Security**: Quantum-resistant, NIST-approved algorithms
+- **Integration**: Fully integrated into blockchain core operations
+
+---
+
+### Future Integration Plans
+
+The POC systems (FHE, ZK, Enigma) are research demonstrations that may be integrated in future versions:
+- FHE could enable private transactions with encrypted amounts
+- ZK could provide proof-based authentication without revealing credentials
+- Enigma wrapper shows alternative PQC implementation approach
 
 ### Related Documentation
-- **Transaction Processing**: ML-DSA and SL-DSA signature integration
-- **Blockchain Core**: Block structure and validation
-- **Web2 Integration**: DAHR with cryptographic integrity
+- **Transaction Processing**: See TRANSACTIONS_MEMPOOL.md for ML-DSA/SL-DSA signature usage
+- **Blockchain Core**: See BLOCKCHAIN_CORE.md for block structure and validation
+- **Web2 Integration**: See WEB2_DAHR.md for DAHR with cryptographic integrity

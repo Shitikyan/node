@@ -303,6 +303,27 @@ flowchart TD
 
 ## 5. Validator Entrance & Management
 
+### ⚠️ Implementation Status: 📋 PLANNED (Incomplete)
+
+**NOTE**: The validator entrance feature is **partially implemented** with several critical components marked as TODO in the codebase:
+
+**✅ Implemented**:
+- Minimum stake validation (10^25 tokens)
+- Basic transaction structure for entrance
+- GCR validators table schema
+- Validator status field (status: 2 for active)
+
+**❌ NOT Implemented** (TODO in code):
+- Blacklist check for banned validators
+- Duplicate staking prevention (checking if already staking)
+- Kicked validator check (prevent re-entry after being kicked)
+- Connection URL validation
+- Online status monitoring and pinging
+
+See `src/libs/blockchain/routines/validatorsManagement.ts:19-26` for TODO comments.
+
+---
+
 ```mermaid
 flowchart TD
     START([Validator Entrance Request])
@@ -932,7 +953,10 @@ flowchart TD
 - **Peer Gossip**: `src/libs/peer/routines/peerGossip.ts` (285 lines - gossip protocol implementation)
 
 ### Validator Management Files
-- **Validators Management**: `src/libs/blockchain/routines/validatorsManagement.ts` (43 lines - validator entrance logic)
+- **Validators Management**: `src/libs/blockchain/routines/validatorsManagement.ts` (43 lines - validator entrance validation)
+  - ⚠️ **STATUS**: 📋 **PLANNED** - Core entrance logic has TODO comments
+  - Currently implements: minimum stake validation
+  - NOT implemented: blacklist check, kicked check, duplicate staking check
 - **Validators Entity**: `src/model/entities/Validators.ts` (26 lines - database schema)
 
 ### Point/Reputation System Files
@@ -961,7 +985,7 @@ flowchart TD
 
 7. **Minimal Stake Requirement**: 10^25 minimum stake to become validator (configurable in genesis)
 
-8. **Peer List Persistence**: Peer list saved to demos_peer.json and peer_list.log for recovery
+8. **Peer List Persistence**: Peer list saved to demos_peerlist.json and peer_list.log for recovery
 
 9. **RPC-Based Communication**: All peer communication via JSON-RPC with timeout and retry logic
 

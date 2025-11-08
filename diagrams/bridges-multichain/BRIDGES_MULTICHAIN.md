@@ -413,6 +413,30 @@ sequenceDiagram
 
 ## 6. Native Bridge Operation Compilation
 
+### ⚠️ Implementation Status: 🚧 IN DEVELOPMENT (Incomplete)
+
+**NOTE**: The Native Bridge feature is **partially implemented**:
+
+**✅ Implemented**:
+- Basic operation structure (NativeBridgeOperation interface)
+- RPC endpoint for compilation (`nativeBridge`)
+- manageNativeBridge.ts scaffold (60 lines)
+- Transaction flow structure
+
+**❌ NOT Implemented**:
+- `parseEVMOperation` - EVM transaction verification and parsing (TODO in code)
+- `parseSOLANAOperation` - Solana transaction verification and parsing (TODO in code)
+- Bridge contract interaction (lock/unlock verification)
+- Merkle proof generation
+- CVSA-based controller coordination
+- handleNativeBridgeTx execution in consensus
+
+**Status**: The Native Bridge architecture is designed but core verification logic is not yet implemented. XM Scripts provide full cross-chain functionality as an alternative.
+
+See `src/libs/network/manageNativeBridge.ts` for current implementation.
+
+---
+
 ```mermaid
 flowchart TD
     START([Client requests native bridge operation])
@@ -886,10 +910,10 @@ stateDiagram-v2
 - **Balance Query Executor**: `src/features/multichain/routines/executors/balance_query.ts`
 
 ### Bridge System Files
-- **Bridges**: `src/features/bridges/bridges.ts` (114 lines - Bridge class, BridgeContext, multiton pattern)
-- **Bridge Utils**: `src/features/bridges/bridgeUtils.ts` (utility functions)
-- **Manage Native Bridge**: `src/libs/network/manageNativeBridge.ts` (60 lines - operation compilation)
-- **Manage Bridges**: `src/libs/network/manageBridge.ts` (44 lines - Rubic integration routing)
+- **Bridges**: `src/features/bridges/bridges.ts` (114 lines - Bridge class, BridgeContext, multiton pattern) ✅ **PRODUCTION**
+- **Bridge Utils**: `src/features/bridges/bridgeUtils.ts` (utility functions) ✅ **PRODUCTION**
+- **Manage Native Bridge**: `src/libs/network/manageNativeBridge.ts` (60 lines - operation compilation scaffold) 🚧 **IN DEVELOPMENT** - parseEVMOperation and parseSOLANAOperation not implemented
+- **Manage Bridges**: `src/libs/network/manageBridge.ts` (44 lines - Rubic integration routing) ✅ **PRODUCTION**
 
 ### Rubic Integration Files
 - **Rubic Service**: `src/features/bridges/rubic.ts` (200+ lines - Rubic API v2 integration)

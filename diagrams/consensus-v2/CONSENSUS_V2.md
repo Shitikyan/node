@@ -958,6 +958,8 @@ stateDiagram-v2
 - **CVSA**: `src/libs/consensus/v2/routines/getCommonValidatorSeed.ts` (133 lines)
 - **Shard Selection**: `src/libs/consensus/v2/routines/getShard.ts` (58 lines - deterministic member selection)
 - **Block Creation**: `src/libs/consensus/v2/routines/createBlock.ts` (74 lines)
+- **Block Hash Management**: `src/libs/consensus/v2/routines/manageProposeBlockHash.ts` (block hash proposal coordination)
+- **Candidate Block Formation**: `src/libs/consensus/v2/routines/ensureCandidateBlockFormed.ts` (ensures block formation completion)
 - **Mempool Merge**: `src/libs/consensus/v2/routines/mergeMempools.ts` (35 lines)
 - **Transaction Ordering**: `src/libs/consensus/v2/routines/orderTransactions.ts` (28 lines)
 - **Block Voting**: `src/libs/consensus/v2/routines/broadcastBlockHash.ts` (130 lines)

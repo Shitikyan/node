@@ -218,7 +218,7 @@ graph TB
     subgraph "Mempool v2 Structure"
         MEMPOOL[Mempool Singleton]
         MEMPOOL --> REPO[Repository: MempoolTx]
-        MEMPOOL --> DB[Database Table: mempool_v2]
+        MEMPOOL --> DB[Database Table: mempooltx]
 
         DB --> FIELDS[Table Fields]
         FIELDS --> HASH[hash: unique varchar]
@@ -415,7 +415,7 @@ sequenceDiagram
     Mempool->>Mempool: Check if already exists
     Mempool->>Mempool: Determine blockNumber
     Note right of Mempool: If inConsensusLoop:<br/>blockNumber = lastBlockRef + 1<br/>Else:<br/>blockNumber = lastBlockNumber + 1
-    Mempool->>Mempool: Save to mempool_v2 table
+    Mempool->>Mempool: Save to mempooltx table
     Mempool->>Node: Return confirmationBlock
     Node->>User: Transaction will be in block N
 
@@ -690,7 +690,7 @@ erDiagram
         integer additionalFee
     }
 
-    MEMPOOL_V2 {
+    MEMPOOLTX {
         varchar hash PK
         integer blockNumber
         bigint timestamp
@@ -718,14 +718,14 @@ erDiagram
     }
 
     TRANSACTIONS ||--o{ BLOCKS : "included_in"
-    MEMPOOL_V2 ||--o{ BLOCKS : "waiting_for"
+    MEMPOOLTX ||--o{ BLOCKS : "waiting_for"
     TRANSACTIONS ||--o| GCR_MAIN : "modifies_state"
-    MEMPOOL_V2 ||--o| GCR_MAIN : "will_modify"
+    MEMPOOLTX ||--o| GCR_MAIN : "will_modify"
 ```
 
 **Database Indexes:**
 - **TRANSACTIONS table indexes:** idx_transactions_hash, idx_transactions_blockNumber, idx_transactions_from_ed25519_address, idx_transactions_to
-- **MEMPOOL_V2 table indexes:** idx_mempool_hash, idx_mempool_blockNumber, idx_mempool_timestamp
+- **MEMPOOLTX table indexes:** idx_mempooltx_hash, idx_mempooltx_blockNumber, idx_mempooltx_timestamp
 
 ```
 
@@ -903,7 +903,7 @@ stateDiagram-v2
 
 ### Mempool Management Files
 - **Mempool v2**: `src/libs/blockchain/mempool_v2.ts` (209 lines - mempool operations)
-- **Mempool Entity**: `src/model/entities/Mempool.ts` (database schema for mempool_v2)
+- **Mempool Entity**: `src/model/entities/Mempool.ts` (database schema for mempooltx table)
 
 ### Related Files
 - **GCR Handler**: `src/libs/blockchain/gcr/handleGCR.ts` (GCREdit processing)

@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZK Identity System - Architecture Diagrams</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #34495e;
+            margin-top: 40px;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+        }
+        .diagram-container {
+            background: white;
+            padding: 30px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+        .description {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        .mermaid {
+            display: flex;
+            justify-content: center;
+        }
+        .toc {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .toc li {
+            margin: 10px 0;
+        }
+        .toc a {
+            color: #3498db;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        .toc a:hover {
+            text-decoration: underline;
+        }
+        .note {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔐 ZK Identity System - Architecture Diagrams</h1>
+
+    <div class="toc">
+        <h3>Table of Contents</h3>
+        <ul>
+            <li><a href="#diagram1">1. Overall System Architecture</a></li>
+            <li><a href="#diagram2">2. Commitment Creation Flow</a></li>
+            <li><a href="#diagram3">3. Proof Generation & Verification Flow</a></li>
+            <li><a href="#diagram4">4. Component Architecture</a></li>
+            <li><a href="#diagram5">5. Data Model Relationships</a></li>
+            <li><a href="#diagram6">6. Cryptographic Primitives Flow</a></li>
+        </ul>
+    </div>
+
+    <div class="note">
+        <strong>Note:</strong> These diagrams are interactive. You can pan and zoom. If a diagram doesn't render properly, try refreshing the page.
+    </div>
+
+    <!-- Diagram 1: Overall System Architecture -->
+    <div id="diagram1" class="diagram-container">
+        <h2>1. Overall System Architecture</h2>
+        <div class="description">
+            <strong>Description:</strong> This diagram shows the complete ZK Identity system architecture, including client-side components, server-side handlers, database layer, and cryptographic components. It illustrates how users interact with the system to create commitments and generate anonymous attestations.
+        </div>
+        <div class="mermaid">
+graph TB
+    subgraph "Client Side"
+        User[User with Provider ID + Secret]
+        ClientCircuit[Circom Circuit Execution]
+        ProofGen[ZK Proof Generator]
+        User -->|provider_id, secret| ClientCircuit
+    end
+
+    subgraph "Node/Server Side"
+        API[API Endpoints]
+        TxExecutor[Transaction Executor]
+        GCRRoutines[GCR Identity Routines]
+        ProofVerifier[Proof Verifier]
+        MerkleManager[Merkle Tree Manager]
+        BlockCommit[Block Commit Handler]
+    end
+
+    subgraph "Database Layer"
+        CommitmentDB[(Identity Commitments)]
+        NullifierDB[(Used Nullifiers)]
+        MerkleStateDB[(Merkle Tree State)]
+        AccountDB[(Account Points)]
+    end
+
+    subgraph "Cryptographic Components"
+        PoseidonHash[Poseidon Hash]
+        Groth16Verify[Groth16 Verifier]
+        MerkleProof[Merkle Proof Generator]
+    end
+
+    ClientCircuit -->|commitment| ProofGen
+    ProofGen -->|proof + public signals| API
+    API -->|execute transaction| TxExecutor
+    TxExecutor -->|zk_commitment_add| GCRRoutines
+    TxExecutor -->|zk_attestation_add| GCRRoutines
+
+    GCRRoutines -->|store commitment| CommitmentDB
+    GCRRoutines -->|verify proof| ProofVerifier
+
+    ProofVerifier -->|check pairing| Groth16Verify
+    ProofVerifier -->|check used| NullifierDB
+    ProofVerifier -->|check root| MerkleStateDB
+
+    BlockCommit -->|after block| MerkleManager
+    MerkleManager -->|add commitments| CommitmentDB
+    MerkleManager -->|update tree| MerkleStateDB
+    MerkleManager -->|use| PoseidonHash
+
+    MerkleManager -->|generate proof| MerkleProof
+    API -->|GET /zk/merkle/proof| MerkleManager
+    API -->|GET /zk/merkle-root| MerkleManager
+
+    ProofVerifier -->|award points| AccountDB
+        </div>
+    </div>
+
+    <!-- Diagram 2: Commitment Creation Flow -->
+    <div id="diagram2" class="diagram-container">
+        <h2>2. Commitment Creation Flow</h2>
+        <div class="description">
+            <strong>Description:</strong> This sequence diagram shows the step-by-step process of creating a commitment. Users compute their commitment hash client-side (keeping secrets private) and submit it to the server. After a block commits, the Merkle tree is automatically updated with pending commitments.
+        </div>
+        <div class="mermaid">
+sequenceDiagram
+    participant User
+    participant Client
+    participant API
+    participant GCRRoutines
+    participant DB
+    participant BlockCommit
+    participant MerkleTree
+
+    User->>Client: Provide provider_id + secret
+    Client->>Client: commitment = Poseidon(provider_id, secret)
+    Client->>API: POST /execute (identity, zk_commitment_add)
+    API->>GCRRoutines: applyZkCommitmentAdd()
+    GCRRoutines->>DB: INSERT IdentityCommitment<br/>(leafIndex = -1)
+    DB-->>GCRRoutines: Success
+    GCRRoutines-->>API: Transaction receipt
+    API-->>Client: Commitment stored
+
+    Note over BlockCommit: After block is committed
+    BlockCommit->>MerkleTree: updateMerkleTreeAfterBlock()
+    MerkleTree->>DB: SELECT commitments WHERE leafIndex = -1
+    DB-->>MerkleTree: Pending commitments
+    MerkleTree->>MerkleTree: Add each commitment to tree
+    MerkleTree->>DB: UPDATE leafIndex for each
+    MerkleTree->>DB: SAVE tree snapshot + root hash
+    DB-->>MerkleTree: Saved
+    MerkleTree-->>BlockCommit: Tree updated
+        </div>
+    </div>
+
+    <!-- Diagram 3: Proof Generation and Verification Flow -->
+    <div id="diagram3" class="diagram-container">
+        <h2>3. Proof Generation & Verification Flow</h2>
+        <div class="description">
+            <strong>Description:</strong> This comprehensive sequence diagram shows how users generate ZK proofs and how the server verifies them through a 3-step pipeline: cryptographic verification, nullifier uniqueness check, and Merkle root currency validation.
+        </div>
+        <div class="mermaid">
+sequenceDiagram
+    participant User
+    participant Client
+    participant API
+    participant ProofVerifier
+    participant Groth16
+    participant NullifierDB
+    participant MerkleDB
+    participant AccountDB
+
+    User->>Client: Request attestation for context
+    Client->>API: GET /zk/merkle-root
+    API-->>Client: {rootHash, blockNumber}
+
+    Client->>API: GET /zk/merkle/proof/{commitment}
+    API-->>Client: {siblings, pathIndices, leafIndex}
+
+    Client->>Client: Generate ZK proof using circuit:<br/>- provider_id (private)<br/>- secret (private)<br/>- pathElements (private)<br/>- pathIndices (private)<br/>- context (public)<br/>- merkle_root (public)
+
+    Client->>Client: Circuit outputs:<br/>- nullifier<br/>- verified commitment in tree
+
+    Client->>API: POST /execute (identity, zk_attestation_add)<br/>{proof, publicSignals}
+
+    API->>ProofVerifier: verifyIdentityAttestation()
+
+    Note over ProofVerifier: Step 1: Cryptographic Verification
+    ProofVerifier->>Groth16: groth16VerifyBun(vkey, publicSignals, proof)
+    Groth16->>Groth16: Check pairing equation:<br/>e(pi_a, pi_b) = e(vk_alpha, vk_beta) * ...
+    Groth16-->>ProofVerifier: Valid/Invalid
+
+    alt Proof Invalid
+        ProofVerifier-->>API: {valid: false, reason: "cryptographic"}
+        API-->>Client: Verification failed
+    end
+
+    Note over ProofVerifier: Step 2: Nullifier Check
+    ProofVerifier->>NullifierDB: SELECT * WHERE nullifier_hash = ?
+    NullifierDB-->>ProofVerifier: Result
+
+    alt Nullifier Already Used
+        ProofVerifier-->>API: {valid: false, reason: "double-attestation"}
+        API-->>Client: Already attested
+    end
+
+    Note over ProofVerifier: Step 3: Merkle Root Check
+    ProofVerifier->>MerkleDB: Get current root hash
+    MerkleDB-->>ProofVerifier: Current root
+
+    alt Root Mismatch
+        ProofVerifier-->>API: {valid: false, reason: "stale proof"}
+        API-->>Client: Proof outdated
+    end
+
+    Note over ProofVerifier: All checks passed
+    ProofVerifier->>NullifierDB: INSERT used_nullifier
+    ProofVerifier->>AccountDB: Award ZK_ATTESTATION_POINTS
+    ProofVerifier-->>API: {valid: true}
+    API-->>Client: Attestation successful!
+        </div>
+    </div>
+
+    <!-- Diagram 4: Component Architecture -->
+    <div id="diagram4" class="diagram-container">
+        <h2>4. Component Architecture</h2>
+        <div class="description">
+            <strong>Description:</strong> This diagram shows the modular architecture of the ZK Identity system, including Circom circuits, proof verification system, tree management, verification pipeline, and API layer.
+        </div>
+        <div class="mermaid">
+graph TB
+    subgraph "Circom Circuits"
+        BasicCircuit[identity.circom<br/>Phase 3: Basic Proof]
+        MerkleCircuit[identity_with_merkle.circom<br/>Phase 5: Tree Membership]
+
+        BasicCircuit -->|outputs| Commitment1[commitment]
+        BasicCircuit -->|outputs| Nullifier1[nullifier]
+
+        MerkleCircuit -->|outputs| Commitment2[commitment]
+        MerkleCircuit -->|outputs| Nullifier2[nullifier]
+        MerkleCircuit -->|verifies| MerkleRoot[merkle_root match]
+    end
+
+    subgraph "Proof System"
+        VKey[Verification Key<br/>verification_key_merkle.json]
+        Verifier[BunSnarkjsWrapper<br/>Groth16 Verifier]
+
+        VKey -->|loaded by| Verifier
+    end
+
+    subgraph "Tree Management"
+        TreeManager[MerkleTreeManager<br/>20-level Poseidon tree]
+        TreeUpdate[updateMerkleTreeAfterBlock<br/>Batch insertion]
+
+        TreeUpdate -->|uses| TreeManager
+        TreeManager -->|generates| ProofPath[Merkle Proofs]
+    end
+
+    subgraph "Verification Pipeline"
+        Pipeline[ProofVerifier]
+        Step1[1. Cryptographic Check]
+        Step2[2. Nullifier Uniqueness]
+        Step3[3. Root Currency]
+
+        Pipeline -->|runs| Step1
+        Step1 -->|if valid| Step2
+        Step2 -->|if unique| Step3
+        Step3 -->|if current| Success[Award Points]
+    end
+
+    subgraph "API Layer"
+        Execute[POST /execute]
+        GetRoot[GET /zk/merkle-root]
+        GetProof[GET /zk/merkle/proof/:hash]
+        CheckNullifier[GET /zk/nullifier/:hash]
+
+        Execute -->|routes to| Pipeline
+        GetRoot -->|queries| TreeManager
+        GetProof -->|queries| TreeManager
+    end
+
+    MerkleCircuit -.->|proof verified by| Verifier
+    TreeManager -.->|provides data for| MerkleCircuit
+        </div>
+    </div>
+
+    <!-- Diagram 5: Data Model Relationships -->
+    <div id="diagram5" class="diagram-container">
+        <h2>5. Data Model Relationships</h2>
+        <div class="description">
+            <strong>Description:</strong> This entity-relationship diagram shows the database schema and how different tables relate to each other. It illustrates the flow from commitments to the Merkle tree, to proofs and nullifiers, and finally to account points.
+        </div>
+        <div class="mermaid">
+erDiagram
+    IDENTITY_COMMITMENTS {
+        string commitment_hash PK
+        int leaf_index "default -1"
+        string provider
+        int block_number
+        string transaction_hash
+        bigint timestamp
+    }
+
+    MERKLE_TREE_STATE {
+        string tree_id PK
+        string root_hash
+        int block_number
+        int leaf_count
+        jsonb tree_snapshot
+    }
+
+    USED_NULLIFIERS {
+        string nullifier_hash PK
+        int block_number
+        string transaction_hash
+        bigint timestamp
+    }
+
+    ACCOUNTS {
+        string address PK
+        jsonb points
+    }
+
+    ZK_PROOFS {
+        string proof_id PK
+        string nullifier_hash FK
+        string merkle_root
+        jsonb proof_data
+        jsonb public_signals
+    }
+
+    IDENTITY_COMMITMENTS ||--o{ MERKLE_TREE_STATE : "inserted_into"
+    USED_NULLIFIERS ||--|| ZK_PROOFS : "marks"
+    ZK_PROOFS }o--|| MERKLE_TREE_STATE : "references_root"
+    USED_NULLIFIERS }o--|| ACCOUNTS : "awards_points_to"
+        </div>
+    </div>
+
+    <!-- Diagram 6: Cryptographic Primitives Flow -->
+    <div id="diagram6" class="diagram-container">
+        <h2>6. Cryptographic Primitives Flow</h2>
+        <div class="description">
+            <strong>Description:</strong> This diagram illustrates how cryptographic primitives (Poseidon hash, Groth16 circuit) transform user inputs (Provider ID, Secret, Context) into outputs (Commitment, Nullifier, Tree Nodes). It shows the data flow through the ZK circuit and the verification constraints.
+        </div>
+        <div class="mermaid">
+graph LR
+    subgraph "Inputs"
+        ProviderID[Provider ID<br/>e.g., GitHub username]
+        Secret[Secret<br/>User's private key]
+        Context[Context<br/>e.g., vote_123]
+    end
+
+    subgraph "Poseidon Hashing"
+        Hash1[Poseidon Hash]
+        Hash2[Poseidon Hash]
+        Hash3[Poseidon Hash - Tree]
+    end
+
+    subgraph "Outputs"
+        Commitment[Commitment<br/>Public, in tree]
+        Nullifier[Nullifier<br/>Unique per context]
+        TreeNode[Tree Nodes<br/>Internal hashes]
+    end
+
+    ProviderID -->|input| Hash1
+    Secret -->|input| Hash1
+    Hash1 -->|output| Commitment
+
+    ProviderID -->|input| Hash2
+    Secret -->|input| Hash2
+    Context -->|input| Hash2
+    Hash2 -->|output| Nullifier
+
+    Commitment -->|leaf| Hash3
+    Hash3 -->|parent| Hash3
+    Hash3 -->|output| TreeNode
+
+    subgraph "Groth16 Circuit"
+        CircuitInput[Private: provider_id, secret, path<br/>Public: context, merkle_root]
+        CircuitLogic[Verify:<br/>1. commitment = H provider_id, secret<br/>2. nullifier = H provider_id, secret, context<br/>3. merkleProof valid<br/>4. merkleProof.root == merkle_root]
+        CircuitOutput[Outputs:<br/>nullifier, merkle_root]
+
+        CircuitInput --> CircuitLogic
+        CircuitLogic --> CircuitOutput
+    end
+
+    Commitment -.->|proves knowledge of| CircuitInput
+    Nullifier -.->|computed by| CircuitLogic
+        </div>
+    </div>
+
+    <div style="margin-top: 50px; padding: 20px; background: white; border-radius: 8px; text-align: center;">
+        <p><strong>Documentation Files:</strong></p>
+        <ul style="list-style: none; padding: 0;">
+            <li>📄 <code>ZK_IDENTITY_ARCHITECTURE.md</code> - Detailed architecture documentation</li>
+            <li>📄 <code>ZK_IDENTITY_STEP_BY_STEP.md</code> - Implementation guide</li>
+            <li>🌐 <code>zk_identity_diagrams.html</code> - This file (diagram viewer)</li>
+        </ul>
+        <p style="margin-top: 20px; color: #7f8c8d;">
+            Generated from <strong>zk_ids</strong> branch analysis | 2025-11-10
+        </p>
+    </div>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#3498db',
+                primaryTextColor: '#2c3e50',
+                primaryBorderColor: '#2980b9',
+                lineColor: '#34495e',
+                secondaryColor: '#95a5a6',
+                tertiaryColor: '#ecf0f1'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                diagramMarginX: 50,
+                diagramMarginY: 10,
+                actorMargin: 50,
+                width: 150,
+                height: 65,
+                boxMargin: 10,
+                useMaxWidth: true
+            }
+        });
+    </script>
+</body>
+</html>
